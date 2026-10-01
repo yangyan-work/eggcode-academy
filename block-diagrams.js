@@ -61,7 +61,12 @@ window.EGG_BLOCKS = (() => {
   function splitArguments(s){let depth=0,out=[],start=0;for(let i=0;i<s.length;i++){if('〔[（('.includes(s[i]))depth++;if('〕]）)'.includes(s[i]))depth--;if((s[i]==='，'||s[i]===',')&&depth===0){out.push(s.slice(start,i));start=i+1;}}out.push(s.slice(start));return out;}
   function expression(raw){
     let s=raw.trim().replace(/〔(?:事件|动作|条件)〕$/,'');
-    if(/^\(.+\)$/.test(s))s=s.slice(1,-1).trim();
+    // 只剥掉包围整个表达式的括号，不能破坏 (a+b)×(c+d) 的分组。
+    while(s.startsWith('(')&&s.endsWith(')')){
+      let depth=0,encloses=true;
+      for(let i=0;i<s.length-1;i++){if(s[i]==='(')depth++;else if(s[i]===')')depth--;if(depth===0){encloses=false;break;}}
+      if(!encloses)break;s=s.slice(1,-1).trim();
+    }
     if(/^(true|false|真|假)$/i.test(s))return literal(s==='true'?'真':s==='false'?'假':s);
     if(/^-?\d+(\.\d+)?(秒|次)?$/.test(s))return literal(s);
     if(/^[“"].*[”"]$/.test(s))return literal(s.replace(/^[“"]|[”"]$/g,''));

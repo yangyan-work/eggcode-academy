@@ -25,7 +25,7 @@ if (page === "courses" || page === "practice") {
     <div class="course-visual"><span class="course-number">${page === "practice" ? "P" : "LESSON "}${String(index + 1).padStart(2, "0")}</span><strong>${escapeHTML(page === "courses" ? topics[index] : item.motif)}</strong><img src="assets/eggy-${mascots[index % 3]}.png" width="120" height="130" alt="" loading="lazy"></div>
     <div class="course-info"><span class="course-category">${escapeHTML(page === "practice" ? item.category : item.category.split(" / ")[1])}</span><h2>${escapeHTML(item.title)}</h2><p>${escapeHTML(page === "courses" ? courseSummaries[index] : item.summary)}</p><div class="card-bottom"><span>${page === "courses" ? "入门课程 · 含动手练习" : buildGuides[index + baseLessonCount].sections.length + " 个搭建步骤 · 参数与连接图"}</span><span class="round-arrow" aria-hidden="true">↗</span></div></div></a>`;
   document.getElementById(page === "courses" ? "courses-grid" : "practice-grid").innerHTML = page === "courses" ? items.map(renderCard).join("") : [
-    ["progression", "数值图", "数值图 · 从训练成长到打怪养成", "12 篇连续课程 / 01—08 训练基础 · 09—12 单人战斗"],
+    ["progression", "数值图", "数值图 · 从训练成长到打怪养成", "18 篇连续课程 / 训练成长 · 单人战斗 · 大数转换与运算"],
     ["match3", "消消乐", "消消乐 · 从棋盘到完整关卡", "6 篇连续课程 / 建议按顺序学习"],
     ["gameplay", "玩法拓展", "把逻辑变成可玩的挑战", "4 个独立玩法 / 在场景中组合验证"],
     ["basics", "积木练习", "先练好每一块积木", "6 个基础案例 / 从提示到机关"]
@@ -41,6 +41,7 @@ function renderBuildGuide(guide, index) {
     '<h3>先准备好这些</h3><ul>' + guide.setup.map(item=>'<li>'+escapeHTML(item)+'</li>').join('') + '</ul>' +
     '<details class="recipe-notation"><summary>第一次照图搭建？先看符号与操作说明</summary><ol>' + window.EGG_GUIDE_NOTATION.map(item=>'<li>'+escapeHTML(item)+'</li>').join('') + '</ol></details>' +
     (guide.variables.length ? '<h3 id="variables">变量清单</h3><p>列表类型与普通变量类型分开选择，名称保持一致。</p><div class="table-wrap"><table><thead><tr><th scope="col">名称</th><th scope="col">类型</th><th scope="col">初值 / 用途</th></tr></thead><tbody>' + guide.variables.map(row=>'<tr>'+row.map(cell=>'<td>'+escapeHTML(cell)+'</td>').join('')+'</tr>').join('') + '</tbody></table></div>' : '<p class="recipe-check">本课不需要创建变量。</p>') +
+    (guide.samples?.length ? '<h3>跟着数值算一遍</h3><div class="table-wrap"><table><thead><tr>'+guide.samples[0].map(cell=>'<th scope="col">'+escapeHTML(cell)+'</th>').join('')+'</tr></thead><tbody>'+guide.samples.slice(1).map(row=>'<tr>'+row.map(cell=>'<td>'+escapeHTML(cell)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>' : '') +
     '<h3>本课积木 · 点开核对参数</h3><div class="block-references">' + refs + '</div>' +
     '<nav class="recipe-nav" aria-label="本课搭建步骤"><strong>搭建步骤</strong><ol>' + guide.sections.map((section,i)=>'<li><a href="#step-'+(i+1)+'">'+escapeHTML(section.title)+'</a></li>').join('') + '</ol><a href="#acceptance">试玩验收</a></nav>' +
     guide.sections.map((section,i)=>'<section class="recipe-step" id="step-'+(i+1)+'"><p class="recipe-number">STEP '+String(i+1).padStart(2,'0')+'</p><h3>'+escapeHTML(section.title)+'</h3><ol>'+section.steps.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ol>'+code(section)+'<p class="recipe-check"><strong>这一步检查：</strong>'+escapeHTML(section.verify)+'</p></section>').join('') +
