@@ -122,7 +122,6 @@ window.EGG_BLOCKS = (() => {
     const picture=svg(roots,label);
     return `<figure class="block-figure"><div class="diagram-toolbar"><span>${esc(label)}</span><div><button type="button" data-diagram="zoom-out" aria-label="缩小积木图">−</button><button type="button" data-diagram="zoom-in" aria-label="放大积木图">＋</button><button type="button" data-diagram="expand">查看大图</button><button type="button" data-diagram="download">下载图片</button></div></div><div class="diagram-viewport" tabindex="0" aria-label="可横向滚动的彩色积木图">${picture}</div><figcaption>教学拼接示意 · ${esc(caption)}</figcaption></figure>`;
   }
-  function reference(images){return images?.length?`<section class="block-photo-section"><h3>对照编辑器实图</h3><div class="block-photo-grid">${images.map(img=>`<figure><a href="${esc(img.src)}" target="_blank" rel="noopener"><img src="${esc(img.src)}" alt="${esc(img.alt)}" loading="lazy"></a><figcaption>${esc(img.caption)} <a href="${esc(img.source)}" target="_blank" rel="noopener">官方来源</a></figcaption></figure>`).join('')}</div></section>`:'';}
   function forEntry(entry,ex){
     const exact=(window.EGG_DIAGRAM_DATA?.examples||[]).find(d=>d.exactIds.includes(entry.id));
     if(exact)return exact;
@@ -156,5 +155,5 @@ window.EGG_BLOCKS = (() => {
     return{caption:'按本条参数练习搭建；场景对象和前提见下方步骤。',roots};
   }
   function legend(){return '<div class="diagram-legend" aria-label="积木分类颜色">'+[['event','事件'],['action','动作'],['control','控制'],['condition','条件'],['value','取值'],['variable','变量'],['custom','自定义']].map(([k,t])=>'<span data-block-kind="'+k+'" style="--swatch:'+colors[k]+'">'+t+'</span>').join('')+'</div>';}
-  return{svg,figure,fromTree,forEntry,literal,value,variable,condition,reference,legend};
+  return{svg,figure,fromTree,forEntry,literal,value,variable,condition,legend};
 })();
