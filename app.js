@@ -32,7 +32,11 @@ if (page === "courses" || page === "practice") {
 }
 
 function renderBuildGuide(guide, index) {
-  const code = section => window.EGG_BLOCKS.figure(window.EGG_BLOCKS.fromTree(section.tree,{definition:/自定义动作|封装成自定义/.test(section.title)}),'彩色积木搭建图') + '<details class="diagram-text"><summary>查看文字连接顺序</summary><div class="lesson-code-wrap"><pre><code>' + escapeHTML(section.tree) + '</code></pre><button class="copy-code" type="button">复制连接文字</button></div></details>';
+  const code = section => {
+    const photo = section.editorPhoto;
+    const picture = photo ? `<figure class="block-figure editor-photo"><div class="diagram-toolbar"><span>原点版编辑器 · 实际搭建截图</span><div><a href="${escapeHTML(photo.src)}" target="_blank" rel="noopener noreferrer">查看完整原图 ↗</a><a href="${escapeHTML(photo.src)}" download>下载截图</a></div></div><a class="editor-photo-preview" href="${escapeHTML(photo.src)}" target="_blank" rel="noopener noreferrer" aria-label="打开完整编辑器截图"><img src="${escapeHTML(photo.src)}" alt="${escapeHTML(photo.alt)}" width="${photo.width}" height="${photo.height}" loading="lazy"></a><figcaption>${escapeHTML(photo.caption)}</figcaption></figure>` : window.EGG_BLOCKS.figure(window.EGG_BLOCKS.fromTree(section.tree,{definition:/自定义动作|封装成自定义/.test(section.title)}),'彩色积木搭建图');
+    return picture + '<details class="diagram-text"><summary>查看文字连接顺序</summary><div class="lesson-code-wrap"><pre><code>' + escapeHTML(section.tree) + '</code></pre><button class="copy-code" type="button">复制连接文字</button></div></details>';
+  };
   const related = index >= 12 && index <= 17 ? '<nav class="recipe-series" aria-label="消消乐六课"><span>这六课组成同一套作品</span>' + practices.slice(6,12).map((item, offset) => '<a href="lesson.html?id=' + (offset+12) + '"' + (index===offset+12?' aria-current="page"':'') + '>' + escapeHTML(item.title.split(' · ')[0]) + '</a>').join('') + '</nav>' : '';
   const refs = guide.refs.map(id => manual.entries.find(entry => entry.id === id)).filter(Boolean).map(entry => '<a class="block-reference" href="block.html?id=' + encodeURIComponent(entry.id) + '&lesson=' + index + '">' + escapeHTML(entry.title) + ' <small>' + escapeHTML(entry.group) + '</small></a>').join('');
   return '<div class="build-guide">' + related + window.EGG_BLOCKS.legend() +
@@ -43,7 +47,7 @@ function renderBuildGuide(guide, index) {
     '<nav class="recipe-nav" aria-label="本课搭建步骤"><strong>搭建步骤</strong><ol>' + guide.sections.map((section,i)=>'<li><a href="#step-'+(i+1)+'">'+escapeHTML(section.title)+'</a></li>').join('') + '</ol><a href="#acceptance">试玩验收</a></nav>' +
     guide.sections.map((section,i)=>'<section class="recipe-step" id="step-'+(i+1)+'"><p class="recipe-number">STEP '+String(i+1).padStart(2,'0')+'</p><h3>'+escapeHTML(section.title)+'</h3><ol>'+section.steps.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ol>'+code(section)+'<p class="recipe-check"><strong>这一步检查：</strong>'+escapeHTML(section.verify)+'</p></section>').join('') +
     '<section id="acceptance" class="recipe-step"><h3>搭完后逐项试玩</h3><ol>'+guide.tests.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ol></section>' +
-    lessonPhotos(index) + '<p class="lesson-source">教程解读 · 对照2026-09-03原点版移动端手册编写。连接图需在蛋码画布逐块搭建，不能直接粘贴执行。积木链接为手册原文；案例尚未在编辑器内实机验证。自定义动作含异步积木时的执行顺序未在手册中明确，本教程核心动作不放等待或计时器；涉及调用后读取结果的地方，应先按步骤验收，也可把动作定义中的整串积木直接展开到调用处。</p></div>';
+    lessonPhotos(index) + '<p class="lesson-source">教程解读 · 对照2026-09-03原点版移动端手册编写。连接图需在蛋码画布逐块搭建，不能直接粘贴执行。标注“实际搭建截图”的图片来自本站在编辑器中搭建的对应步骤；其他彩色图为教学示意。实拍证明画布接法，完整玩法仍需按本课清单逐项试玩验收。自定义动作含异步积木时的执行顺序未在手册中明确，本教程核心动作不放等待或计时器；涉及调用后读取结果的地方，应先按步骤验收，也可把动作定义中的整串积木直接展开到调用处。</p></div>';
 }
 
 function renderPractice(tutorial, index) {
