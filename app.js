@@ -25,6 +25,7 @@ if (page === "courses" || page === "practice") {
     <div class="course-visual"><span class="course-number">${page === "practice" ? "P" : "LESSON "}${String(index + 1).padStart(2, "0")}</span><strong>${escapeHTML(page === "courses" ? topics[index] : item.motif)}</strong><img src="assets/eggy-${mascots[index % 3]}.png" width="120" height="130" alt="" loading="lazy"></div>
     <div class="course-info"><span class="course-category">${escapeHTML(page === "practice" ? item.category : item.category.split(" / ")[1])}</span><h2>${escapeHTML(item.title)}</h2><p>${escapeHTML(page === "courses" ? courseSummaries[index] : item.summary)}</p><div class="card-bottom"><span>${page === "courses" ? "入门课程 · 含动手练习" : buildGuides[index + baseLessonCount].sections.length + " 个搭建步骤 · 参数与连接图"}</span><span class="round-arrow" aria-hidden="true">↗</span></div></div></a>`;
   document.getElementById(page === "courses" ? "courses-grid" : "practice-grid").innerHTML = page === "courses" ? items.map(renderCard).join("") : [
+    ["progression", "数值图", "数值图 · 从训练成长到打怪养成", "12 篇连续课程 / 01—08 训练基础 · 09—12 单人战斗"],
     ["match3", "消消乐", "消消乐 · 从棋盘到完整关卡", "6 篇连续课程 / 建议按顺序学习"],
     ["gameplay", "玩法拓展", "把逻辑变成可玩的挑战", "4 个独立玩法 / 在场景中组合验证"],
     ["basics", "积木练习", "先练好每一块积木", "6 个基础案例 / 从提示到机关"]
@@ -33,7 +34,8 @@ if (page === "courses" || page === "practice") {
 
 function renderBuildGuide(guide, index) {
   const code = section => window.EGG_BLOCKS.figure(window.EGG_BLOCKS.fromTree(section.tree,{definition:/自定义动作|封装成自定义/.test(section.title)}),'彩色积木搭建图') + '<details class="diagram-text"><summary>查看文字连接顺序</summary><div class="lesson-code-wrap"><pre><code>' + escapeHTML(section.tree) + '</code></pre><button class="copy-code" type="button">复制连接文字</button></div></details>';
-  const related = index >= 12 && index <= 17 ? '<nav class="recipe-series" aria-label="消消乐六课"><span>这六课组成同一套作品</span>' + practices.slice(6,12).map((item, offset) => '<a href="lesson.html?id=' + (offset+12) + '"' + (index===offset+12?' aria-current="page"':'') + '>' + escapeHTML(item.title.split(' · ')[0]) + '</a>').join('') + '</nav>' : '';
+  const series = practices[index-baseLessonCount]?.series;
+  const related = ["消消乐","数值图"].includes(series) ? '<nav class="recipe-series" aria-label="'+escapeHTML(series)+'系列课程"><span>按顺序搭建这组课程</span>' + practices.map((item,offset)=>item.series===series?'<a href="lesson.html?id='+(offset+baseLessonCount)+'"'+(index===offset+baseLessonCount?' aria-current="page"':'')+'>'+escapeHTML(item.title.split(' · ')[0])+'</a>':'').join('')+'</nav>' : '';
   const refs = guide.refs.map(id => manual.entries.find(entry => entry.id === id)).filter(Boolean).map(entry => '<a class="block-reference" href="block.html?id=' + encodeURIComponent(entry.id) + '&lesson=' + index + '">' + escapeHTML(entry.title) + ' <small>' + escapeHTML(entry.group) + '</small></a>').join('');
   return '<div class="build-guide">' + related + window.EGG_BLOCKS.legend() +
     '<h3>先准备好这些</h3><ul>' + guide.setup.map(item=>'<li>'+escapeHTML(item)+'</li>').join('') + '</ul>' +
@@ -43,6 +45,7 @@ function renderBuildGuide(guide, index) {
     '<nav class="recipe-nav" aria-label="本课搭建步骤"><strong>搭建步骤</strong><ol>' + guide.sections.map((section,i)=>'<li><a href="#step-'+(i+1)+'">'+escapeHTML(section.title)+'</a></li>').join('') + '</ol><a href="#acceptance">试玩验收</a></nav>' +
     guide.sections.map((section,i)=>'<section class="recipe-step" id="step-'+(i+1)+'"><p class="recipe-number">STEP '+String(i+1).padStart(2,'0')+'</p><h3>'+escapeHTML(section.title)+'</h3><ol>'+section.steps.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ol>'+code(section)+'<p class="recipe-check"><strong>这一步检查：</strong>'+escapeHTML(section.verify)+'</p></section>').join('') +
     '<section id="acceptance" class="recipe-step"><h3>搭完后逐项试玩</h3><ol>'+guide.tests.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ol></section>' +
+    (guide.pitfalls?.length ? '<section class="recipe-step"><h3>常见问题</h3><ul>'+guide.pitfalls.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ul></section>' : '') +
     '<p class="lesson-source">教程解读 · 对照2026-09-03原点版移动端手册编写。连接图需在蛋码画布逐块搭建，不能直接粘贴执行。彩色积木图为教学连接示意，完整玩法仍需按本课清单逐项试玩验收。自定义动作含异步积木时的执行顺序未在手册中明确，本教程核心动作不放等待或计时器；涉及调用后读取结果的地方，应先按步骤验收，也可把动作定义中的整串积木直接展开到调用处。</p></div>';
 }
 
