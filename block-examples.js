@@ -61,7 +61,7 @@ window.EGG_EXAMPLE_FOR = function(entry) {
   preconditions.forEach(s=>objectNotes.add('原文前提：'+s));
   const filled=description.replace(/\{#(\d+)\}/g,(_,n)=>'【'+(samples[Number(n)]||'在编辑器核对')+'】');
   const attachment={事件:'放在触发器顶部。事件发生后，才会执行它下面的动作。',动作:'连接在事件或控制积木的动作区，按执行顺序修改游戏状态。',条件:'放进“如果/否则”的条件槽，输出真或假；也可接到布尔值槽。',控制:'放在动作流程中，并把要重复、分支或定时执行的动作放入内部动作区。',取值:'嵌入其他积木的参数槽。它提供一个值，本身不单独执行动作。',基础:'先理解画布、事件与动作的连接，再进入编辑器动手。'}[entry.category];
-  let result={parameters:parameters.map(p=>({...p,summary:briefType(p),help:parameterHelp(p)})),description,purpose,attachment,warnings,explanation:(purpose||entry.title)+'。'+attachment,setup:[...objectNotes],steps:[],expected:'',pitfalls:[],tree:'',sampleTitle:'试一次：'+entry.title,mode:'参数练习'};
+  let result={diagramInputs:samples,parameters:parameters.map(p=>({...p,summary:briefType(p),help:parameterHelp(p)})),description,purpose,attachment,warnings,explanation:(purpose||entry.title)+'。'+attachment,setup:[...objectNotes],steps:[],expected:'',pitfalls:[],tree:'',sampleTitle:'试一次：'+entry.title,mode:'参数练习'};
   const config=parameters.map((p,i)=>'第'+(i+1)+'项（'+p.type+'）：'+samples[i]);
   if(entry.category==='事件'){
     result.steps=['新建一条触发器，把“'+entry.title+'”放在最上方。',...config,'在下方接“发送信息”，内容填“'+entry.title+'已触发”。','试玩时满足本条事件的行为：'+(filled||entry.title)+'；再尝试一个不满足条件的操作，对照调试窗口。'];
