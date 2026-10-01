@@ -32,11 +32,7 @@ if (page === "courses" || page === "practice") {
 }
 
 function renderBuildGuide(guide, index) {
-  const code = section => {
-    const photo = section.editorPhoto;
-    const picture = photo ? `<figure class="block-figure editor-photo"><div class="diagram-toolbar"><span>原点版编辑器 · 实际搭建截图</span><div><a href="${escapeHTML(photo.src)}" target="_blank" rel="noopener noreferrer">查看完整原图 ↗</a><a href="${escapeHTML(photo.src)}" download>下载截图</a></div></div><a class="editor-photo-preview" href="${escapeHTML(photo.src)}" target="_blank" rel="noopener noreferrer" aria-label="打开完整编辑器截图"><img src="${escapeHTML(photo.src)}" alt="${escapeHTML(photo.alt)}" width="${photo.width}" height="${photo.height}" loading="lazy"></a><figcaption>${escapeHTML(photo.caption)}</figcaption></figure>` : window.EGG_BLOCKS.figure(window.EGG_BLOCKS.fromTree(section.tree,{definition:/自定义动作|封装成自定义/.test(section.title)}),'彩色积木搭建图');
-    return picture + '<details class="diagram-text"><summary>查看文字连接顺序</summary><div class="lesson-code-wrap"><pre><code>' + escapeHTML(section.tree) + '</code></pre><button class="copy-code" type="button">复制连接文字</button></div></details>';
-  };
+  const code = section => window.EGG_BLOCKS.figure(window.EGG_BLOCKS.fromTree(section.tree,{definition:/自定义动作|封装成自定义/.test(section.title)}),'彩色积木搭建图') + '<details class="diagram-text"><summary>查看文字连接顺序</summary><div class="lesson-code-wrap"><pre><code>' + escapeHTML(section.tree) + '</code></pre><button class="copy-code" type="button">复制连接文字</button></div></details>';
   const related = index >= 12 && index <= 17 ? '<nav class="recipe-series" aria-label="消消乐六课"><span>这六课组成同一套作品</span>' + practices.slice(6,12).map((item, offset) => '<a href="lesson.html?id=' + (offset+12) + '"' + (index===offset+12?' aria-current="page"':'') + '>' + escapeHTML(item.title.split(' · ')[0]) + '</a>').join('') + '</nav>' : '';
   const refs = guide.refs.map(id => manual.entries.find(entry => entry.id === id)).filter(Boolean).map(entry => '<a class="block-reference" href="block.html?id=' + encodeURIComponent(entry.id) + '&lesson=' + index + '">' + escapeHTML(entry.title) + ' <small>' + escapeHTML(entry.group) + '</small></a>').join('');
   return '<div class="build-guide">' + related + window.EGG_BLOCKS.legend() +
@@ -232,5 +228,9 @@ document.addEventListener('click',async event=>{
 });
 
 function photoSet(ids){const p=window.EGG_DIAGRAM_DATA?.photos||[];return window.EGG_BLOCKS.reference(ids.map(id=>p.find(x=>x.id===id)).filter(Boolean));}
-function lessonPhotos(index){const ids=index===0||index===1||index===6?['event-action']:index===2||index===9?['variable-expression','variable-transfer']:index===3||index===7?['repeat','if-else']:index===8?['delay']:['custom-action-definition','custom-action-call'];return photoSet(ids);}
+function lessonPhotos(index){
+  const photos=buildGuides[index].sections.flatMap((section,i)=>section.editorPhoto?[{...section.editorPhoto,step:i+1}]:[]);
+  if(photos.length)return '<section class="block-photo-section" id="editor-photos"><h3>对照编辑器实图</h3>'+photos.map(photo=>`<figure class="block-figure editor-photo"><div class="diagram-toolbar"><span>第 ${photo.step} 步 · 实际搭建截图</span><div><a href="${escapeHTML(photo.src)}" target="_blank" rel="noopener noreferrer">查看完整原图 ↗</a><a href="${escapeHTML(photo.src)}" download>下载截图</a></div></div><a class="editor-photo-preview" href="${escapeHTML(photo.src)}" target="_blank" rel="noopener noreferrer" aria-label="打开完整编辑器截图"><img src="${escapeHTML(photo.src)}" alt="${escapeHTML(photo.alt)}" width="${photo.width}" height="${photo.height}" loading="lazy"></a><figcaption>${escapeHTML(photo.caption)}</figcaption></figure>`).join('')+'</section>';
+  const ids=index===0||index===1||index===6?['event-action']:index===2||index===9?['variable-expression','variable-transfer']:index===3||index===7?['repeat','if-else']:index===8?['delay']:['custom-action-definition','custom-action-call'];return photoSet(ids);
+}
 function blockPhotos(entry){return photoSet(entry.category==='事件'?['event-action']:entry.category==='控制'?(entry.title.includes('计时器')?['delay']:entry.title.includes('重复')?['repeat']:['if-else']):entry.category==='条件'?['if-else']:entry.category==='取值'?['custom-getter']:entry.title.includes('变量')?['variable-expression','variable-transfer']:['event-action']);}
