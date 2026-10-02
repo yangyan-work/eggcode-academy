@@ -94,7 +94,7 @@ async function checkLessonRoutes() {
     assert.equal(doc.querySelectorAll('#lesson-toc a').length, data.all.length, `route ${id} TOC count`);
     assert.equal(doc.querySelectorAll('#lesson-toc a[aria-current="page"]').length, 1);
     assert.equal(doc.querySelector('#lesson-toc a[aria-current="page"]').getAttribute('href'), `lesson.html?id=${id}`);
-    assert.equal(doc.querySelectorAll('#lesson-steps a').length, guide.sections.length + 2);
+    assert.equal(doc.querySelectorAll('#lesson-steps a').length, guide.sections.length + 3);
     assert.equal(doc.querySelector('#lesson-position').textContent, `${id + 1} / 145`);
     const sequence = series ? [...series.lessonIds] : [0, 1, 2, 3, 4, 5], position = sequence.indexOf(id);
     const previousURL = position === 0 ? parentURL : `lesson.html?id=${sequence[position - 1]}`;
@@ -114,7 +114,7 @@ async function checkLessonRoutes() {
       assert.equal(url.searchParams.get('lesson'), String(id));
       totals.refs++;
     }
-    assert.equal(doc.querySelector('#acceptance ol').children.length, guide.tests.length);
+    assert.equal(doc.querySelector('#acceptance > ol').children.length, guide.tests.length);
     assert.equal(doc.querySelectorAll('.concept-review').length, id < 6 ? 1 : 0);
     verifyDocument(dom, 'lesson.html');
     close(dom);

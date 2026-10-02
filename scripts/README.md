@@ -29,3 +29,14 @@ Coverage:
 - Home demo repeated play/reset and interrupted-animation recovery
 
 These checks do not prove pixel layout, browser image export/download, or execution inside the Eggcode editor. Those need separate real-browser/editor verification. Tutorial diagrams are teaching representations, not executable code.
+
+
+Detailed revision checks:
+
+```sh
+node scripts/build-details.cjs --check
+node scripts/check-details.cjs
+node scripts/check-renderer.cjs
+```
+
+The detailed-guide checker covers all 145 lesson mappings, structured scene/trigger/custom-action instructions and tests, and renders location/slot/wiring explanations for all 3,871 manual records. These structural checks complement independent content review; neither proves real editor execution. Renderer tests cover list-literal expansion, separate custom definition bodies, typed list/math operands, parameter labeling, nested branches and unsupported-text fallback.

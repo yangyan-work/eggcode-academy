@@ -7,6 +7,7 @@ window.EGG_EXAMPLE_FOR = function(entry) {
   const slots=[...description.matchAll(/\{#(\d+)\}/g)].map(m=>Number(m[1]));
   const count=Math.max(declared.length,...slots.map(n=>n+1),0);
   const warnings=[];
+  if(entry.title==='比较')warnings.push('本手册快照的比较参数表存在不一致：说明与左值槽涉及多种类型，右值槽却仅列整数。整数比较可按本页练习；涉及玩家、对象、动态定点数时，须在当前编辑器核对左右槽是否接受同一类型，不能把实例改填成名字或随意取整。');
   if(window.EGG_MANUAL_NOTES?.[entry.id])warnings.push(window.EGG_MANUAL_NOTES[entry.id]);
   const familyType=entry.title.split(/[：:]/)[1]?.trim();
   const family=/^(列表取值|复制列表|列表中随机取|获取自定义属性|表格取值|权重池中随机取)/.test(entry.title);

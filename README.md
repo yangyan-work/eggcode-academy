@@ -12,6 +12,19 @@
 
 原有 18 篇数值图课程已经存在，不重复生成。背包、宠物、装备等新课为其拓展专题。
 
+## 逐步详解版
+
+每课增加独立的场景准备、触发器区域与预设入口、变量创建、自定义动作内部步骤、逐槽操作和分场景验收。原有课名、ID 与基础指南继续保留；玩法仍明确区分数值练习、单人操作原型和需要额外验证的多人/引擎接入。
+
+- `editor-guide.html`：九类触发器区域、预设/运行实例/事件参与者、官方新版入口及排错
+- `detail-source/`：全部课程的可维护详解来源
+- `detailed-guides-*.js`：生成后的分片数据
+- `learning-detail.js`：逐步阅读、查找路径和参数槽说明
+- 积木详情页根据其真实平台、类别、分组和参数类型逐项展示定位与接法；原文缺项保留核对提示
+- SVG 展开列表初始化、嵌套输入、多个独立自定义定义、分支与循环连线。灰色说明不是原生积木，也不是可导入程序
+
+修改详解 JSON 后运行 `node scripts/build-details.cjs`，再执行 `node scripts/build-details.cjs --check` 和 `node scripts/check-details.cjs`。详解中重复介绍同一动作只用于核对，一套定义只创建一次。
+
 ## 文件与维护
 
 原始课程保留在 `lessons-data.js`、`tutorials.js`、`build-guides.js` 和 `progression-guides.js`。手册及现有图示数据保留原样。
@@ -62,3 +75,14 @@ python3 -m http.server 8000
 本站为非官方教学站，手册快照日期为 2026-09-03，包含 3,871 条积木记录。彩色图是帮助搭建的连接示意，不是可导入工程，也不是编辑器实拍。
 
 新增课程保留有关网络运行域、计时精度、存档故障与防重复结算的限制说明。网页及数据验证不等于游戏编辑器内的实测；涉及多人、持久化和计时的玩法，必须按每课验收清单在实际项目中测试后再发布。
+
+
+## 学习路线、记录与验证补全
+
+- `learning-path.html`：八条建议路线与全部145课目录；大数i1/s1/f1作为独立方案展示
+- `learning-progress.js`：本浏览器自报完成记录、继续阅读、跨标签更新和明确确认后清除；不联网同步，不代表编辑器测试通过。坏数据/未来版本不静默覆盖
+- `verification.html` 与 `verification-report.json`：列明文档审查、DOM网页检查、独立玩法演示和原生编辑器测试的不同范围，保留逐课证据索引
+- `big-number-lab.html`：额外的精确字符串加减乘除实验，不改变原有145个课程ID；60位输入、完整乘法和商/余数长除法、逐步轨迹。原生搭建仍需实机验收
+- 变量表增加作用范围的原文依据与设置理由；大图弹窗增加缩放和恢复100%
+
+新增检查：`node scripts/check-progress.cjs`、`node scripts/check-big-number.cjs`、`node scripts/check-quality.cjs`。这三个检查及原有DOM测试均需要jsdom。设置好NODE_PATH后，运行 `node scripts/build-verification.cjs` 可重跑全部检查并生成证据页；失败时不会生成通过记录。`--build-only`只生成待检查页，不是验收通过。

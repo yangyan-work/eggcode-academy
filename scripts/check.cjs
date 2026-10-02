@@ -9,7 +9,7 @@ const path = require('node:path');
 const vm = require('node:vm');
 const crypto = require('node:crypto');
 const root = path.resolve(__dirname, '..');
-const pages = ['index.html', 'courses.html', 'practice.html', 'lesson.html', 'manual.html', 'block.html'];
+const pages = ['index.html', 'courses.html', 'practice.html', 'lesson.html', 'manual.html', 'block.html', 'editor-guide.html', 'learning-path.html', 'big-number-lab.html', 'verification.html'];
 const legacy = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures/legacy-lessons.json'), 'utf8'));
 const expectedSeries = {
   '积木练习': 6, '消消乐': 6, '玩法拓展': 4, '数值图': 18,
@@ -143,7 +143,7 @@ function checkContent() {
     for (const [i, section] of guide.sections.entries()) {
       ['title', 'tree', 'verify'].forEach(key => nonempty(section[key], `guide ${id}.sections[${i}].${key}`));
       stringList(section.steps, 2, `guide ${id}.sections[${i}].steps`);
-      const roots = w.EGG_BLOCKS.fromTree(section.tree, { definition: /自定义动作|封装成自定义/.test(section.title) });
+      const roots = w.EGG_BLOCKS.fromTree(section.tree, { definition: /自定义动作|封装成自定义/.test(section.title), variables:guide.variables, sections:guide.sections });
       assert(roots.length, `guide ${id} section ${i}: empty block tree`);
       const markup = w.EGG_BLOCKS.svg(roots, section.title);
       assert(markup.startsWith('<svg '), `guide ${id} section ${i}: missing SVG`);
@@ -172,7 +172,7 @@ function checkContent() {
     assert(!/(?:40\s*(?:篇教程|课)|34\s*篇)/.test(html), `${page}: stale visible course count`);
     const scripts = scriptFiles(page);
     assert.equal(new Set(scripts).size, scripts.length, `${page}: duplicate script load`);
-    assert.equal(scripts.at(-1), 'app.js', `${page}: app must load after its data`);
+    if(!['editor-guide.html','verification.html'].includes(page)) assert.equal(scripts.at(-1), 'app.js', `${page}: app must load after its data`); else assert.equal(scripts.length,0,'Primer remains readable without JS');
   }
   const scripts = scriptFiles('lesson.html');
   for (const file of ['lessons-data.js', 'tutorials.js', 'manual-data.js', 'build-guides.js', 'progression-guides.js', 'curriculum-expansion.js', 'block-diagram-data.js', 'block-diagrams.js']) assert(scripts.includes(file), `lesson page does not load ${file}`);

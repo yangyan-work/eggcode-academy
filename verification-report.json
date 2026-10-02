@@ -1,0 +1,1215 @@
+{
+  "build": "20261002-quality",
+  "status": "passed",
+  "checkedAt": "2026-10-02T06:49:59.296Z",
+  "scope": "文档结构、图示和自动化DOM检查；不是原生蛋码执行",
+  "engineStatus": "not_tested",
+  "webGameplayStatus": "individual_lessons_not_provided",
+  "checks": [
+    {
+      "script": "scripts/check.cjs",
+      "status": "passed",
+      "output": "PASS content: 145 routes, 139 tutorials, 34 series, 454 SVG sections, 2602 native references\nPASS preservation: original 40 records/guides and 3,871 manual entries match git 8688c19\nPASS static: 10 HTML pages, script ordering, local assets, metadata, all JavaScript syntax"
+    },
+    {
+      "script": "scripts/check-details.cjs",
+      "status": "passed",
+      "output": "PASS details: 145 lessons, 6521 detailed steps, 304 custom definitions, 479 test scenarios\nPASS blocks: 3871 location/wiring pages, 7856 parameter slots, nine trigger domains"
+    },
+    {
+      "script": "scripts/check-renderer.cjs",
+      "status": "passed",
+      "output": "PASS renderer: 21 focused regression groups; all 40 legacy + 105 new guides, 454 SVG sections"
+    },
+    {
+      "script": "scripts/check-dom.cjs",
+      "status": "passed",
+      "output": "PASS DOM lessons: 145 routes, 454 valid SVG drawings, 2602 rendered native references, invalid/default IDs\nPASS lesson interactions: copy/fallback, repeat expand/close, zoom bounds, deep anchors, mobile disclosure changes\nPASS practice: all 139 card IDs, 34 series tabs, family+series filters, legacy/unknown hashes, Back/Forward, search empty/reset, deep URLs and NFKC lookup\nPASS manual: both platforms/all categories, group+query, pagination, empty/reset, filtered return URLs and new-lesson backlinks\nPASS home/foundations: original card IDs, repeated play/reset and interrupted animation recovery\nPASS all DOM QA (layout, downloads and live editor execution require real-browser/editor verification)"
+    },
+    {
+      "script": "scripts/check-progress.cjs",
+      "status": "passed",
+      "output": "PASS learning progress: 812 assertions; 145 stable IDs, 34 series, 8 routes, branch prerequisites, self-report controls, persistence, idempotence, corrupted/future/blocked storage, repeated actions, filtered cards and multi-tab events."
+    },
+    {
+      "script": "scripts/check-big-number.cjs",
+      "status": "passed",
+      "output": "Big-number lab passed: 10541 assertions; 816 deterministic arithmetic pairs; validation, full string multiplication/division, traces, DOM recovery, SVG and links. Native Eggcode runtime not tested."
+    },
+    {
+      "script": "scripts/check-quality.cjs",
+      "status": "passed",
+      "output": "PASS quality integration: 13 representative lessons; honest validation vs personal progress, 5-column variable evidence, independent numeric branches, dialog zoom/reset, evidence manifest"
+    }
+  ],
+  "lessons": [
+    {
+      "id": 0,
+      "title": "认识你的第一块蛋码",
+      "detailedSteps": 16,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 1,
+      "title": "让地图听懂你的指令",
+      "detailedSteps": 16,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 2,
+      "title": "给地图一份小小记忆",
+      "detailedSteps": 16,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 3,
+      "title": "让玩法有判断、有节奏",
+      "detailedSteps": 16,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 4,
+      "title": "把小积木拼成大能力",
+      "detailedSteps": 18,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 5,
+      "title": "下一站，用 Lua 扩展脑洞",
+      "detailedSteps": 18,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 6,
+      "title": "给玩家一个开场欢迎",
+      "detailedSteps": 16,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 7,
+      "title": "把动作准确重复 3 次",
+      "detailedSteps": 16,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 8,
+      "title": "一秒一次，只提醒三次",
+      "detailedSteps": 16,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 9,
+      "title": "累计三次，解锁达标提示",
+      "detailedSteps": 16,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 10,
+      "title": "走进区域，让方块动起来",
+      "detailedSteps": 16,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 11,
+      "title": "用一个信号连接两段逻辑",
+      "detailedSteps": 16,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 12,
+      "title": "消消乐 01 · 用列表搭出一张棋盘",
+      "detailedSteps": 139,
+      "diagrams": 4,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 13,
+      "title": "消消乐 02 · 选择、交换与无效回退",
+      "detailedSteps": 139,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 14,
+      "title": "消消乐 03 · 找出横竖三连并去重",
+      "detailedSteps": 61,
+      "diagrams": 4,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 15,
+      "title": "消消乐 04 · 清除、下落、补齐与连锁",
+      "detailedSteps": 76,
+      "diagrams": 4,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 16,
+      "title": "消消乐 05 · 步数、分数与结算顺序",
+      "detailedSteps": 66,
+      "diagrams": 4,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 17,
+      "title": "消消乐 06 · 死局检测与关卡验收",
+      "detailedSteps": 220,
+      "diagrams": 6,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 18,
+      "title": "限时收集 · 30 秒找到 5 个目标",
+      "detailedSteps": 51,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 19,
+      "title": "记忆机关 · 按顺序重现三个信号",
+      "detailedSteps": 62,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 20,
+      "title": "跑酷闯关 · 按顺序通过检查点",
+      "detailedSteps": 34,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 21,
+      "title": "双开关联动 · 两个条件打开一道门",
+      "detailedSteps": 33,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 22,
+      "title": "数值图 01 · 玩家数据与成长路线",
+      "detailedSteps": 47,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 23,
+      "title": "数值图 02 · 训练收益与点击限频",
+      "detailedSteps": 43,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 24,
+      "title": "数值图 03 · 出售力量换金币",
+      "detailedSteps": 37,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 25,
+      "title": "数值图 04 · 金币升级与价格曲线",
+      "detailedSteps": 38,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 26,
+      "title": "数值图 05 · 个人区域与训练倍率",
+      "detailedSteps": 50,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 27,
+      "title": "数值图 06 · 转生与永久加成",
+      "detailedSteps": 35,
+      "diagrams": 2,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 28,
+      "title": "数值图 07 · 属性面板与操作反馈",
+      "detailedSteps": 41,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 29,
+      "title": "数值图 08 · 存档、读档与重进验收",
+      "detailedSteps": 127,
+      "diagrams": 5,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 30,
+      "title": "数值图 09 · 整数攻击、字符串与实际伤害",
+      "detailedSteps": 155,
+      "diagrams": 7,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 31,
+      "title": "数值图 10 · 固定怪物、伤害与掉落",
+      "detailedSteps": 128,
+      "diagrams": 5,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 32,
+      "title": "数值图 11 · 装备强化与金币消耗",
+      "detailedSteps": 66,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 33,
+      "title": "数值图 12 · 三关推进与整图验收",
+      "detailedSteps": 112,
+      "diagrams": 4,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 34,
+      "title": "数值图 13 · 万、亿与 K/M/B 大数显示",
+      "detailedSteps": 57,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 35,
+      "title": "数值图 14 · 小数、舍入与单位进位",
+      "detailedSteps": 71,
+      "diagrams": 4,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 36,
+      "title": "数值图 15 · 三种方案与原生整数运算",
+      "detailedSteps": 133,
+      "diagrams": 5,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 37,
+      "title": "数值图 16 · 逐位字符串比较、加法与减法",
+      "detailedSteps": 158,
+      "diagrams": 4,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 38,
+      "title": "数值图 17 · 字符串倍率、交易与存档",
+      "detailedSteps": 166,
+      "diagrams": 6,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 39,
+      "title": "数值图 18 · 尾数＋指数：近似成长强度",
+      "detailedSteps": 439,
+      "diagrams": 12,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 40,
+      "title": "背包与物品管理 01：固定物品表与独立容量",
+      "detailedSteps": 49,
+      "diagrams": 4,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 41,
+      "title": "背包与物品管理 02：先预检再入包的幂等奖励",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 42,
+      "title": "背包与物品管理 03：消耗、合成与数量守恒",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 43,
+      "title": "装备穿戴与属性计算 01：装备实例、归属与槽位替换",
+      "detailedSteps": 36,
+      "diagrams": 4,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 44,
+      "title": "装备穿戴与属性计算 02：从基础值重算最终属性",
+      "detailedSteps": 28,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 45,
+      "title": "装备穿戴与属性计算 03：强化、耐久与原子候选状态",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 46,
+      "title": "宠物养成系统 01：宠物实例与单只出战",
+      "detailedSteps": 36,
+      "diagrams": 4,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 47,
+      "title": "宠物养成系统 02：喂养升级与经验结转",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 48,
+      "title": "宠物养成系统 03：合成去重、锁定与材料销毁",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 49,
+      "title": "随机掉落与保底 01：整数区间与原生权重池",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 50,
+      "title": "随机掉落与保底 02：第十次必出与独立保底",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 51,
+      "title": "随机掉落与保底 03：扣券发奖与重复请求重放",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 52,
+      "title": "主动技能与冷却 01：原生主动技能与零号槽位",
+      "detailedSteps": 30,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 53,
+      "title": "主动技能与冷却 02：读取原生冷却与一次性减冷却",
+      "detailedSteps": 30,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 54,
+      "title": "主动技能与冷却 03：施法承诺、打断与单次命中",
+      "detailedSteps": 30,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 55,
+      "title": "增益与异常状态 01：增益刷新与非叠加加攻",
+      "detailedSteps": 30,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 56,
+      "title": "增益与异常状态 02：中毒逐跳、层数上限与归属",
+      "detailedSteps": 30,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 57,
+      "title": "增益与异常状态 03：驱散、免疫与死亡清理",
+      "detailedSteps": 30,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 58,
+      "title": "多阶段Boss 01：生命阈值与跨阶段处理",
+      "detailedSteps": 30,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 59,
+      "title": "多阶段Boss 02：唯一主循环与可取消预警",
+      "detailedSteps": 30,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 60,
+      "title": "多阶段Boss 03：击杀结算、参与资格与重开代次",
+      "detailedSteps": 30,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 61,
+      "title": "任务与成就 01：任务状态机与去重击杀进度",
+      "detailedSteps": 30,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 62,
+      "title": "任务与成就 02：奖励领取与原生任务面板接入",
+      "detailedSteps": 30,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 63,
+      "title": "任务与成就 03：累计成就与一次性里程碑",
+      "detailedSteps": 30,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 64,
+      "title": "离线收益 01 · 把离线秒数封顶并计算整分钟奖励",
+      "detailedSteps": 28,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 65,
+      "title": "离线收益 02 · 用检查点和回执阻止重复领取",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 66,
+      "title": "离线收益 03 · 接通游玩进度并识别真实保存边界",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 67,
+      "title": "签到与每日刷新 01 · 按固定时区四点生成业务日号",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 68,
+      "title": "签到与每日刷新 02 · 让每日额度只随日号前进刷新",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 69,
+      "title": "签到与每日刷新 03 · 将连续签到奖励和日回执一起提交",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 70,
+      "title": "多人数据与奖励归属 01 · 用事件玩家隔离两个人的运行状态",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 71,
+      "title": "多人数据与奖励归属 02 · 按玩家和奖励编号记录领取回执",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 72,
+      "title": "多人数据与奖励归属 03 · 重连时按同一玩家加载并拒绝错配",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 73,
+      "title": "存档升级与故障处理 01 · 区分新档、旧档、失败与未来版本",
+      "detailedSteps": 33,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 74,
+      "title": "存档升级与故障处理 02 · 在副本迁移并保留可恢复旧档",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 75,
+      "title": "存档升级与故障处理 03 · 重放故障并处理未知提交结果",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 76,
+      "title": "餐厅经营 1/4：一碗面从接单到收款",
+      "detailedSteps": 42,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 77,
+      "title": "餐厅经营 2/4：三位顾客的队列与耐心",
+      "detailedSteps": 45,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 78,
+      "title": "餐厅经营 3/4：两道菜的配方与缺料保护",
+      "detailedSteps": 47,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 79,
+      "title": "餐厅经营 4/4：营业日结算与灶台升级",
+      "detailedSteps": 51,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 80,
+      "title": "农场种植 1/4：播种、浇水与一次收获",
+      "detailedSteps": 36,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 81,
+      "title": "农场种植 2/4：三块田共享一个生长时钟",
+      "detailedSteps": 42,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 82,
+      "title": "农场种植 3/4：轮作与肥力的可计算收益",
+      "detailedSteps": 46,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 83,
+      "title": "农场种植 4/4：天气配额与交货订单",
+      "detailedSteps": 40,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 84,
+      "title": "钓鱼与图鉴 1/4：抛竿、咬钩与提竿窗口",
+      "detailedSteps": 40,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 85,
+      "title": "钓鱼与图鉴 2/4：三种鱼的权重与边界",
+      "detailedSteps": 60,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 86,
+      "title": "钓鱼与图鉴 3/4：重复捕获与最大体长图鉴",
+      "detailedSteps": 33,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 87,
+      "title": "钓鱼与图鉴 4/4：卖鱼与收藏奖励分账",
+      "detailedSteps": 36,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 88,
+      "title": "工厂流水线 1/4：三工位输送与物料守恒",
+      "detailedSteps": 46,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 89,
+      "title": "工厂流水线 2/4：缓冲仓满时停机不丢料",
+      "detailedSteps": 38,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 90,
+      "title": "工厂流水线 3/4：配方批次、能量与库存预留",
+      "detailedSteps": 40,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 91,
+      "title": "工厂流水线 4/4：质检、返修与停机保养",
+      "detailedSteps": 35,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 92,
+      "title": "密室逃脱 1/4：找钥匙、开锁与单次开门",
+      "detailedSteps": 34,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 93,
+      "title": "密室逃脱 2/4：三位密码与错误重置",
+      "detailedSteps": 41,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 94,
+      "title": "密室逃脱 3/4：三只拨杆的组合逻辑",
+      "detailedSteps": 33,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 95,
+      "title": "密室逃脱 4/4：限时整合、提示扣分与结局",
+      "detailedSteps": 46,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 96,
+      "title": "双人合作解谜 1/4：双踏板与中央状态提交",
+      "detailedSteps": 46,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 97,
+      "title": "双人合作解谜 2/4：一拍误差内的同步按钮",
+      "detailedSteps": 47,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 98,
+      "title": "双人合作解谜 3/4：分工密码与钥匙所有权",
+      "detailedSteps": 47,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 99,
+      "title": "双人合作解谜 4/4：退出重开、旧请求隔离与各自领奖",
+      "detailedSteps": 73,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 100,
+      "title": "推箱子关卡 1/4：方向输入与墙壁边界",
+      "detailedSteps": 39,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 101,
+      "title": "推箱子关卡 2/4：先检查箱后面的格子再推",
+      "detailedSteps": 44,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 102,
+      "title": "推箱子关卡 3/4：两只箱子与目标覆盖",
+      "detailedSteps": 61,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 103,
+      "title": "推箱子关卡 4/4：一步撤销与重新开始",
+      "detailedSteps": 91,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 104,
+      "title": "分支剧情冒险 1/4：节点编号与两个选择",
+      "detailedSteps": 55,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 105,
+      "title": "分支剧情冒险 2/4：道具条件与不可重复领取",
+      "detailedSteps": 42,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 106,
+      "title": "分支剧情冒险 3/4：资源、信任与结局优先级",
+      "detailedSteps": 50,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 107,
+      "title": "分支剧情冒险 4/4：本局检查点与奖励防回档",
+      "detailedSteps": 41,
+      "diagrams": 3,
+      "testScenarios": 4,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 108,
+      "title": "躲猫猫 01 · 锁定名单与20秒藏身期",
+      "detailedSteps": 36,
+      "diagrams": 4,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 109,
+      "title": "躲猫猫 02 · 把三种伪装变成明确规则",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 110,
+      "title": "躲猫猫 03 · 近距离猜中才算抓获",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 111,
+      "title": "躲猫猫 04 · 处理离线、胜负与下一局",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 112,
+      "title": "灾难生存 01 · 预告、危险与休息三阶段",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 113,
+      "title": "灾难生存 02 · 熔岩只淘汰还在危险区的人",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 114,
+      "title": "灾难生存 03 · 提前标记三块陨石落点",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 115,
+      "title": "灾难生存 04 · 混合灾难与幸存者结算",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 116,
+      "title": "团队夺旗 01 · 交替分队与两座旗台",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 117,
+      "title": "团队夺旗 02 · 拾取敌旗与唯一持有人",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 118,
+      "title": "团队夺旗 03 · 掉旗、救回与10秒归位",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 119,
+      "title": "团队夺旗 04 · 交旗计分、加时与奖励",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 120,
+      "title": "烫手山芋 01 · 一颗山芋和共享引信",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 121,
+      "title": "烫手山芋 02 · 近距离传递与一秒防回传",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 122,
+      "title": "烫手山芋 03 · 爆炸只淘汰一次并换下一颗",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 123,
+      "title": "烫手山芋 04 · 退出继任与冠军奖励",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 124,
+      "title": "回合制卡牌 01 · 两位玩家与实体手牌编号",
+      "detailedSteps": 28,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 125,
+      "title": "回合制卡牌 02 · 费用、护甲与原子出牌",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 126,
+      "title": "回合制卡牌 03 · 抽牌、洗弃牌与30秒回合",
+      "detailedSteps": 28,
+      "diagrams": 3,
+      "testScenarios": 5,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 127,
+      "title": "回合制卡牌 04 · 十轮终局、平局与离线认输",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 128,
+      "title": "节奏点击 01 · 先测时钟，再选判定窗口",
+      "detailedSteps": 28,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 129,
+      "title": "节奏点击 02 · 单轨最近音符与一次命中",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 130,
+      "title": "节奏点击 03 · 漏拍、连击与完整结算",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 131,
+      "title": "节奏点击 04 · 双轨谱面、偏移与回放验收",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 132,
+      "title": "棋盘掷骰冒险 01 · 十二格环路与轮流掷骰",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 133,
+      "title": "棋盘掷骰冒险 02 · 宝箱、陷阱与事件只结算一次",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 134,
+      "title": "棋盘掷骰冒险 03 · 分岔选择与一次性护盾",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 135,
+      "title": "棋盘掷骰冒险 04 · 八轮排名与同分共同获胜",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 136,
+      "title": "塔防 01 · 六路点与可复用敌人池",
+      "detailedSteps": 28,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 137,
+      "title": "塔防 02 · 最前目标、射程与击杀收入",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 138,
+      "title": "塔防 03 · 三波难度、升级费用与胜负",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 139,
+      "title": "肉鸽闯关 01 · 七房间有向路线与清房锁门",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 140,
+      "title": "肉鸽闯关 02 · 无放回三选一与叠加上限",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 141,
+      "title": "肉鸽闯关 03 · 首领两阶段与局内重置",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 142,
+      "title": "消消乐进阶 01 · 四连、五连与交叉生成特殊格",
+      "detailedSteps": 33,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 143,
+      "title": "消消乐进阶 02 · 队列扩展特殊效果并全轮去重",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    },
+    {
+      "id": 144,
+      "title": "消消乐进阶 03 · 双层冰与颜色目标的结算顺序",
+      "detailedSteps": 27,
+      "diagrams": 3,
+      "testScenarios": 3,
+      "editorStatus": "not_tested"
+    }
+  ],
+  "files": {
+    "app.js": "bd32580390d0daa43ac2cd7aaf177d9c2f976fe4b8ce034b2a0cd0299bdf483a",
+    "learning-detail.js": "d278919ee0d84e724a7f16738e55b8ab0698412bb375a6eaa11d7679984f408f",
+    "block-diagrams.js": "3c04e2d1c1e277272629f2c8998cd1ad6d822daae34f4eaad6dfa242fb176839",
+    "course-validation.js": "52a49fe96ef8fd8e350e52e6b50b29c3e9c421a534d2f1dc9eebfaf6b28a1cfa",
+    "learning-progress.js": "142e37ff6b5d37557f650e72eee3daaa15975f99bc39ed176c0d629c49f09d76",
+    "big-number-lab.js": "e8d5b83d484e9aae489570d32f16a047e29b039ad4d9f6b165538da6951e6b86"
+  }
+}
