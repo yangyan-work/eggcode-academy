@@ -24,7 +24,7 @@ if (page === "courses" || page === "practice") {
     const number = page === 'courses' ? index + 1 : items.slice(0,index+1).filter(lesson=>(lesson.series||'积木练习')===(item.series||'积木练习')).length;
     return `<a class="course-card tone-${index % 3}" href="lesson.html?id=${index + (page === "practice" ? baseLessonCount : 0)}">
     <div class="course-visual"><span class="course-number">${String(number).padStart(2, "0")}</span><img src="assets/eggy-${mascots[index % 3]}.png" width="120" height="130" alt="" loading="lazy"></div>
-    <div class="course-info"><span class="course-category">${escapeHTML(page === "practice" ? item.category : item.category.split(" / ")[1])}</span><h2>${escapeHTML(item.title.replace(/^(?:数值图|消消乐)\s*\d+\s*·\s*/,''))}</h2><p>${escapeHTML(page === "courses" ? courseSummaries[index] : item.summary)}</p><div class="card-bottom"><span>${page === "courses" ? "入门课程 · 含动手练习" : buildGuides[index + baseLessonCount].sections.length + " 个搭建步骤 · 参数与连接图"}</span><span class="round-arrow" aria-hidden="true">↗</span></div></div></a>`;
+    <div class="course-info"><span class="course-category">${escapeHTML(page === "practice" ? item.category : item.category.split(" / ")[1])}</span><h2>${escapeHTML(item.title.replace(/^(?:数值图|消消乐)\s*\d+\s*·\s*/,''))}</h2><p>${escapeHTML(page === "courses" ? courseSummaries[index] : item.summary)}</p><div class="card-bottom"><span>${page === "courses" ? "入门课程 · 含动手练习" : buildGuides[index + baseLessonCount].sections.length + " 个搭建步骤 · 参数与连接图"}</span><span class="round-arrow" aria-hidden="true">›</span></div></div></a>`;
   };
   document.getElementById(page === "courses" ? "courses-grid" : "practice-grid").innerHTML = page === "courses" ? items.map(renderCard).join("") : [
     ["progression", "数值图", "数值图 · 从训练成长到打怪养成", "18 篇连续课程 / 训练成长 · 单人战斗 · 大数转换与运算"],
@@ -56,7 +56,7 @@ function renderBuildGuide(guide, index) {
     (guide.variables.length ? '<h3 id="variables">变量清单</h3><p>列表类型与普通变量类型分开选择，名称保持一致。</p><div class="table-wrap"><table><thead><tr><th scope="col">名称</th><th scope="col">类型</th><th scope="col">初值 / 用途</th></tr></thead><tbody>' + guide.variables.map(row=>'<tr>'+row.map(cell=>'<td>'+escapeHTML(cell)+'</td>').join('')+'</tr>').join('') + '</tbody></table></div>' : '<p class="recipe-check">本课不需要创建变量。</p>') +
     (guide.samples?.length ? '<h3>跟着数值算一遍</h3><div class="table-wrap"><table><thead><tr>'+guide.samples[0].map(cell=>'<th scope="col">'+escapeHTML(cell)+'</th>').join('')+'</tr></thead><tbody>'+guide.samples.slice(1).map(row=>'<tr>'+row.map(cell=>'<td>'+escapeHTML(cell)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>' : '') +
     '<h3>本课积木 · 点开核对参数</h3><div class="block-references">' + refs + '</div></div></details>' + related + window.EGG_BLOCKS.legend() +
-    guide.sections.map((section,i)=>'<section class="recipe-step" id="step-'+(i+1)+'"><p class="recipe-number">STEP '+String(i+1).padStart(2,'0')+'</p><h3>'+escapeHTML(section.title)+'</h3><ol>'+section.steps.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ol>'+code(section)+'<p class="recipe-check"><strong>这一步检查：</strong>'+escapeHTML(section.verify)+'</p></section>').join('') +
+    guide.sections.map((section,i)=>'<section class="recipe-step" id="step-'+(i+1)+'"><p class="recipe-number">第 '+String(i+1).padStart(2,'0')+' 步</p><h3>'+escapeHTML(section.title)+'</h3><ol>'+section.steps.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ol>'+code(section)+'<p class="recipe-check"><strong>这一步检查：</strong>'+escapeHTML(section.verify)+'</p></section>').join('') +
     '<section id="acceptance" class="recipe-step"><h3>搭完后逐项试玩</h3><ol>'+guide.tests.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ol></section>' +
     (guide.pitfalls?.length ? '<section class="recipe-step"><h3>常见问题</h3><ul>'+guide.pitfalls.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ul></section>' : '') +
     '<p class="lesson-source">教程解读 · 对照2026-09-03原点版移动端手册编写。连接图需在蛋码画布逐块搭建，不能直接粘贴执行。彩色积木图为教学连接示意，完整玩法仍需按本课清单逐项试玩验收。自定义动作含异步积木时的执行顺序未在手册中明确，本教程核心动作不放等待或计时器；涉及调用后读取结果的地方，应先按步骤验收，也可把动作定义中的整串积木直接展开到调用处。</p></div>';
@@ -85,7 +85,7 @@ if (page === "lesson") {
     const parent = document.getElementById("lesson-parent");
     parent.href = isPractice ? "practice.html" : "courses.html";
     parent.textContent = isPractice ? "玩法实战" : "入门课程";
-    document.title = lesson.title + " · 蛋码自习室";
+    document.title = lesson.title + " · 自由树梦想空间";
     document.getElementById("lesson-breadcrumb").textContent = lesson.title;
     const chapterNumber = isPractice ? practices.slice(0, index - baseLessonCount + 1).filter(item => (item.series || "积木练习") === (lesson.series || "积木练习")).length : index + 1;
     document.getElementById("lesson-counter").textContent = `${isPractice ? lesson.series || "积木练习" : "入门"} / ${String(chapterNumber).padStart(2, "0")}`;
@@ -244,7 +244,7 @@ if(page==='block'){
   if(!entry){root.innerHTML='<section class="empty-state"><h1>这条积木链接不存在</h1><p>请回到手册按名称重新搜索。</p><a class="button button-blue" href="manual.html">打开积木手册</a></section>';}
   else{
     const ex=window.EGG_EXAMPLE_FOR(entry), diagram=window.EGG_BLOCKS.forEntry(entry,ex), source=manual.sources.find(s=>s.id===entry.source);
-    document.title=entry.title+' · '+entry.group+' · 蛋码自习室';
+    document.title=entry.title+' · '+entry.group+' · 自由树梦想空间';
     document.getElementById('block-crumb').textContent=entry.title;
     const list=(items,tag='ul')=>`<${tag}>${items.map(x=>`<li>${escapeHTML(x)}</li>`).join('')}</${tag}>`;
     const other=manual.entries.filter(e=>e.platform===entry.platform&&e.group===entry.group&&e.category===entry.category&&e.id!==entry.id).slice(0,6);
