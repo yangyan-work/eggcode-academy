@@ -1,7 +1,7 @@
 {
   "build": "20261002-quality",
   "status": "passed",
-  "checkedAt": "2026-10-02T06:49:59.296Z",
+  "checkedAt": "2026-10-02T07:35:09.801Z",
   "scope": "文档结构、图示和自动化DOM检查；不是原生蛋码执行",
   "engineStatus": "not_tested",
   "webGameplayStatus": "individual_lessons_not_provided",
@@ -1205,7 +1205,7 @@
     }
   ],
   "files": {
-    "app.js": "bd32580390d0daa43ac2cd7aaf177d9c2f976fe4b8ce034b2a0cd0299bdf483a",
+    "app.js": "c0ffe94bd1980fd790a8dadf09c7487e19777b0aaadb64cde58d663472b5e803",
     "learning-detail.js": "d278919ee0d84e724a7f16738e55b8ab0698412bb375a6eaa11d7679984f408f",
     "block-diagrams.js": "3c04e2d1c1e277272629f2c8998cd1ad6d822daae34f4eaad6dfa242fb176839",
     "course-validation.js": "52a49fe96ef8fd8e350e52e6b50b29c3e9c421a534d2f1dc9eebfaf6b28a1cfa",

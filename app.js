@@ -20,7 +20,7 @@ const mascots = ["yellow", "pink", "black"];
 const courseSummaries = ["打开蛋码，用一条欢迎提示完成第一次创作。", "认识事件、条件和动作，让地图听懂你的指令。", "用变量记录分数，理解数据的作用范围。", "学会判断与重复，把简单动作排出节奏。", "认识列表和自定义积木，让重复步骤变简单。", "阅读一段纯 Lua 示例，向文本编程迈出一小步。"];
 
 if (page === "home") {
-  const legacy = { "#courses": "courses.html", "#practice": "practice.html", "#manual": "manual.html", "#roadmap": "courses.html" };
+  const legacy = { "#courses": "courses.html", "#practice": "practice.html", "#manual": "manual.html", "#roadmap": "learning-path.html" };
   if (legacy[location.hash]) location.replace(legacy[location.hash]);
 }
 function renderCourseCard(item, index, foundation = false) {
@@ -147,7 +147,7 @@ if (page === "lesson") {
   const lesson = allLessons[index];
   if (!lesson) {
     document.getElementById("lesson-title").textContent = "这堂课暂时不存在";
-    document.getElementById("lesson-body").innerHTML = '<p>课程链接可能有误，回到课程目录重新选择吧。</p><a class="button button-blue" href="courses.html">查看全部课程</a>';
+    document.getElementById("lesson-body").innerHTML = '<p>课程链接可能有误，回到课程目录重新选择吧。</p><a class="button button-blue" href="learning-path.html">查看全部课程</a>';
     document.querySelector(".lesson-navigation").hidden = true;
   } else {
     const isPractice = index >= lessons.length;
@@ -375,3 +375,28 @@ document.addEventListener('click',async event=>{
 
 // Personal completion records are separate from validation evidence.
 window.EGG_PROGRESS?.init();
+
+// 手机将宽变量/参数表逐行排开；保留表格的列标题和阅读语义。
+for (const table of document.querySelectorAll('.detailed-variable-table, .slot-workbench table, .bn-table, #parameters > .table-wrap table')) {
+  table.classList.add('mobile-readable-table');
+  table.setAttribute('role', 'table');
+  const headings = [...table.querySelectorAll('thead th')].map(th => {
+    th.scope = 'col'; th.setAttribute('role', 'columnheader'); return th.textContent.trim();
+  });
+  for (const group of table.querySelectorAll('thead,tbody')) group.setAttribute('role', 'rowgroup');
+  for (const row of table.rows) {
+    row.setAttribute('role', 'row');
+    [...row.cells].forEach((cell, index) => {
+      if (cell.tagName === 'TD') { cell.dataset.label = headings[index] || ''; cell.setAttribute('role', 'cell'); }
+    });
+  }
+}
+for (const region of document.querySelectorAll('.table-wrap, .bn-table-wrap')) {
+  region.tabIndex = 0;
+  region.setAttribute('role', 'region');
+  region.setAttribute('aria-label', '数据表格；宽表可左右滚动');
+}
+const siteHeader = document.querySelector('.site-header');
+if (siteHeader && typeof ResizeObserver === 'function') {
+  new ResizeObserver(() => document.documentElement.style.setProperty('--site-header-height', siteHeader.getBoundingClientRect().height + 'px')).observe(siteHeader);
+}
