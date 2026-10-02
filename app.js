@@ -29,21 +29,31 @@ if (page === "courses" || page === "practice") {
     ["match3", "消消乐", "消消乐 · 从棋盘到完整关卡", "6 篇连续课程 / 建议按顺序学习"],
     ["gameplay", "玩法拓展", "把逻辑变成可玩的挑战", "4 个独立玩法 / 在场景中组合验证"],
     ["basics", "积木练习", "先练好每一块积木", "6 个基础案例 / 从提示到机关"]
-  ].map(([id, series, title, description]) => `<section class="practice-group" id="${id}"><div class="section-title"><div><p class="eyebrow">${escapeHTML(description)}</p><h2>${escapeHTML(title)}</h2></div></div><div class="course-grid">${items.map((item,index) => (item.series || "积木练习") === series ? renderCard(item,index) : "").join("")}</div></section>`).join("");
+  ].map(([id, series, title, description],groupIndex) => `<section class="practice-group" id="${id}"><div class="practice-banner"><div><p class="eyebrow">${escapeHTML(series)}专题</p><h2>${escapeHTML(title)}</h2><p>${escapeHTML(description)}</p></div><img src="assets/eggy-${mascots[groupIndex%3]}.png" alt="" width="120" height="130"></div><div class="course-grid">${items.map((item,index) => (item.series || "积木练习") === series ? renderCard(item,index) : "").join("")}</div></section>`).join("");
+  if(page==='practice') {
+    const selectSeries=()=>{
+      const key=location.hash.slice(1),groups=[...document.querySelectorAll('.practice-group')];
+      const selected=groups.some(group=>group.id===key)?key:'all';
+      groups.forEach(group=>{group.hidden=selected!=='all'&&group.id!==selected;});
+      document.querySelectorAll('[data-series]').forEach(link=>{if(link.dataset.series===selected)link.setAttribute('aria-current','true');else link.removeAttribute('aria-current');});
+      const count=groups.filter(group=>!group.hidden).reduce((sum,group)=>sum+group.querySelectorAll('.course-card').length,0);
+      document.getElementById('series-status').textContent=`当前显示${count}篇教程`;
+    };
+    selectSeries();window.addEventListener('hashchange',selectSeries);
+  }
 }
 
 function renderBuildGuide(guide, index) {
   const code = section => window.EGG_BLOCKS.figure(window.EGG_BLOCKS.fromTree(section.tree,{definition:/自定义动作|封装成自定义/.test(section.title)}),'彩色积木搭建图') + '<details class="diagram-text"><summary>查看文字连接顺序</summary><div class="lesson-code-wrap"><pre><code>' + escapeHTML(section.tree) + '</code></pre><button class="copy-code" type="button">复制连接文字</button></div></details>';
   const series = practices[index-baseLessonCount]?.series;
-  const related = ["消消乐","数值图"].includes(series) ? '<nav class="recipe-series" aria-label="'+escapeHTML(series)+'系列课程"><span>按顺序搭建这组课程</span>' + practices.map((item,offset)=>item.series===series?'<a href="lesson.html?id='+(offset+baseLessonCount)+'"'+(index===offset+baseLessonCount?' aria-current="page"':'')+'>'+escapeHTML(item.title.split(' · ')[0])+'</a>':'').join('')+'</nav>' : '';
+  const related = ["消消乐","数值图"].includes(series) ? '<details class="series-switcher"><summary>同专题的其他课程</summary><nav class="recipe-series" aria-label="'+escapeHTML(series)+'系列课程">' + practices.map((item,offset)=>item.series===series?'<a href="lesson.html?id='+(offset+baseLessonCount)+'"'+(index===offset+baseLessonCount?' aria-current="page"':'')+'>'+escapeHTML(item.title.split(' · ')[0])+'</a>':'').join('')+'</nav></details>' : '';
   const refs = guide.refs.map(id => manual.entries.find(entry => entry.id === id)).filter(Boolean).map(entry => '<a class="block-reference" href="block.html?id=' + encodeURIComponent(entry.id) + '&lesson=' + index + '">' + escapeHTML(entry.title) + ' <small>' + escapeHTML(entry.group) + '</small></a>').join('');
-  return '<div class="build-guide">' + related + window.EGG_BLOCKS.legend() +
-    '<h3>先准备好这些</h3><ul>' + guide.setup.map(item=>'<li>'+escapeHTML(item)+'</li>').join('') + '</ul>' +
+  return '<div class="build-guide"><h2 class="sr-only">搭建指南</h2><div class="guide-overview"><span><strong>'+guide.sections.length+'</strong> 个搭建步骤</span><span>附彩色连接图与验收清单</span><a class="button button-blue" href="#step-1">开始搭建</a></div>' +
+    '<details class="lesson-preparation" id="preparation"><summary><span>搭建前，先准备好这些<small>环境约定、变量、算例与积木参数</small></span><span class="disclosure-mark" aria-hidden="true">+</span></summary><div class="preparation-body"><h3>环境与约定</h3><ul>' + guide.setup.map(item=>'<li>'+escapeHTML(item)+'</li>').join('') + '</ul>' +
     '<details class="recipe-notation"><summary>第一次照图搭建？先看符号与操作说明</summary><ol>' + window.EGG_GUIDE_NOTATION.map(item=>'<li>'+escapeHTML(item)+'</li>').join('') + '</ol></details>' +
     (guide.variables.length ? '<h3 id="variables">变量清单</h3><p>列表类型与普通变量类型分开选择，名称保持一致。</p><div class="table-wrap"><table><thead><tr><th scope="col">名称</th><th scope="col">类型</th><th scope="col">初值 / 用途</th></tr></thead><tbody>' + guide.variables.map(row=>'<tr>'+row.map(cell=>'<td>'+escapeHTML(cell)+'</td>').join('')+'</tr>').join('') + '</tbody></table></div>' : '<p class="recipe-check">本课不需要创建变量。</p>') +
     (guide.samples?.length ? '<h3>跟着数值算一遍</h3><div class="table-wrap"><table><thead><tr>'+guide.samples[0].map(cell=>'<th scope="col">'+escapeHTML(cell)+'</th>').join('')+'</tr></thead><tbody>'+guide.samples.slice(1).map(row=>'<tr>'+row.map(cell=>'<td>'+escapeHTML(cell)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>' : '') +
-    '<h3>本课积木 · 点开核对参数</h3><div class="block-references">' + refs + '</div>' +
-    '<nav class="recipe-nav" aria-label="本课搭建步骤"><strong>搭建步骤</strong><ol>' + guide.sections.map((section,i)=>'<li><a href="#step-'+(i+1)+'">'+escapeHTML(section.title)+'</a></li>').join('') + '</ol><a href="#acceptance">试玩验收</a></nav>' +
+    '<h3>本课积木 · 点开核对参数</h3><div class="block-references">' + refs + '</div></div></details>' + related + window.EGG_BLOCKS.legend() +
     guide.sections.map((section,i)=>'<section class="recipe-step" id="step-'+(i+1)+'"><p class="recipe-number">STEP '+String(i+1).padStart(2,'0')+'</p><h3>'+escapeHTML(section.title)+'</h3><ol>'+section.steps.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ol>'+code(section)+'<p class="recipe-check"><strong>这一步检查：</strong>'+escapeHTML(section.verify)+'</p></section>').join('') +
     '<section id="acceptance" class="recipe-step"><h3>搭完后逐项试玩</h3><ol>'+guide.tests.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ol></section>' +
     (guide.pitfalls?.length ? '<section class="recipe-step"><h3>常见问题</h3><ul>'+guide.pitfalls.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ul></section>' : '') +
@@ -56,7 +66,9 @@ function renderPractice(tutorial, index) {
 
 if (page === "lesson") {
   const allLessons = [...lessons, ...practices];
-  if (matchMedia("(max-width: 720px)").matches) document.querySelector(".course-outline").open = false;
+  const compactReading=matchMedia('(max-width: 768px)');
+  const updateReadingLayout=()=>{document.querySelector('.lesson-outline').open=!compactReading.matches;document.querySelector('.course-outline').open=false;};
+  updateReadingLayout();compactReading.addEventListener('change',updateReadingLayout);
   const rawId = params.get("id") ?? "0";
   const index = /^\d+$/.test(rawId) ? Number(rawId) : -1;
   const groupOf = (item, i) => i < baseLessonCount ? "入门课程" : item.series || "积木练习";
@@ -78,6 +90,10 @@ if (page === "lesson") {
     document.getElementById("lesson-kicker").textContent = lesson.category;
     document.getElementById("lesson-title").textContent = lesson.title;
     document.getElementById("lesson-body").innerHTML = isPractice ? renderPractice(lesson, index) : renderBuildGuide(buildGuides[index], index) + '<details class="concept-review"><summary>概念与原示例回顾' + (index===5?' · 含Lua语法示例':'') + '</summary>' + lesson.content + '</details>';
+    const guide=buildGuides[index];
+    document.getElementById('lesson-steps').innerHTML='<a href="#preparation">准备与变量</a>'+guide.sections.map((section,i)=>'<a href="#step-'+(i+1)+'"><span>'+String(i+1).padStart(2,'0')+'</span>'+escapeHTML(section.title.replace(/^自定义动作[：:]\s*/,''))+'</a>').join('')+'<a href="#acceptance">试玩验收</a>';
+    const observer=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting){document.querySelectorAll('#lesson-steps a').forEach(link=>{if(link.hash==='#'+entry.target.id)link.setAttribute('aria-current','step');else link.removeAttribute('aria-current');});}},{rootMargin:'-18% 0px -55% 0px'});
+    document.querySelectorAll('#preparation,.recipe-step[id]').forEach(section=>observer.observe(section));
     document.getElementById("lesson-position").textContent = `${index + 1} / ${allLessons.length}`;
     const previous = document.getElementById("previous-lesson");
     previous.href = index === 0 ? "courses.html" : `lesson.html?id=${index - 1}`;
@@ -86,6 +102,29 @@ if (page === "lesson") {
     next.href = index === allLessons.length - 1 ? "practice.html" : `lesson.html?id=${index + 1}`;
     next.textContent = index === allLessons.length - 1 ? "返回实战目录" : "下一课";
   }
+}
+
+// 锚点可直达折叠区里的变量表，原生 details 仍支持键盘展开。
+function revealAnchor(hash) {
+  let id;try{id=decodeURIComponent(hash.slice(1));}catch{return;}
+  const target=document.getElementById(id);if(!target)return;
+  let node=target;while(node){if(node.tagName==='DETAILS')node.open=true;node=node.parentElement;}
+  requestAnimationFrame(()=>target.scrollIntoView({block:'start',behavior:'instant'}));
+}
+if(page==='lesson') {
+  document.addEventListener('click',event=>{const link=event.target.closest('a[href^="#"]');if(link&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey)revealAnchor(link.hash);});
+  window.addEventListener('hashchange',()=>revealAnchor(location.hash));
+  if(location.hash)revealAnchor(location.hash);
+}
+if(page==='home') {
+  document.getElementById('home-demo').addEventListener('click',()=>{
+    document.getElementById('demo-status').textContent='你好，世界！欢迎来到蛋码自习室';
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    document.querySelectorAll('.stage-block,.stage-eggy').forEach((element,index)=>{
+      element.getAnimations().forEach(animation=>animation.cancel());
+      element.animate([{opacity:.2,translate:'0 20px'},{opacity:1,translate:'0 0'}],{duration:650,delay:index*100,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'});
+    });
+  });
 }
 
 let toastTimer;
