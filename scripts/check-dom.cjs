@@ -325,6 +325,13 @@ async function checkManual() {
 }
 async function checkHomeAndCourses() {
   let dom = open('courses.html'), doc = dom.window.document;
+  const layout = doc.querySelector('.course-map-layout');
+  const summary = doc.querySelector('[data-learning-progress-summary]');
+  assert.equal(summary.parentElement, layout.parentElement, '学习记录应独立于课程的两列布局');
+  assert.equal(layout.previousElementSibling, summary, '学习记录应显示在课程列表上方');
+  assert.equal(layout.children.length, 2, '课程布局只应包含主列表和辅助提示');
+  assert.equal(layout.firstElementChild.id, 'courses-grid', '课程列表应占据左侧主栏');
+  assert(layout.lastElementChild.classList.contains('journey-guide'), '辅助提示应位于右侧');
   assert.equal(doc.querySelectorAll('.course-card').length, 6);
   [...doc.querySelectorAll('.course-card')].forEach((card, id) => assert.equal(card.getAttribute('href'), `lesson.html?id=${id}`));
   verifyDocument(dom, 'courses.html'); close(dom);
