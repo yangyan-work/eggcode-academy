@@ -1,0 +1,52 @@
+.challenge-solution {
+  margin-top: 24px;
+  border: 1px solid var(--line, #d5dfd0);
+  border-radius: 14px;
+  background: #f6faef;
+  overflow: hidden;
+}
+.challenge-solution > summary {
+  display: list-item;
+  min-height: 44px;
+  padding: 18px 22px;
+  color: var(--text, #273327);
+  font-weight: 750;
+  cursor: pointer;
+}
+.challenge-solution > summary::marker { color: #50832d; }
+.challenge-solution > summary small {
+  display: block;
+  margin: 5px 0 0 18px;
+  color: #586a4d;
+  font-size: 14px;
+  font-weight: 400;
+}
+.challenge-solution > summary:focus-visible {
+  outline: 3px solid #568b30;
+  outline-offset: -5px;
+  border-radius: 12px;
+}
+.challenge-solution[open] > summary { border-bottom: 1px solid var(--line, #d5dfd0); }
+.challenge-solution-body { padding: 22px; background: #fff; }
+.challenge-solution-body h3 { margin: 26px 0 12px; font-size: 19px; color: var(--text, #273327); }
+.challenge-solution-body li { margin: 10px 0; line-height: 1.8; overflow-wrap: anywhere; }
+.challenge-solution-note, .challenge-connection-label { color: #586451; font-size: 14px; line-height: 1.8; }
+.challenge-solution-body .lesson-code-wrap pre {
+  padding-right: 20px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.challenge-solution-body .lesson-code-wrap { padding-bottom: 56px; }
+.challenge-solution-body .copy-code {
+  inset: auto 12px 10px auto;
+  min-height: 44px;
+  max-width: calc(100% - 24px);
+}
+#challenge, #challenge-solution { scroll-margin-top: calc(var(--site-header-height, 100px) + 24px); }
+@media (max-width: 640px) {
+  .challenge-solution > summary { padding: 16px; }
+  .challenge-solution-body { padding: 16px; }
+  .challenge-solution-body :where(p, li, code) { font-size: 16px; }
+  .challenge-solution-body :where(ol, ul) { padding-left: 22px; }
+}

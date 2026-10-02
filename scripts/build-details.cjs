@@ -13,13 +13,13 @@ for(let id=0;id<145;id++){
  assert(d.scopeNote&&d.scene.length&&d.sections.length&&d.tests.length>=3&&d.triggerPlacement.length,id+' incomplete detail');
  for(const s of d.sections)assert(s.title&&s.steps.length>=8&&s.check,id+' needs actual section instructions');
 }
-const output=new Map();let group={},number=1;
-function emit(){if(!Object.keys(group).length)return;const name='detailed-guides-'+String(number++).padStart(2,'0')+'.js';output.set(name,'"use strict";\nwindow.EGG_DETAILED_GUIDES ||= {};\nObject.assign(window.EGG_DETAILED_GUIDES, '+JSON.stringify(group,null,2)+');\n');group={};}
+const output=new Map(),manifest={};let group={},number=1;
+function emit(){if(!Object.keys(group).length)return;const name='detailed-guides-'+String(number++).padStart(2,'0')+'.js';const content='"use strict";\nwindow.EGG_DETAILED_GUIDES ||= {};\nObject.assign(window.EGG_DETAILED_GUIDES, '+JSON.stringify(group,null,2)+');\n';output.set(name,content);const version=require('node:crypto').createHash('sha256').update(content).digest('hex').slice(0,12);for(const id of Object.keys(group))manifest[id]={file:name,version};group={};}
 for(let id=0;id<145;id++){if(Object.keys(group).length&&Buffer.byteLength(JSON.stringify({...group,[id]:all[id]},null,2))>190000)emit();group[id]=all[id];}emit();
 for(const [name,content]of output){if(check)assert.equal(read(name),content,name+' stale');else fs.writeFileSync(path.join(root,name),content);}
-const html=read('lesson.html').replace(/<script src="detailed-guides-\d+\.js[^>]*><\/script>/g,'');
-const scripts=[...output.keys()].map(f=>'<script src="'+f+'?v=20261002-quality" defer></script>').join('');
-const updated=html.replace('<script src="learning-detail.js',scripts+'<script src="learning-detail.js');
+const manifestText=JSON.stringify(manifest,null,2)+'\n';
+if(check)assert.equal(read('detail-chunks.json'),manifestText,'Detailed chunk manifest stale');else fs.writeFileSync(path.join(root,'detail-chunks.json'),manifestText);
+const updated=read('lesson.html').replace(/<script src="detailed-guides-\d+\.js[^>]*><\/script>/g,'').replace(/<script src="(?:app|lesson-loader)\.js[^>]*><\/script>/,'<script src="lesson-loader.js?v=20261002-learning" defer></script>');
 if(check)assert.equal(read('lesson.html'),updated,'Lesson script list stale');else fs.writeFileSync(path.join(root,'lesson.html'),updated);
 const old=fs.readdirSync(root).filter(f=>/^detailed-guides-\d+\.js$/.test(f)&&!output.has(f));
 if(check)assert(!old.length,'Obsolete detail chunks');else for(const f of old)fs.unlinkSync(path.join(root,f));

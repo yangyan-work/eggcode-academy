@@ -86,3 +86,11 @@ python3 -m http.server 8000
 - 变量表增加作用范围的原文依据与设置理由；大图弹窗增加缩放和恢复100%
 
 新增检查：`node scripts/check-progress.cjs`、`node scripts/check-big-number.cjs`、`node scripts/check-quality.cjs`。这三个检查及原有DOM测试均需要jsdom。设置好NODE_PATH后，运行 `node scripts/build-verification.cjs` 可重跑全部检查并生成证据页；失败时不会生成通过记录。`--build-only`只生成待检查页，不是验收通过。
+
+## 案例、挑战解法与按课加载
+
+- 积木案例在 `block-curated.js` 中精确绑定原文ID；新增22个独立场景覆盖44条移动端／电脑端记录，包含具体参数、预期、反例和原文疑点。未知时序或枚举不会补成已确认的行为。
+- `challenge-solutions.js` 保存有挑战题课程的参考解法；原题保留，参考思路、连接顺序、验收例与误区折叠展示。这些是教学参考，不代表编辑器试玩已通过。
+- `scripts/build-details.cjs` 生成原有24份详解及 `detail-chunks.json` 映射。课程页由 `lesson-loader.js` 先读取小索引，再加载本课对应分片，最后执行页面渲染；目录、旧ID和前置课保留。分片使用内容哈希缓存，索引重新验证；加载失败显示重试，不静默展示缺失详解的课程。
+- 修改 `detail-source` 后运行 `node scripts/build-details.cjs`，提交详解分片和索引。部署须保留完整目录，并通过 HTTP/HTTPS 访问课程页。
+- 新增检查见 `scripts/README.md`。证据页生成现在也需要单独QA环境中的 Playwright，真实浏览器检查仍不执行原生蛋码。

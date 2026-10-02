@@ -1,8 +1,8 @@
 {
-  "build": "20261002-quality",
+  "build": "20261002-learning",
   "status": "passed",
-  "checkedAt": "2026-10-02T07:35:09.801Z",
-  "scope": "文档结构、图示和自动化DOM检查；不是原生蛋码执行",
+  "checkedAt": "2026-10-02T09:19:24.100Z",
+  "scope": "文档结构、图示、自动化DOM与真实浏览器按课加载检查；不是原生蛋码执行",
   "engineStatus": "not_tested",
   "webGameplayStatus": "individual_lessons_not_provided",
   "checks": [
@@ -40,6 +40,21 @@
       "script": "scripts/check-quality.cjs",
       "status": "passed",
       "output": "PASS quality integration: 13 representative lessons; honest validation vs personal progress, 5-column variable evidence, independent numeric branches, dialog zoom/reset, evidence manifest"
+    },
+    {
+      "script": "scripts/check-block-cases.cjs",
+      "status": "passed",
+      "output": "PASS curated cases: 22 distinct scenarios, 44 native IDs; exact source parameters, object domains, counterexamples and SVG inputs. Native editor not tested."
+    },
+    {
+      "script": "scripts/check-challenges.cjs",
+      "status": "passed",
+      "output": "挑战检查通过：121 / 121 题，363 条搭建改法，242 个验收例；折叠、转义、目录锚点和关键算例已核对。"
+    },
+    {
+      "script": "scripts/check-loading-browser.cjs",
+      "status": "passed",
+      "output": "已核对 7 个课程加载与页面\n已核对 14 个课程加载与页面\n已核对 21 个课程加载与页面\n已核对 28 个课程加载与页面\nPASS real browser loading: 28 lessons / 24 chunks, single renderer, TOC and navigation, mobile layout, 4 failures and successful retries"
     }
   ],
   "lessons": [
@@ -1205,11 +1220,17 @@
     }
   ],
   "files": {
-    "app.js": "c0ffe94bd1980fd790a8dadf09c7487e19777b0aaadb64cde58d663472b5e803",
+    "app.js": "0292edb43530830dfbfa7c7e37f5666871a569377f00c22307226ead066bdf3b",
     "learning-detail.js": "d278919ee0d84e724a7f16738e55b8ab0698412bb375a6eaa11d7679984f408f",
     "block-diagrams.js": "3c04e2d1c1e277272629f2c8998cd1ad6d822daae34f4eaad6dfa242fb176839",
     "course-validation.js": "52a49fe96ef8fd8e350e52e6b50b29c3e9c421a534d2f1dc9eebfaf6b28a1cfa",
     "learning-progress.js": "142e37ff6b5d37557f650e72eee3daaa15975f99bc39ed176c0d629c49f09d76",
-    "big-number-lab.js": "e8d5b83d484e9aae489570d32f16a047e29b039ad4d9f6b165538da6951e6b86"
+    "big-number-lab.js": "e8d5b83d484e9aae489570d32f16a047e29b039ad4d9f6b165538da6951e6b86",
+    "lesson-loader.js": "3fe42976361fbc0701ccd403e39125585331196b35672186e37ba330f1de4c22",
+    "detail-chunks.json": "7219214e4ba3b6ec8b41b551b1da7af7bb59f31c1e393b3f50956d57384d1030",
+    "block-curated.js": "cfb8977bc8315dbca8e1963e7236ef58d9ce158203e56a81fc722c88b894a599",
+    "block-examples.js": "56d60df2912709700010d0c6d5f95f680b2671f29512c220d53dcd90a9ed7c7a",
+    "challenge-solutions.js": "0151c22edcb0ffb280db7956e436e80ea57e585066a247edf61b6f318f895691",
+    "challenge-solutions.css": "424cac086f8d0a220bd23e17af331994f42e59e4b6ce92ba6a583191af31b7ea"
   }
 }

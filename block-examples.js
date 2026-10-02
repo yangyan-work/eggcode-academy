@@ -116,7 +116,7 @@ window.EGG_EXAMPLE_FOR = function(entry) {
   }
   const curated=(window.EGG_CURATED||[]).find(x=>x.exactIds?.includes(entry.id));
   if(curated){
-    result={...result,mode:'搭建示例',sampleTitle:curated.name||('试一次：'+entry.title),explanation:curated.explanation,setup:curated.setup,steps:curated.steps,expected:curated.expected,pitfalls:curated.pitfalls,returnType:curated.returnType||'',tree:''};
+    result={...result,diagramInputs:curated.diagramInputs||result.diagramInputs,mode:'搭建示例',sampleTitle:curated.name||('试一次：'+entry.title),explanation:curated.explanation,setup:curated.setup,steps:curated.steps,expected:curated.expected,pitfalls:curated.pitfalls,returnType:curated.returnType||'',tree:''};
   }
   result.setup=result.setup.length?result.setup:['打开一份独立测试地图，进入对应关卡的蛋码画布。'];
   if(note&&!curated&&!family)result.explanation=(note.length>450?note.slice(0,450)+'…（完整说明见原文）':note).replace(/!\[[^\]]*\]\([^)]*\)/g,'').replace(/\*\*/g,'');

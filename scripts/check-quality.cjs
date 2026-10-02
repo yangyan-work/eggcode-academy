@@ -1,7 +1,8 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),{JSDOM}=require('jsdom');
 const root=path.resolve(__dirname,'..');
-function open(id){const d=new JSDOM(fs.readFileSync(path.join(root,'lesson.html'),'utf8'),{url:'https://quality.invalid/lesson.html?id='+id,runScripts:'outside-only'}),w=d.window;w.matchMedia=()=>({matches:false,addEventListener(){},removeEventListener(){}});w.IntersectionObserver=class{observe(){}disconnect(){}};w.requestAnimationFrame=fn=>{fn();return 1};w.cancelAnimationFrame=()=>{};w.HTMLElement.prototype.scrollIntoView=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true};w.HTMLDialogElement.prototype.close=function(){this.open=false};for(const s of w.document.querySelectorAll('script[src]'))w.eval(fs.readFileSync(path.join(root,s.getAttribute('src').split('?')[0]),'utf8'));return d;}
+const {renderingScripts}=require('./check.cjs');
+function open(id){const d=new JSDOM(fs.readFileSync(path.join(root,'lesson.html'),'utf8'),{url:'https://quality.invalid/lesson.html?id='+id,runScripts:'outside-only'}),w=d.window;w.matchMedia=()=>({matches:false,addEventListener(){},removeEventListener(){}});w.IntersectionObserver=class{observe(){}disconnect(){}};w.requestAnimationFrame=fn=>{fn();return 1};w.cancelAnimationFrame=()=>{};w.HTMLElement.prototype.scrollIntoView=()=>{};w.HTMLDialogElement.prototype.showModal=function(){this.open=true};w.HTMLDialogElement.prototype.close=function(){this.open=false};for(const source of renderingScripts('lesson.html','?id='+id))w.eval(fs.readFileSync(path.join(root,source),'utf8'));return d;}
 for(const id of [0,13,24,35,36,37,38,39,40,70,75,128,142]){
  const d=open(id),doc=d.window.document;
  assert.equal(doc.querySelectorAll('.verification-grid article').length,4);

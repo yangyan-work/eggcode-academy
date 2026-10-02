@@ -117,10 +117,16 @@ function renderBuildGuide(guide, index) {
     '<p class="lesson-source">教程解读 · 对照2026-09-03原点版移动端手册编写。连接图需在蛋码画布逐块搭建，不能直接粘贴执行。彩色积木图为教学连接示意，完整玩法仍需按本课清单逐项试玩验收。自定义动作含异步积木时的执行顺序未在手册中明确，本教程核心动作不放等待或计时器；涉及调用后读取结果的地方，应先按步骤验收，也可把动作定义中的整串积木直接展开到调用处。</p></div>';
 }
 
+function renderChallengeSolution(index) {
+  const solution = window.EGG_CHALLENGE_SOLUTIONS?.[index];
+  if (!solution) return '';
+  const list = (items, tag) => '<'+tag+'>'+items.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</'+tag+'>';
+  return '<details class="challenge-solution" id="challenge-solution" data-challenge-lesson="'+index+'"><summary><span>展开参考解法<small>搭建改法 · 关键连接 · 验收与误区</small></span></summary><div class="challenge-solution-body"><p class="challenge-solution-note">先自己试一遍，再对照这份解法。建议在本课副本中做挑战，避免改变后续课程沿用的原始配置。下面是教学扩展思路与预期结果，尚未逐题通过蛋仔编辑器实机验收。</p><h3>怎样修改与搭建</h3>'+list(solution.steps,'ol')+'<h3>关键逻辑连接顺序</h3><p class="challenge-connection-label">文字为搭建说明，需要在蛋码画布按步骤接线；不能直接粘贴运行或导入为工程。</p><div class="lesson-code-wrap"><pre><code>'+escapeHTML(solution.connection)+'</code></pre><button class="copy-code" type="button">复制参考连接</button></div><h3>用这些输入验收</h3>'+list(solution.tests,'ul')+'<h3>这题容易错在哪</h3>'+list(solution.pitfalls,'ul')+'</div></details>';
+}
 function renderPractice(tutorial, index) {
   return '<p class="lesson-callout">目标：' + escapeHTML(tutorial.goal) + '</p>' + renderBuildGuide(buildGuides[index], index) +
     (!buildGuides[index].pitfalls?.length && tutorial.pitfalls?.length ? '<section class="practice-followup"><h2>容易踩到的小坑</h2><ul>'+tutorial.pitfalls.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ul></section>' : '') +
-    (tutorial.challenge ? '<section class="practice-followup"><h2>完成后，再挑战一下</h2><p>'+escapeHTML(tutorial.challenge)+'</p></section>' : '');
+    (tutorial.challenge ? '<section class="practice-followup" id="challenge"><h2>完成后，再挑战一下</h2><p>'+escapeHTML(tutorial.challenge)+'</p>'+renderChallengeSolution(index)+'</section>' : '');
 }
 
 if (page === "lesson") {
@@ -163,9 +169,9 @@ if (page === "lesson") {
     document.getElementById("lesson-title").textContent = lesson.title;
     document.getElementById("lesson-body").innerHTML = isPractice ? renderPractice(lesson, index) : renderBuildGuide(buildGuides[index], index) + '<details class="concept-review"><summary>概念与原示例回顾' + (index===5?' · 含Lua语法示例':'') + '</summary>' + lesson.content + '</details>';
     const guide=buildGuides[index];
-    document.getElementById('lesson-steps').innerHTML='<a href="#start-here">触发器与场景准备</a><a href="#preparation">准备与变量</a>'+guide.sections.map((section,i)=>'<a href="#step-'+(i+1)+'"><span>'+String(i+1).padStart(2,'0')+'</span>'+escapeHTML(section.title.replace(/^自定义动作[：:]\s*/,''))+'</a>').join('')+'<a href="#acceptance">试玩验收</a>';
+    document.getElementById('lesson-steps').innerHTML='<a href="#start-here">触发器与场景准备</a><a href="#preparation">准备与变量</a>'+guide.sections.map((section,i)=>'<a href="#step-'+(i+1)+'"><span>'+String(i+1).padStart(2,'0')+'</span>'+escapeHTML(section.title.replace(/^自定义动作[：:]\s*/,''))+'</a>').join('')+'<a href="#acceptance">试玩验收</a>'+(lesson.challenge?'<a href="#challenge">挑战与参考解法</a>':'');
     const observer=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting){document.querySelectorAll('#lesson-steps a').forEach(link=>{if(link.hash==='#'+entry.target.id)link.setAttribute('aria-current','step');else link.removeAttribute('aria-current');});}},{rootMargin:'-18% 0px -55% 0px'});
-    document.querySelectorAll('#preparation,.recipe-step[id]').forEach(section=>observer.observe(section));
+    document.querySelectorAll('#preparation,.recipe-step[id],#challenge').forEach(section=>observer.observe(section));
     document.getElementById("lesson-position").textContent = `${index + 1} / ${allLessons.length}`;
     const previous = document.getElementById("previous-lesson");
     const sequence = currentSeries?.lessonIds || lessons.map((_,id)=>id);

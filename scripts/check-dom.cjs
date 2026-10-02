@@ -8,7 +8,7 @@ const vm = require('node:vm');
 let JSDOM, VirtualConsole;
 try { ({ JSDOM, VirtualConsole } = require('jsdom')); }
 catch { console.error('DOM QA requires jsdom. Install it in a QA environment and set NODE_PATH to its node_modules directory.'); process.exit(2); }
-const { root, pages, read, scriptFiles, loadContent, checkLocalLink, expectedSeries } = require('./check.cjs');
+const { root, pages, read, renderingScripts, loadContent, checkLocalLink, expectedSeries } = require('./check.cjs');
 const data = loadContent();
 const compiled = new Map();
 const tick = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -42,7 +42,7 @@ function open(file, query = '', options = {}) {
   Object.defineProperty(w.navigator, 'clipboard', { configurable: true, value: { writeText: async text => { if (options.clipboardFailure) throw new Error('simulated clipboard failure'); w.__copied = text; } } });
   w.addEventListener('error', event => errors.push(event.error || new Error(event.message)));
   w.addEventListener('unhandledrejection', event => errors.push(event.reason));
-  for (const source of scriptFiles(file)) {
+  for (const source of renderingScripts(file, query)) {
     if (!compiled.has(source)) compiled.set(source, new vm.Script(read(source), { filename: source }));
     compiled.get(source).runInContext(dom.getInternalVMContext());
   }
@@ -94,7 +94,12 @@ async function checkLessonRoutes() {
     assert.equal(doc.querySelectorAll('#lesson-toc a').length, data.all.length, `route ${id} TOC count`);
     assert.equal(doc.querySelectorAll('#lesson-toc a[aria-current="page"]').length, 1);
     assert.equal(doc.querySelector('#lesson-toc a[aria-current="page"]').getAttribute('href'), `lesson.html?id=${id}`);
-    assert.equal(doc.querySelectorAll('#lesson-steps a').length, guide.sections.length + 3);
+    assert.equal(doc.querySelectorAll('#lesson-steps a').length, guide.sections.length + 3 + Number(Boolean(lesson.challenge)));
+    assert.equal(doc.querySelectorAll('.challenge-solution').length, Number(Boolean(lesson.challenge)), `route ${id}: challenge solution coverage`);
+    if (lesson.challenge) {
+      assert(doc.querySelector('#challenge').textContent.includes(lesson.challenge), `route ${id}: original challenge preserved`);
+      assert.equal(doc.querySelector('.challenge-solution').open, false, `route ${id}: solution starts collapsed`);
+    }
     assert.equal(doc.querySelector('#lesson-position').textContent, `${id + 1} / 145`);
     const sequence = series ? [...series.lessonIds] : [0, 1, 2, 3, 4, 5], position = sequence.indexOf(id);
     const previousURL = position === 0 ? parentURL : `lesson.html?id=${sequence[position - 1]}`;

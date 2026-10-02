@@ -13,7 +13,7 @@ For DOM/interaction coverage, make `jsdom` available through Node's normal modul
 NODE_PATH=/path/to/qa/node_modules node --expose-gc scripts/check-dom.cjs
 ```
 
-The DOM checks were developed with jsdom 30.1.1. They load the real page script order without requesting external resources. Clipboard, media queries, intersection observers, scrolling, dialogs, and animation are deliberately stubbed so supported event flows can be tested without a graphical browser.
+The DOM checks were developed with jsdom 30.1.1. They resolve the lesson's detailed chunk from the same manifest before running the renderer, without requesting external resources. Clipboard, media queries, intersection observers, scrolling, dialogs, and animation are deliberately stubbed so supported event flows can be tested without a graphical browser. Actual loading, network failures and retries are covered separately in the real-browser check below.
 
 Coverage:
 - Exactly 145 lesson routes: 6 foundations, 34 original practices, and 105 added lessons across 30 new series
@@ -40,3 +40,13 @@ node scripts/check-renderer.cjs
 ```
 
 The detailed-guide checker covers all 145 lesson mappings, structured scene/trigger/custom-action instructions and tests, and renders location/slot/wiring explanations for all 3,871 manual records. These structural checks complement independent content review; neither proves real editor execution. Renderer tests cover list-literal expansion, separate custom definition bodies, typed list/math operands, parameter labeling, nested branches and unsupported-text fallback.
+
+Learning revision checks:
+
+```sh
+node scripts/check-block-cases.cjs
+node scripts/check-challenges.cjs
+node scripts/check-loading-browser.cjs
+```
+
+The browser check requires Playwright in the separate QA environment (make it available through `NODE_PATH`). Set `EGG_QA_BROWSER` to an installed Chromium/Edge executable when using that browser instead of Playwright's bundled Chromium. The check serves the real repository over HTTP, covers all 24 detailed chunks and 28 representative lessons, checks that only the current chunk and one renderer are requested, and verifies failed manifest/chunk requests, incomplete data and successful retries. It also checks the directory search, chapter navigation and mobile layout. To check the deployed site, pass its base URL as the first argument; use `EGG_QA_PROXY` only when that network needs a proxy. An optional second argument saves screenshots and measured JavaScript bytes. These browser results do not change editor validation status.

@@ -26,7 +26,17 @@ const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const digest = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const localPath = value => decodeURIComponent(new URL(value, 'https://qa.invalid/').pathname).replace(/^\//, '');
 const scriptFiles = page => [...read(page).matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/g)].map(match => localPath(match[1]));
-const lessonScripts = () => scriptFiles('lesson.html').filter(file => file !== 'app.js');
+const detailManifest = () => JSON.parse(read('detail-chunks.json'));
+function renderingScripts(page, query = '', allDetails = false) {
+  const scripts = scriptFiles(page);
+  if (page !== 'lesson.html') return scripts;
+  const raw = new URLSearchParams(query).get('id') ?? '0';
+  const id = /^\d+$/.test(raw) ? Number(raw) : -1;
+  const manifest = detailManifest();
+  const chunks = allDetails ? [...new Set(Object.values(manifest).map(chunk => chunk.file))] : manifest[id] ? [manifest[id].file] : [];
+  return [...scripts.filter(file => file !== 'lesson-loader.js'), ...chunks, 'app.js'];
+}
+const lessonScripts = () => renderingScripts('lesson.html', '', true).filter(file => file !== 'app.js');
 function loadContent() {
   const context = vm.createContext({ window: {} });
   for (const file of lessonScripts()) new vm.Script(read(file), { filename: file }).runInContext(context);
@@ -172,10 +182,18 @@ function checkContent() {
     assert(!/(?:40\s*(?:篇教程|课)|34\s*篇)/.test(html), `${page}: stale visible course count`);
     const scripts = scriptFiles(page);
     assert.equal(new Set(scripts).size, scripts.length, `${page}: duplicate script load`);
-    if(!['editor-guide.html','verification.html'].includes(page)) assert.equal(scripts.at(-1), 'app.js', `${page}: app must load after its data`); else assert.equal(scripts.length,0,'Primer remains readable without JS');
+    if(!['editor-guide.html','verification.html'].includes(page)) assert.equal(scripts.at(-1), page==='lesson.html'?'lesson-loader.js':'app.js', `${page}: rendering must load after its data`); else assert.equal(scripts.length,0,'Primer remains readable without JS');
   }
   const scripts = scriptFiles('lesson.html');
-  for (const file of ['lessons-data.js', 'tutorials.js', 'manual-data.js', 'build-guides.js', 'progression-guides.js', 'curriculum-expansion.js', 'block-diagram-data.js', 'block-diagrams.js']) assert(scripts.includes(file), `lesson page does not load ${file}`);
+  assert(!scripts.includes('app.js'), 'lesson renderer must run exactly once after its detail chunk');
+  assert(!scripts.some(file=>/^detailed-guides-/.test(file)), 'lesson must not preload every detailed chunk');
+  const manifest = detailManifest();
+  assert.equal(Object.keys(manifest).length, all.length, 'one detailed chunk mapping per lesson');
+  for (let id=0;id<all.length;id++) {
+    const chunk=manifest[id]; assert(chunk && /^detailed-guides-\d+\.js$/.test(chunk.file), 'invalid detail chunk '+id);
+    assert.equal(crypto.createHash('sha256').update(read(chunk.file)).digest('hex').slice(0,12),chunk.version,'stale detail chunk '+id);
+  }
+  for (const file of ['lessons-data.js', 'tutorials.js', 'manual-data.js', 'build-guides.js', 'progression-guides.js', 'curriculum-expansion.js', 'block-diagrams.js']) assert(scripts.includes(file), `lesson page does not load ${file}`);
   const guideChunks = fs.readdirSync(root).filter(file => /^curriculum-guides(?:-\d+)?\.js$/.test(file));
   const lessonChunks = fs.readdirSync(root).filter(file => /^curriculum-lessons(?:-\d+)?\.js$/.test(file));
   assert(guideChunks.length && lessonChunks.length, 'missing generated curriculum chunks');
@@ -190,7 +208,7 @@ function checkContent() {
   console.log(`PASS static: ${pages.length} HTML pages, script ordering, local assets, metadata, all JavaScript syntax`);
   return { ...content, sections, references };
 }
-module.exports = { root, pages, read, scriptFiles, loadContent, checkContent, checkLocalLink, expectedSeries };
+module.exports = { root, pages, read, scriptFiles, renderingScripts, loadContent, checkContent, checkLocalLink, expectedSeries };
 if (require.main === module) {
   try { checkContent(); } catch (error) { console.error(`FAIL: ${error.message}`); process.exitCode = 1; }
 }
