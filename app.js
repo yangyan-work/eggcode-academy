@@ -3,11 +3,16 @@
 const page = document.body.dataset.page;
 const params = new URLSearchParams(location.search);
 const lessons = window.EGG_LESSONS || [];
-const practices = window.EGG_TUTORIALS || [];
+const practices = [...(window.EGG_TUTORIALS || []), ...(window.EGG_EXPANSION_LESSONS || [])];
 const buildGuides = window.EGG_BUILD_GUIDES || {};
 const manual = window.EGG_MANUAL;
-const baseLessonCount = Number(document.body.dataset.foundationCount);
-const totalLessonCount = Number(document.body.dataset.lessonCount);
+const curriculum = window.EGG_CURRICULUM;
+const baseLessonCount = curriculum?.foundationCount || Number(document.body.dataset.foundationCount);
+const totalLessonCount = curriculum?.totalCount || Number(document.body.dataset.lessonCount);
+const seriesCatalog = curriculum?.series || [];
+const seriesOf = item => item.series || '积木练习';
+const seriesFor = item => seriesCatalog.find(series => series.name === seriesOf(item));
+const normalizeSearch = value => String(value).normalize('NFKC').toLocaleLowerCase().trim();
 function escapeHTML(value) {
   return String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
 }
@@ -18,37 +23,75 @@ if (page === "home") {
   const legacy = { "#courses": "courses.html", "#practice": "practice.html", "#manual": "manual.html", "#roadmap": "courses.html" };
   if (legacy[location.hash]) location.replace(legacy[location.hash]);
 }
-if (page === "courses" || page === "practice") {
-  const items = page === "courses" ? lessons : practices;
-  const renderCard = (item, index) => {
-    const number = page === 'courses' ? index + 1 : items.slice(0,index+1).filter(lesson=>(lesson.series||'积木练习')===(item.series||'积木练习')).length;
-    return `<a class="course-card tone-${index % 3}" href="lesson.html?id=${index + (page === "practice" ? baseLessonCount : 0)}">
+function renderCourseCard(item, index, foundation = false) {
+    const id = foundation ? index : index + baseLessonCount;
+    const number = foundation ? index + 1 : practices.slice(0,index+1).filter(lesson=>seriesOf(lesson)===seriesOf(item)).length;
+    const title = foundation ? item.title : item.title.replace(new RegExp('^' + seriesOf(item).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*\\d+(?:/\\d+)?\\s*[·：:]\\s*'), '');
+    return `<a class="course-card tone-${index % 3}" href="lesson.html?id=${id}" data-lesson-id="${id}">
     <div class="course-visual"><span class="course-number">${String(number).padStart(2, "0")}</span><img src="assets/eggy-${mascots[index % 3]}.png" width="120" height="130" alt="" loading="lazy"></div>
-    <div class="course-info"><span class="course-category">${escapeHTML(page === "practice" ? item.category : item.category.split(" / ")[1])}</span><h2>${escapeHTML(item.title.replace(/^(?:数值图|消消乐)\s*\d+\s*·\s*/,''))}</h2><p>${escapeHTML(page === "courses" ? courseSummaries[index] : item.summary)}</p><div class="card-bottom"><span>${page === "courses" ? "入门课程 · 含动手练习" : buildGuides[index + baseLessonCount].sections.length + " 个搭建步骤 · 参数与连接图"}</span><span class="round-arrow" aria-hidden="true">›</span></div></div></a>`;
-  };
-  document.getElementById(page === "courses" ? "courses-grid" : "practice-grid").innerHTML = page === "courses" ? items.map(renderCard).join("") : [
-    ["progression", "数值图", "数值图 · 从训练成长到打怪养成", "18 篇连续课程 / 训练成长 · 单人战斗 · 大数转换与运算"],
-    ["match3", "消消乐", "消消乐 · 从棋盘到完整关卡", "6 篇连续课程 / 建议按顺序学习"],
-    ["gameplay", "玩法拓展", "把逻辑变成可玩的挑战", "4 个独立玩法 / 在场景中组合验证"],
-    ["basics", "积木练习", "先练好每一块积木", "6 个基础案例 / 从提示到机关"]
-  ].map(([id, series, title, description],groupIndex) => `<section class="practice-group" id="${id}"><div class="practice-banner"><div><p class="eyebrow">${escapeHTML(series)}专题</p><h2>${escapeHTML(title)}</h2><p>${escapeHTML(description)}</p></div><img src="assets/eggy-${mascots[groupIndex%3]}.png" alt="" width="120" height="130"></div><div class="course-grid">${items.map((item,index) => (item.series || "积木练习") === series ? renderCard(item,index) : "").join("")}</div></section>`).join("");
-  if(page==='practice') {
-    const selectSeries=()=>{
-      const key=location.hash.slice(1),groups=[...document.querySelectorAll('.practice-group')];
-      const selected=groups.some(group=>group.id===key)?key:'all';
-      groups.forEach(group=>{group.hidden=selected!=='all'&&group.id!==selected;});
-      document.querySelectorAll('[data-series]').forEach(link=>{if(link.dataset.series===selected)link.setAttribute('aria-current','true');else link.removeAttribute('aria-current');});
-      const count=groups.filter(group=>!group.hidden).reduce((sum,group)=>sum+group.querySelectorAll('.course-card').length,0);
-      document.getElementById('series-status').textContent=`当前显示${count}篇教程`;
-    };
-    selectSeries();window.addEventListener('hashchange',selectSeries);
+    <div class="course-info"><span class="course-category">${escapeHTML(foundation ? item.category.split(" / ")[1] : item.category)}</span><h2>${escapeHTML(title)}</h2><p>${escapeHTML(foundation ? courseSummaries[index] : item.summary)}</p><div class="card-bottom"><span>${foundation ? "入门课程 · 含动手练习" : buildGuides[id].sections.length + " 个搭建步骤 · 参数与连接图"}</span><span class="round-arrow" aria-hidden="true">›</span></div></div></a>`;
+}
+if (page === 'courses') document.getElementById('courses-grid').innerHTML = lessons.map((item,index)=>renderCourseCard(item,index,true)).join('');
+if (page === 'practice') {
+  const query = document.getElementById('practice-query');
+  const familySelect = document.getElementById('practice-family');
+  const seriesSelect = document.getElementById('practice-series');
+  const grid = document.getElementById('practice-grid');
+  familySelect.innerHTML += curriculum.families.map(family=>`<option value="${family.id}">${escapeHTML(family.name)}</option>`).join('');
+  document.getElementById('family-nav').innerHTML = '<a href="#all" data-family="all">全部教程 <small>'+practices.length+'</small></a>' + curriculum.families.map(family=>`<a href="#family-${family.id}" data-family="${family.id}">${escapeHTML(family.name)} <small>${seriesCatalog.filter(series=>series.family===family.id).reduce((sum,series)=>sum+series.lessonIds.length,0)}</small></a>`).join('');
+  document.getElementById('series-nav').innerHTML = seriesCatalog.map(series=>`<a href="#${series.id}" data-series="${series.id}">${escapeHTML(series.name)} <small>${series.lessonIds.length}</small></a>`).join('');
+  const searchTexts = practices.map(item=>normalizeSearch([item.title,item.series,item.category,item.summary,item.goal,...(item.blocks||[])].join(' ')));
+  function seriesOptions(selected = 'all') {
+    seriesSelect.innerHTML = '<option value="all">全部专题</option>' + seriesCatalog.filter(series=>familySelect.value==='all'||series.family===familySelect.value).map(series=>`<option value="${series.id}">${escapeHTML(series.name)}（${series.lessonIds.length}课）</option>`).join('');
+    seriesSelect.value = [...seriesSelect.options].some(option=>option.value===selected) ? selected : 'all';
   }
+  function renderPracticeDirectory() {
+    const terms = normalizeSearch(query.value).split(/\s+/).filter(Boolean);
+    let count=0, groupCount=0;
+    grid.innerHTML = seriesCatalog.map((series,groupIndex)=>{
+      if ((familySelect.value!=='all' && series.family!==familySelect.value) || (seriesSelect.value!=='all' && series.id!==seriesSelect.value)) return '';
+      const ids = series.lessonIds.filter(id=>terms.every(term=>searchTexts[id-baseLessonCount]?.includes(term)));
+      if (!ids.length) return '';
+      count += ids.length; groupCount++;
+      return `<section class="practice-group" id="${series.id}"><div class="practice-banner"><div><p class="eyebrow">${escapeHTML(curriculum.families.find(family=>family.id===series.family).name)} · ${ids.length}${ids.length!==series.lessonIds.length?' / '+series.lessonIds.length:''} 课</p><h2>${escapeHTML(series.name)}</h2><p>${escapeHTML(series.description)}</p></div><img src="assets/eggy-${mascots[groupIndex%3]}.png" alt="" width="120" height="130"></div><div class="course-grid">${ids.map(id=>renderCourseCard(practices[id-baseLessonCount],id-baseLessonCount)).join('')}</div></section>`;
+    }).join('');
+    document.getElementById('practice-empty').hidden = count > 0;
+    document.getElementById('series-status').textContent = `找到 ${count} 篇教程 · ${groupCount} 个专题`;
+    document.querySelectorAll('[data-series]').forEach(link=>{if(link.dataset.series===seriesSelect.value)link.setAttribute('aria-current','true');else link.removeAttribute('aria-current');});
+    document.querySelectorAll('[data-family]').forEach(link=>{if(link.dataset.family===familySelect.value)link.setAttribute('aria-current','true');else link.removeAttribute('aria-current');});
+  }
+  function restoreDirectory() {
+    const state = new URLSearchParams(location.search);
+    const hash = location.hash.slice(1);
+    const selectedSeries = seriesCatalog.find(series=>series.id===hash);
+    const selectedFamily = curriculum.families.find(family=>'family-'+family.id===hash);
+    query.value = state.get('q') || '';
+    familySelect.value = selectedSeries?.family || selectedFamily?.id || (hash==='all' ? 'all' : curriculum.families.find(family=>family.id===state.get('family'))?.id) || 'all';
+    seriesOptions(selectedSeries?.id);
+    renderPracticeDirectory();
+  }
+  function saveDirectory() {
+    const state = new URLSearchParams(location.search);
+    if(query.value.trim())state.set('q',query.value.trim());else state.delete('q');
+    if(familySelect.value!=='all')state.set('family',familySelect.value);else state.delete('family');
+    const hash = seriesSelect.value!=='all' ? seriesSelect.value : familySelect.value!=='all' ? 'family-'+familySelect.value : 'all';
+    history.replaceState(null,'',location.pathname+(state.size?'?'+state:'')+'#'+hash);
+    renderPracticeDirectory();
+  }
+  document.getElementById('practice-filters').addEventListener('submit',event=>{event.preventDefault();saveDirectory();});
+  query.addEventListener('input',saveDirectory);
+  familySelect.addEventListener('change',()=>{seriesOptions();saveDirectory();});
+  seriesSelect.addEventListener('change',saveDirectory);
+  document.getElementById('practice-reset').addEventListener('click',()=>{query.value='';familySelect.value='all';seriesOptions();saveDirectory();query.focus();});
+  window.addEventListener('hashchange',restoreDirectory);
+  window.addEventListener('popstate',restoreDirectory);
+  restoreDirectory();
 }
 
 function renderBuildGuide(guide, index) {
   const code = section => window.EGG_BLOCKS.figure(window.EGG_BLOCKS.fromTree(section.tree,{definition:/自定义动作|封装成自定义/.test(section.title)}),'彩色积木搭建图') + '<details class="diagram-text"><summary>查看文字连接顺序</summary><div class="lesson-code-wrap"><pre><code>' + escapeHTML(section.tree) + '</code></pre><button class="copy-code" type="button">复制连接文字</button></div></details>';
-  const series = practices[index-baseLessonCount]?.series;
-  const related = ["消消乐","数值图"].includes(series) ? '<details class="series-switcher"><summary>同专题的其他课程</summary><nav class="recipe-series" aria-label="'+escapeHTML(series)+'系列课程">' + practices.map((item,offset)=>item.series===series?'<a href="lesson.html?id='+(offset+baseLessonCount)+'"'+(index===offset+baseLessonCount?' aria-current="page"':'')+'>'+escapeHTML(item.title.split(' · ')[0])+'</a>':'').join('')+'</nav></details>' : '';
+  const series = index >= baseLessonCount ? seriesFor(practices[index-baseLessonCount]) : null;
+  const related = series ? '<details class="series-switcher"><summary>'+escapeHTML(series.name)+' · 同专题 '+series.lessonIds.length+' 课</summary><nav class="recipe-series" aria-label="'+escapeHTML(series.name)+'系列课程">' + series.lessonIds.map(id=>'<a href="lesson.html?id='+id+'"'+(index===id?' aria-current="page"':'')+'>'+escapeHTML(practices[id-baseLessonCount].title)+'</a>').join('')+'</nav><a class="text-link" href="practice.html#'+series.id+'">查看这个专题</a></details>' : '';
   const refs = guide.refs.map(id => manual.entries.find(entry => entry.id === id)).filter(Boolean).map(entry => '<a class="block-reference" href="block.html?id=' + encodeURIComponent(entry.id) + '&lesson=' + index + '">' + escapeHTML(entry.title) + ' <small>' + escapeHTML(entry.group) + '</small></a>').join('');
   return '<div class="build-guide"><h2 class="sr-only">搭建指南</h2><div class="guide-overview"><span><strong>'+guide.sections.length+'</strong> 个搭建步骤</span><span>附彩色连接图与验收清单</span><a class="button button-blue" href="#step-1">开始搭建</a></div>' +
     '<details class="lesson-preparation" id="preparation"><summary><span>搭建前，先准备好这些<small>环境约定、变量、算例与积木参数</small></span><span class="disclosure-mark" aria-hidden="true">+</span></summary><div class="preparation-body"><h3>环境与约定</h3><ul>' + guide.setup.map(item=>'<li>'+escapeHTML(item)+'</li>').join('') + '</ul>' +
@@ -63,7 +106,9 @@ function renderBuildGuide(guide, index) {
 }
 
 function renderPractice(tutorial, index) {
-  return '<p class="lesson-callout">目标：' + escapeHTML(tutorial.goal) + '</p>' + renderBuildGuide(buildGuides[index], index);
+  return '<p class="lesson-callout">目标：' + escapeHTML(tutorial.goal) + '</p>' + renderBuildGuide(buildGuides[index], index) +
+    (!buildGuides[index].pitfalls?.length && tutorial.pitfalls?.length ? '<section class="practice-followup"><h2>容易踩到的小坑</h2><ul>'+tutorial.pitfalls.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ul></section>' : '') +
+    (tutorial.challenge ? '<section class="practice-followup"><h2>完成后，再挑战一下</h2><p>'+escapeHTML(tutorial.challenge)+'</p></section>' : '');
 }
 
 if (page === "lesson") {
@@ -73,8 +118,20 @@ if (page === "lesson") {
   updateReadingLayout();compactReading.addEventListener('change',updateReadingLayout);
   const rawId = params.get("id") ?? "0";
   const index = /^\d+$/.test(rawId) ? Number(rawId) : -1;
-  const groupOf = (item, i) => i < baseLessonCount ? "入门课程" : item.series || "积木练习";
-  document.getElementById("lesson-toc").innerHTML = allLessons.map((item, i) => `${i === 0 || groupOf(item,i) !== groupOf(allLessons[i-1],i-1) ? `<p class="toc-group">${escapeHTML(groupOf(item,i))}</p>` : ""}<a href="lesson.html?id=${i}"${i === index ? ' aria-current="page"' : ""}><span>${String(i < baseLessonCount ? i + 1 : i - baseLessonCount + 1).padStart(2, "0")}</span>${escapeHTML(item.title)}</a>`).join("");
+  const tocGroups = [{id:'foundation',name:'入门课程',lessonIds:lessons.map((_,id)=>id)},...seriesCatalog];
+  document.getElementById("lesson-toc").innerHTML = tocGroups.map(group=>`<details class="toc-series"${group.lessonIds.includes(index)?' open':''}><summary>${escapeHTML(group.name)} <small>${group.lessonIds.length} 课</small></summary>${group.lessonIds.map((id,chapter)=>`<a href="lesson.html?id=${id}" data-search="${escapeHTML(normalizeSearch(allLessons[id].title+' '+allLessons[id].category))}"${id===index?' aria-current="page"':''}><span>${String(chapter+1).padStart(2,'0')}</span>${escapeHTML(allLessons[id].title)}</a>`).join('')}</details>`).join('');
+  document.getElementById('lesson-count').textContent = allLessons.length+' 课';
+  const tocQuery = document.getElementById('lesson-query');
+  tocQuery.addEventListener('input',()=>{
+    const words = normalizeSearch(tocQuery.value).split(/\s+/).filter(Boolean); let matches=0;
+    document.querySelectorAll('.toc-series').forEach(group=>{
+      const links=[...group.querySelectorAll('a')];
+      links.forEach(link=>{link.hidden=!words.every(word=>link.dataset.search.includes(word));if(!link.hidden)matches++;});
+      group.hidden=links.every(link=>link.hidden);
+      group.open=words.length>0 ? !group.hidden : !!group.querySelector('[aria-current="page"]');
+    });
+    document.getElementById('lesson-search-status').textContent=words.length?`找到 ${matches} 课`:'';
+  });
   const lesson = allLessons[index];
   if (!lesson) {
     document.getElementById("lesson-title").textContent = "这堂课暂时不存在";
@@ -83,8 +140,9 @@ if (page === "lesson") {
   } else {
     const isPractice = index >= lessons.length;
     const parent = document.getElementById("lesson-parent");
-    parent.href = isPractice ? "practice.html" : "courses.html";
-    parent.textContent = isPractice ? "玩法实战" : "入门课程";
+    const currentSeries = isPractice ? seriesFor(lesson) : null;
+    parent.href = currentSeries ? 'practice.html#'+currentSeries.id : 'courses.html';
+    parent.textContent = currentSeries?.name || '入门课程';
     document.title = lesson.title + " · 自由树梦想空间";
     document.getElementById("lesson-breadcrumb").textContent = lesson.title;
     const chapterNumber = isPractice ? practices.slice(0, index - baseLessonCount + 1).filter(item => (item.series || "积木练习") === (lesson.series || "积木练习")).length : index + 1;
@@ -98,11 +156,13 @@ if (page === "lesson") {
     document.querySelectorAll('#preparation,.recipe-step[id]').forEach(section=>observer.observe(section));
     document.getElementById("lesson-position").textContent = `${index + 1} / ${allLessons.length}`;
     const previous = document.getElementById("previous-lesson");
-    previous.href = index === 0 ? "courses.html" : `lesson.html?id=${index - 1}`;
-    previous.textContent = index === 0 ? "课程目录" : "上一课";
+    const sequence = currentSeries?.lessonIds || lessons.map((_,id)=>id);
+    const position = sequence.indexOf(index);
+    previous.href = position === 0 ? parent.href : `lesson.html?id=${sequence[position - 1]}`;
+    previous.textContent = position === 0 ? (isPractice ? '专题目录' : '课程目录') : '上一课';
     const next = document.getElementById("next-lesson");
-    next.href = index === allLessons.length - 1 ? "practice.html" : `lesson.html?id=${index + 1}`;
-    next.textContent = index === allLessons.length - 1 ? "返回实战目录" : "下一课";
+    next.href = position === sequence.length - 1 ? (isPractice ? parent.href : 'practice.html') : `lesson.html?id=${sequence[position + 1]}`;
+    next.textContent = position === sequence.length - 1 ? (isPractice ? '完成，回到专题' : '进入玩法实战') : '下一课';
   }
 }
 
@@ -119,6 +179,12 @@ if(page==='lesson') {
   if(location.hash)revealAnchor(location.hash);
 }
 if(page==='home') {
+  const familyGrid = document.getElementById('curriculum-paths');
+  if (familyGrid && curriculum) familyGrid.innerHTML = curriculum.families.map((family,index)=>{
+    const series = seriesCatalog.filter(item=>item.family===family.id);
+    const count = series.reduce((sum,item)=>sum+item.lessonIds.length,0);
+    return `<a class="topic-card topic-${['green','blue','purple'][index%3]}" href="practice.html#family-${family.id}"><span class="curriculum-path-number" aria-hidden="true">${String(index+1).padStart(2,'0')}</span><h3>${escapeHTML(family.name)}</h3><p>${escapeHTML(family.description)}</p><span class="topic-count">${series.length} 个专题 · ${count} 堂课 <b aria-hidden="true">›</b></span></a>`;
+  }).join('');
   // ponytail: 固定 3×3 交换与消除示意；完整棋盘扫描、下落和连锁见消消乐课程。
   const initial=['gold','blue','coral','blue','gold','blue','coral','blue','gold'];
   const cells=[...document.querySelectorAll('[data-cell]')],button=document.getElementById('home-demo'),status=document.getElementById('demo-status');

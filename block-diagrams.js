@@ -57,29 +57,56 @@ window.EGG_BLOCKS = (() => {
   const literal=text=>({kind:'literal',text:String(text)}),value=text=>({kind:'value',text:String(text)}),variable=text=>({kind:'variable',text:String(text)}),condition=parts=>({kind:'condition',parts});
   const known=window.EGG_MANUAL?.entries||[], titles=[...new Set(known.map(e=>e.title))].sort((a,b)=>b.length-a.length);
   const symbols=new Set(Object.values(window.EGG_BUILD_GUIDES||{}).flatMap(g=>g.variables.flatMap(row=>row[0].split(' / '))));
-  function splitAtTop(s,separators,last=false){let depth=0,at=-1;for(let i=0;i<s.length;i++){if('〔[（('.includes(s[i]))depth++;if('〕]）)'.includes(s[i]))depth--;if(!depth&&separators.includes(s[i])&&i>0){at=i;if(!last)break;}}return at;}
-  function splitArguments(s){let depth=0,out=[],start=0;for(let i=0;i<s.length;i++){if('〔[（('.includes(s[i]))depth++;if('〕]）)'.includes(s[i]))depth--;if((s[i]==='，'||s[i]===',')&&depth===0){out.push(s.slice(start,i));start=i+1;}}out.push(s.slice(start));return out;}
+  // Only split connectors outside parameter slots, grouping brackets and quoted text.
+  function topTokens(s,tokens){
+    const pairs={'〔':'〕','[':']','（':'）','(':')'},stack=[],out=[];let quote='';
+    for(let i=0;i<s.length;i++){
+      const c=s[i];
+      if(quote){if(c==='\\'){i++;continue;}if(c===quote)quote='';continue;}
+      if(c==='"'||c==='“'){quote=c==='“'?'”':'"';continue;}
+      if(pairs[c]){stack.push(pairs[c]);continue;}
+      if(stack.length&&c===stack.at(-1)){stack.pop();continue;}
+      if(stack.length)continue;
+      const token=tokens.find(t=>s.startsWith(t,i));
+      if(token){out.push({at:i,token});i+=token.length-1;}
+    }
+    return out;
+  }
+  function splitAtTop(s,separators,last=false,binary=false){
+    const found=topTokens(s,[...separators]).filter(({at,token})=>at>0&&(!binary||!'+−-'.includes(token)||!/[+−\-×÷*]$/.test(s.slice(0,at).trim())));
+    return (last?found.at(-1):found[0])?.at??-1;
+  }
+  function splitTop(s,separators){let start=0;const out=[];for(const {at,token} of topTokens(s,separators)){out.push(s.slice(start,at));start=at+token.length;}out.push(s.slice(start));return out;}
+  const splitArguments=s=>splitTop(s,['，',',']);
+  const splitStatements=s=>splitTop(s,['；',';']).map(x=>x.trim()).filter(Boolean);
   function expression(raw){
     let s=raw.trim().replace(/〔(?:事件|动作|条件)〕$/,'');
     // 只剥掉包围整个表达式的括号，不能破坏 (a+b)×(c+d) 的分组。
-    while(s.startsWith('(')&&s.endsWith(')')){
+    while((s.startsWith('(')&&s.endsWith(')'))||(s.startsWith('（')&&s.endsWith('）'))){
       let depth=0,encloses=true;
-      for(let i=0;i<s.length-1;i++){if(s[i]==='(')depth++;else if(s[i]===')')depth--;if(depth===0){encloses=false;break;}}
+      for(let i=0;i<s.length-1;i++){if('（('.includes(s[i]))depth++;else if('）)'.includes(s[i]))depth--;if(depth===0){encloses=false;break;}}
       if(!encloses)break;s=s.slice(1,-1).trim();
     }
-    if(/^(true|false|真|假)$/i.test(s))return literal(s==='true'?'真':s==='false'?'假':s);
-    if(/^-?\d+(\.\d+)?(秒|次)?$/.test(s))return literal(s);
+    if(/^(true|false|真|假)$/i.test(s))return literal(s.toLowerCase()==='true'?'真':s.toLowerCase()==='false'?'假':s);
+    if(/^[+−-]?\d+(\.\d+)?(秒|次)?$/.test(s))return literal(s);
     if(/^[“"].*[”"]$/.test(s))return literal(s.replace(/^[“"]|[”"]$/g,''));
     for(const op of ['或','且']){const i=splitAtTop(s,op);if(i>0)return condition([op==='且'?'与':'或',expression(s.slice(0,i)),expression(s.slice(i+1))]);}
-    const i=splitAtTop(s,'≥≤≠=><!');
-    if(i>0){const op=/^(?:>=|<=|!=|[≥≤≠=><])/.exec(s.slice(i))[0];return condition(['比较',expression(s.slice(0,i)),op,expression(s.slice(i+op.length))]);}
-    for(const ops of ['+−-','×÷*']){const i=splitAtTop(s,ops,true);if(i>0)return{kind:'value',parts:['整数运算',expression(s.slice(0,i)),s[i],expression(s.slice(i+1))]};}
+    const comparisons=topTokens(s,['>=','<=','!=','≥','≤','≠','=','>','<']);
+    if(comparisons.length){
+      let start=0;const operands=[];
+      for(const {at,token} of comparisons){operands.push(s.slice(start,at).trim());start=at+token.length;}
+      operands.push(s.slice(start).trim());
+      // 0≤p<2 means (0≤p) AND (p<2), never 0≤(p<2).
+      if(operands.every(Boolean))return comparisons.map(({token},i)=>condition(['比较',expression(operands[i]),token,expression(operands[i+1])])).reduce((left,right)=>condition(['与',left,right]));
+      return literal(s);
+    }
+    for(const ops of ['+−-','×÷*']){const i=splitAtTop(s,ops,true,true);if(i>0&&s.slice(i+1).trim())return{kind:'value',parts:['整数运算',expression(s.slice(0,i)),s[i],expression(s.slice(i+1))]};}
     if(/^N\(.+\)(次)?$/.test(s))return{kind:'value',parts:['获取列表长度',variable(s.slice(2,s.lastIndexOf(')')))]};
     if(s.endsWith('次')&&/[+−×\w]/.test(s.slice(0,-1)))return expression(s.slice(0,-1));
     const list=/^([^\[\]]+)\[([^\[\]]+)\]$/.exec(s);
     if(list)return{kind:'value',parts:['列表取值：整数',variable(list[1]),expression(list[2])]};
     const call=/^(.+?)〔(.*)〕$/.exec(s);
-    if(call)return{kind:'value',parts:[call[1]==='向量'?'由实数获得[X:0, Y:0, Z:0]':call[1],...splitArguments(call[2]).map(x=>expression(call[1]==='向量'?x.replace(/^[XYZ]=/,''):x))]};
+    if(call)return{kind:known.some(e=>e.title===call[1]&&e.platform==='移动端'&&e.category==='条件')?'condition':'value',parts:[call[1]==='向量'?'由实数获得[X:0, Y:0, Z:0]':call[1],...splitArguments(call[2]).map(x=>expression(call[1]==='向量'?x.replace(/^[XYZ]=/,''):x))]};
     if(known.some(e=>e.title===s&&e.category==='取值'))return value(s);
     const labelled=/^(次数|间隔|立刻执行)(.+)$/.exec(s);
     if(labelled)return expression(labelled[2]);
@@ -102,7 +129,12 @@ window.EGG_BLOCKS = (() => {
       if(found){const kind={事件:'event',动作:'action',控制:'control',条件:'condition',取值:'value'}[found.category]||'note';return{kind,parts:parts(clean.replace(/〔(?:事件|本课临时测试|最终仅保留这一条)〕$/,'')),...(['event','control'].includes(kind)?{children:[]}:{} )};}
       return{kind:'note',parts:[line]};
     }
-    function parts(line){const open=line.indexOf('〔');if(open<0)return[line];const close=line.lastIndexOf('〕');if(close<open)return[line];const title=line.slice(0,open);return[title,...splitArguments(line.slice(open+1,close)).map((s,i)=>title==='发送信息'||title==='接收自定义事件（全局）'||title==='发送自定义事件（全局）'||(title==='发送提示给玩家'&&i===1)?literal(s):expression(s)),line.slice(close+1)].filter(x=>x!=='');}
+    function parts(line){
+      const open=line.indexOf('〔');if(open<0)return[line];const close=line.lastIndexOf('〕');if(close<open)return[line];
+      const title=line.slice(0,open),content=line.slice(open+1,close),textOnly=['发送信息','接收自定义事件（全局）','发送自定义事件（全局）'].includes(title);
+      const inputs=textOnly?[literal(content)]:splitArguments(content).map((s,i)=>title==='发送提示给玩家'&&i===1?literal(s):expression(s));
+      return[title,...inputs,line.slice(close+1)].filter(x=>x!=='');
+    }
     for(const raw of tree.split('\n')){
       if(!raw.trim())continue;
       const indent=raw.match(/^ */)[0].length;
@@ -111,12 +143,22 @@ window.EGG_BLOCKS = (() => {
       // 参数说明行并入父积木的插槽。
       const field=/^(接收者|提示文字|持续时间|组件|线速度|是否局部坐标|次数|间隔)：(.+)$/.exec(line);
       if(field&&scope.parent&&scope.parent.kind!=='control'){scope.parent.parts.push(field[1],field[1]==='提示文字'?literal(field[2]):expression(field[2]));continue;}
-      const arrow=line.indexOf(' → ');let before=arrow<0?line:line.slice(0,arrow),after=arrow<0?'':line.slice(arrow+3);
-      if(/^否则/.test(before)){const previous=[...scope.nodes].reverse().find(n=>n.kind==='control');if(previous){previous.otherwise=[];const branch={indent,nodes:previous.otherwise,parent:previous};stack.push(branch);if(after)for(const s of after.split('；'))branch.nodes.push(create(s));}else scope.nodes.push({kind:'note',parts:[line]});continue;}
-      // 同行多次赋值均转为独立动作；字符串内部的分号保持原样。
-      const lines=before.includes('←')&&!before.includes('〔')?before.split('；'):[before];
+      const arrow=topTokens(line,[' → '])[0]?.at??-1;let before=arrow<0?line:line.slice(0,arrow),after=arrow<0?'':line.slice(arrow+3);
+      if(before==='否则'||/^否则如果\s+/.test(before)){
+        const previous=[...scope.nodes].reverse().find(n=>n.kind==='control');
+        if(previous){
+          previous.otherwise=[];let branch={indent,nodes:previous.otherwise,parent:previous};
+          if(before!=='否则'){const nested=create(before.slice(2));branch.nodes.push(nested);branch={indent,nodes:nested.children,parent:nested};}
+          stack.push(branch);if(after)for(const statement of splitStatements(after))branch.nodes.push(create(statement));
+        }else scope.nodes.push({kind:'note',parts:[line]});
+        continue;
+      }
+      // 其余“否则…”是说明文字，不能省略条件或擅自转成无条件的否则分支。
+      if(/^否则/.test(before)){scope.nodes.push({kind:'note',parts:[line]});continue;}
+      // 同行语句均转为独立动作；参数槽和字符串内部的分号保持原样。
+      const lines=splitStatements(before);
       for(const item of lines){const node=create(item);scope.nodes.push(node);
-        if(after){node.children||=[];for(const s of after.split('；'))node.children.push(create(s));}
+        if(after){node.children||=[];for(const s of splitStatements(after))node.children.push(create(s));}
         if(node.children||node.kind==='action'){node.children||=[];stack.push({indent,nodes:node.children,parent:node});}
       }
     }
