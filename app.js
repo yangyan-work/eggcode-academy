@@ -13,7 +13,6 @@ function escapeHTML(value) {
 }
 const mascots = ["yellow", "pink", "black"];
 const courseSummaries = ["打开蛋码，用一条欢迎提示完成第一次创作。", "认识事件、条件和动作，让地图听懂你的指令。", "用变量记录分数，理解数据的作用范围。", "学会判断与重复，把简单动作排出节奏。", "认识列表和自定义积木，让重复步骤变简单。", "阅读一段纯 Lua 示例，向文本编程迈出一小步。"];
-const topics = ["你好，蛋码！", "什么时候，做什么？", "给灵感一点记忆", "再来一次！", "小积木，大能力", "下一站，Lua"];
 
 if (page === "home") {
   const legacy = { "#courses": "courses.html", "#practice": "practice.html", "#manual": "manual.html", "#roadmap": "courses.html" };
@@ -21,9 +20,12 @@ if (page === "home") {
 }
 if (page === "courses" || page === "practice") {
   const items = page === "courses" ? lessons : practices;
-  const renderCard = (item, index) => `<a class="course-card tone-${index % 3}" href="lesson.html?id=${index + (page === "practice" ? baseLessonCount : 0)}">
-    <div class="course-visual"><span class="course-number">${page === "practice" ? "P" : "LESSON "}${String(index + 1).padStart(2, "0")}</span><strong>${escapeHTML(page === "courses" ? topics[index] : item.motif)}</strong><img src="assets/eggy-${mascots[index % 3]}.png" width="120" height="130" alt="" loading="lazy"></div>
-    <div class="course-info"><span class="course-category">${escapeHTML(page === "practice" ? item.category : item.category.split(" / ")[1])}</span><h2>${escapeHTML(item.title)}</h2><p>${escapeHTML(page === "courses" ? courseSummaries[index] : item.summary)}</p><div class="card-bottom"><span>${page === "courses" ? "入门课程 · 含动手练习" : buildGuides[index + baseLessonCount].sections.length + " 个搭建步骤 · 参数与连接图"}</span><span class="round-arrow" aria-hidden="true">↗</span></div></div></a>`;
+  const renderCard = (item, index) => {
+    const number = page === 'courses' ? index + 1 : items.slice(0,index+1).filter(lesson=>(lesson.series||'积木练习')===(item.series||'积木练习')).length;
+    return `<a class="course-card tone-${index % 3}" href="lesson.html?id=${index + (page === "practice" ? baseLessonCount : 0)}">
+    <div class="course-visual"><span class="course-number">${String(number).padStart(2, "0")}</span><img src="assets/eggy-${mascots[index % 3]}.png" width="120" height="130" alt="" loading="lazy"></div>
+    <div class="course-info"><span class="course-category">${escapeHTML(page === "practice" ? item.category : item.category.split(" / ")[1])}</span><h2>${escapeHTML(item.title.replace(/^(?:数值图|消消乐)\s*\d+\s*·\s*/,''))}</h2><p>${escapeHTML(page === "courses" ? courseSummaries[index] : item.summary)}</p><div class="card-bottom"><span>${page === "courses" ? "入门课程 · 含动手练习" : buildGuides[index + baseLessonCount].sections.length + " 个搭建步骤 · 参数与连接图"}</span><span class="round-arrow" aria-hidden="true">↗</span></div></div></a>`;
+  };
   document.getElementById(page === "courses" ? "courses-grid" : "practice-grid").innerHTML = page === "courses" ? items.map(renderCard).join("") : [
     ["progression", "数值图", "数值图 · 从训练成长到打怪养成", "18 篇连续课程 / 训练成长 · 单人战斗 · 大数转换与运算"],
     ["match3", "消消乐", "消消乐 · 从棋盘到完整关卡", "6 篇连续课程 / 建议按顺序学习"],
@@ -117,13 +119,36 @@ if(page==='lesson') {
   if(location.hash)revealAnchor(location.hash);
 }
 if(page==='home') {
-  document.getElementById('home-demo').addEventListener('click',()=>{
-    document.getElementById('demo-status').textContent='你好，世界！欢迎来到蛋码自习室';
-    if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-    document.querySelectorAll('.stage-block,.stage-eggy').forEach((element,index)=>{
-      element.getAnimations().forEach(animation=>animation.cancel());
-      element.animate([{opacity:.2,translate:'0 20px'},{opacity:1,translate:'0 0'}],{duration:650,delay:index*100,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'});
-    });
+  // ponytail: 固定 3×3 交换与消除示意；完整棋盘扫描、下落和连锁见消消乐课程。
+  const initial=['gold','blue','coral','blue','gold','blue','coral','blue','gold'];
+  const cells=[...document.querySelectorAll('[data-cell]')],button=document.getElementById('home-demo'),status=document.getElementById('demo-status');
+  let cleared=false;
+  button.addEventListener('click',async()=>{
+    if(cleared){
+      cells.forEach((cell,index)=>cell.className='demo-tile tile-'+initial[index]);
+      status.textContent='棋盘已重置。交换一下，再试一次。';
+      button.innerHTML='交换，消除！ <span aria-hidden="true">↗</span>';
+      button.setAttribute('aria-label','播放消消乐交换与消除演示');
+      cleared=false;return;
+    }
+    button.disabled=true;
+    const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    try{
+      if(!reduce){
+        const distance=cells[4].offsetTop-cells[1].offsetTop;
+        await Promise.all([[1,distance],[4,-distance]].map(([index,y])=>cells[index].animate([{translate:'0 0'},{translate:'0 '+y+'px'}],{duration:340,easing:'cubic-bezier(.2,.8,.2,1)'}).finished));
+      }
+      cells[1].className='demo-tile tile-gold';cells[4].className='demo-tile tile-blue';
+      if(!reduce)await Promise.all([3,4,5].map(index=>cells[index].animate([{scale:1,opacity:1},{scale:1.12,opacity:1,offset:.35},{scale:.3,opacity:0}],{duration:430}).finished));
+      [3,4,5].forEach(index=>cells[index].classList.add('is-cleared'));
+      status.textContent='消除了 3 个蓝色积木！下一步：下落与补齐。';
+      button.innerHTML='再玩一次 <span aria-hidden="true">↻</span>';
+      button.setAttribute('aria-label','重置消消乐演示棋盘');
+      cleared=true;
+    }catch{
+      cells.forEach((cell,index)=>cell.className='demo-tile tile-'+initial[index]);
+      status.textContent='演示已重置，可以再试一次。';
+    }finally{button.disabled=false;}
   });
 }
 
