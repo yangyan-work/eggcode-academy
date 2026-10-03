@@ -74,13 +74,16 @@
   const cloud=window.EGG_CLOUD,$=id=>document.getElementById(id),form=$('login-email-form');
   if(!cloud||!form)return;
   const query=new URLSearchParams(location.search),buttons=[...document.querySelectorAll('[data-auth-mode]')];
-  let mode=query.get('mode')==='recovery'?'update':'signin',busy=false;
+  const isCloudbase=()=>cloud.status().provider==='cloudbase';
+  let mode=!isCloudbase()&&query.get('mode')==='recovery'?'update':'signin',busy=false,verification=null,lastUserId=cloud.status().user?.id;
   const destination=()=>cloud.safeNext(query.get('next'));
   const hasGate=()=>typeof window.EGG_ACCESS?.logout==='function';
   const titles={signin:'登录',signup:'注册并发送确认邮件',forgot:'发送找回邮件',update:'保存新密码'};
   function showError(error){$('login-cloud-error').textContent=error?.message||String(error);$('login-cloud-result').textContent='';}
+  function cancelVerification(){cloud.cancelVerification?.();verification=null;$('login-otp').value='';$('login-password').value='';$('login-confirm').value='';}
   function setMode(value){
-    if(busy)return;mode=value;
+    if(busy)return;cancelVerification();mode=value==='update'&&isCloudbase()?'forgot':value;
+    if(mode==='forgot'&&isCloudbase()&&cloud.status().user?.email)$('login-email').value=cloud.status().user.email;
     buttons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.authMode===mode)));
     $('login-email-field').hidden=mode==='update';$('login-password-field').hidden=mode==='forgot';$('login-confirm-field').hidden=!['signup','update'].includes(mode);
     $('login-password').autocomplete=mode==='signin'?'current-password':'new-password';$('login-password-label').textContent=mode==='update'?'新密码':'密码';
@@ -88,12 +91,15 @@
     $('login-password').value='';$('login-confirm').value='';render();
   }
   function render(){
-    const state=cloud.status(),hasUser=Boolean(state.user),editing=mode==='update';
-    $('login-email-field').hidden=editing;$('login-password-field').hidden=mode==='forgot';$('login-confirm-field').hidden=!['signup','update'].includes(mode);
+    const state=cloud.status(),hasUser=Boolean(state.user),resetting=verification?.kind==='reset',editing=mode==='update'||mode==='forgot'&&isCloudbase();
+    $('login-email-field').hidden=mode==='update';$('login-email').readOnly=Boolean(verification);
+    $('login-password-field').hidden=verification?.kind==='signup'||mode==='forgot'&&!resetting;
+    $('login-confirm-field').hidden=!(resetting||!verification&&['signup','update'].includes(mode));
+    $('login-otp-field').hidden=!verification;$('login-otp-actions').hidden=!verification;
     $('login-password').autocomplete=mode==='signin'?'current-password':'new-password';$('login-password-label').textContent=editing?'新密码':'密码';
     buttons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.authMode===mode)));
-    if(!busy)$('login-auth-submit').textContent=titles[mode];
-    $('login-email-form').hidden=hasUser&&!editing;
+    if(!busy)$('login-auth-submit').textContent=verification?resetting?'确认验证码并设置密码':'确认验证码':isCloudbase()?({signin:'登录',signup:'发送注册验证码',forgot:'发送重置验证码'}[mode]||titles[mode]):titles[mode];
+    $('login-email-form').hidden=hasUser&&!editing&&!verification;
     $('login-cloud-session').hidden=!hasUser;
     $('login-current-email').textContent=state.user?.email||'';
     $('login-cloud-continue').href=destination();
@@ -104,40 +110,53 @@
   }
   buttons.forEach(button=>button.addEventListener('click',()=>setMode(button.dataset.authMode)));
   $('login-change-password').addEventListener('click',()=>setMode('update'));
+  $('login-otp-cancel').addEventListener('click',()=>{if(!busy){cancelVerification();render();$('login-email').focus();}});
+  $('login-email').addEventListener('input',()=>{if(verification&&!busy){cancelVerification();render();}});
   form.addEventListener('submit',async event=>{
     event.preventDefault();if(busy)return;
-    const action=mode,address=$('login-email').value,secret=$('login-password').value;
-    if(['signup','update'].includes(action)&&secret!==$('login-confirm').value){showError(new Error('两次输入的密码不一致。'));$('login-confirm').focus();return;}
+    const action=mode,address=$('login-email').value,secret=$('login-password').value,challenge=verification;
+    if((challenge?challenge.kind==='reset':['signup','update'].includes(action))&&secret!==$('login-confirm').value){showError(new Error('两次输入的密码不一致。'));$('login-confirm').focus();return;}
     busy=true;render();$('login-auth-submit').textContent='正在处理…';$('login-cloud-error').textContent='';$('login-cloud-result').textContent='';
     try{
       if(!hasGate())throw new Error('登录校验组件未能加载，请刷新后再试。');
-      if(action==='signin'){await cloud.signIn(address,secret);location.assign(destination());}
+      if(challenge){
+        await cloud.verifyEmail($('login-otp').value,challenge.kind==='reset'?secret:undefined);verification=null;$('login-otp').value='';mode='signin';
+        $('login-cloud-result').textContent=challenge.kind==='reset'?'验证码已确认，密码已重置。':'邮箱验证已完成。';location.assign(destination());
+      }else if(action==='signin'){await cloud.signIn(address,secret);location.assign(destination());}
       else if(action==='signup'){
         const data=await cloud.signUp(address,secret,destination());
-        if(data.session){$('login-cloud-result').textContent='账号服务已返回登录会话，可以进入云端账号。';}
+        if(data.verificationRequired){verification={kind:'signup'};$('login-cloud-result').textContent='验证码已发送，请检查收件箱与垃圾箱，并在此页填写验证码。';}
+        else if(data.session){$('login-cloud-result').textContent='账号服务已返回登录会话，可以进入云端账号。';}
         else $('login-cloud-result').textContent='请求已由账号服务处理。请检查邮箱确认邮件；确认邮箱后再登录。若账号已存在，可直接登录或找回密码。';
       }else if(action==='forgot'){
-        await cloud.requestPasswordReset(address,destination());
-        $('login-cloud-result').textContent='账号服务已接受请求。若该邮箱可接收找回邮件，请检查收件箱与垃圾箱，并通过邮件链接设置新密码。';
+        const data=await cloud.requestPasswordReset(address,destination());
+        if(data.verificationRequired){verification={kind:'reset'};$('login-cloud-result').textContent='验证码已发送，请在此页填写验证码和新密码。';}
+        else $('login-cloud-result').textContent='账号服务已接受请求。若该邮箱可接收找回邮件，请检查收件箱与垃圾箱，并通过邮件链接设置新密码。';
       }else{
         await cloud.updatePassword(secret);mode='signin';$('login-cloud-result').textContent='账号服务已确认密码更新。可以继续进入云端账号。';
       }
     }catch(error){showError(error);}finally{
-      $('login-password').value='';$('login-confirm').value='';busy=false;$('login-auth-submit').textContent=titles[mode];render();
+      $('login-password').value='';$('login-confirm').value='';busy=false;render();if(verification)$('login-otp').focus();
     }
   });
   $('login-cloud-signout').addEventListener('click',async()=>{
     if(busy)return;busy=true;render();
-    try{if(!hasGate())throw new Error('登录校验组件未能加载，请刷新后再试。');await window.EGG_ACCESS.logout();mode='signin';$('login-cloud-result').textContent='已退出当前登录。';}
+    try{if(!hasGate())throw new Error('登录校验组件未能加载，请刷新后再试。');cancelVerification();await window.EGG_ACCESS.logout();mode='signin';$('login-cloud-result').textContent='已退出当前登录。';}
     catch(error){showError(error);}finally{busy=false;render();}
   });
   $('login-cloud-continue').addEventListener('click',event=>{
     if(!hasGate()){event.preventDefault();showError(new Error('登录校验组件未能加载，请刷新后再试。'));}
   });
-  cloud.subscribe(state=>{if(state.event==='PASSWORD_RECOVERY')setMode('update');render();});
+  cloud.subscribe(state=>{
+    if(state.event==='VERIFICATION_EXPIRED'){cancelVerification();showError(new Error('验证码步骤已超时，请重新发送。'));}
+    if(lastUserId&&lastUserId!==state.user?.id||state.event==='SIGNED_OUT')cancelVerification();lastUserId=state.user?.id;
+    if(!isCloudbase()&&state.event==='PASSWORD_RECOVERY')setMode('update');render();
+  });
+  window.addEventListener?.('pagehide',cancelVerification);
   const state=cloud.status();
   $('login-cloud-heading').textContent=state.mode==='local'?'邮箱登录待开放':state.mode==='error'?'云端配置需要修正':'使用真实邮箱账号';
   $('login-cloud-description').textContent=state.message;
+  if(isCloudbase())$('login-cloud-help').textContent='邮箱验证码确认后可同步学习记录。教程投稿暂未开放，本机记录不会自动上传。';
   setMode(mode);
   if(!hasGate())showError(new Error('登录校验组件未能加载，请刷新后再试。'));
   if(state.configured&&hasGate()){
@@ -146,7 +165,7 @@
     if(callbackError)showError(new Error('邮箱回跳未完成：'+callbackError));
     cloud.init().then(async()=>{
       const session=await cloud.getSession();
-      if(session&&query.get('mode')==='confirm')$('login-cloud-result').textContent='邮箱回跳会话已恢复，可以进入云端账号。';
+      if(!isCloudbase()&&session&&query.get('mode')==='confirm')$('login-cloud-result').textContent='邮箱回跳会话已恢复，可以进入云端账号。';
       if(mode==='update'&&!session)showError(new Error('当前没有有效的找回会话，请重新发送邮件并通过最新链接回来。'));
       render();
     }).catch(error=>{showError(error);$('login-cloud-heading').textContent='暂时无法连接账号服务';});

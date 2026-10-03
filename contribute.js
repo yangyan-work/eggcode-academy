@@ -25,6 +25,8 @@
     return error.message || '操作未完成，当前编辑仍保留。请先导出教程包备份。';
   }
   function openDB() {
+    const mode=window.EGG_CLOUD?.status().mode;
+    if(mode&&mode!=='local')throw new Error('教程投稿正在接入云端，目前开放课程与个人学习记录。');
     if (!dbPromise) dbPromise = new Promise((resolve, reject) => {
       const request = indexedDB.open(DB, 1);
       request.onupgradeneeded = () => { if (!request.result.objectStoreNames.contains(STORE)) request.result.createObjectStore(STORE,{keyPath:'id'}); };

@@ -37,6 +37,8 @@
   function notify(remote=false) {window.dispatchEvent(new CustomEvent('egg-community-change'));if(!remote)channel?.postMessage('changed');}
   try {if(typeof BroadcastChannel==='function'){channel=new BroadcastChannel(DB);channel.onmessage=event=>{if(event.data==='changed')notify(true);};}}catch {/* 同页事件仍可用；跨页可手动刷新。 */}
   async function transaction(change) {
+    const mode=window.EGG_CLOUD?.status().mode;
+    if(mode&&mode!=='local')fail('教程社区正在接入云端，目前开放课程与个人学习记录。');
     const db=await openDB();
     return new Promise((resolve,reject)=>{
       const tx=db.transaction(STORE,change?'readwrite':'readonly'),store=tx.objectStore(STORE),request=store.get(KEY);let result,issue;

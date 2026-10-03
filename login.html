@@ -52,6 +52,8 @@
             <div id="login-email-field"><label for="login-email">邮箱地址</label><input id="login-email" type="email" required maxlength="254" placeholder="name@example.com" autocomplete="email" aria-describedby="login-cloud-error"></div>
             <div id="login-password-field"><label for="login-password" id="login-password-label">密码</label><input id="login-password" type="password" required minlength="8" maxlength="128" placeholder="至少 8 个字符" autocomplete="current-password" aria-describedby="login-cloud-error"></div>
             <div id="login-confirm-field" hidden><label for="login-confirm">再次输入密码</label><input id="login-confirm" type="password" maxlength="128" autocomplete="new-password" aria-describedby="login-cloud-error"></div>
+            <div id="login-otp-field" hidden><label for="login-otp">邮箱验证码</label><input id="login-otp" type="text" inputmode="numeric" maxlength="64" autocomplete="one-time-code" placeholder="填写邮件中的验证码" aria-describedby="login-otp-help login-cloud-error"><p id="login-otp-help" class="login-field-help">可直接粘贴验证码；离开或刷新页面后需重新发送。</p></div>
+            <div id="login-otp-actions" class="login-auth-modes" hidden><button id="login-otp-cancel" type="button">重新填写邮箱</button></div>
             <button class="space-button space-button-primary login-submit" id="login-auth-submit" type="submit">登录</button>
           </fieldset>
         </form>
@@ -65,6 +67,6 @@
       <div class="login-play"><button class="login-seed-button" id="login-seed" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m12 3 8 8-8 10-8-10Z"/><path d="m4 11 8 2 8-2M12 3v10l-4 3m4-3 4 3"/></svg><span>唤醒一点灵感</span></button><span class="login-seed-response" id="login-seed-response" role="status" aria-live="polite"></span></div>
     </div>
   </main>
-  <footer class="login-footer"><span>自由树梦想空间</span><span>体验模式 · 学习记录保存在当前浏览器</span></footer>
+  <footer class="login-footer"><span>自由树梦想空间</span><span>学习与创作，从这里开始</span></footer>
 </body>
 </html>

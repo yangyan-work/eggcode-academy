@@ -28,7 +28,7 @@
   const date = value => { const d = new Date(value); return Number.isNaN(d.getTime()) ? '演示记录' : new Intl.DateTimeFormat('zh-CN',{month:'long',day:'numeric'}).format(d); };
   const names = {overview:'学习概览',progress:'我的课程',favorites:'我的收藏',notes:'学习笔记',feedback:'问题反馈',settings:'账号与数据'};
   const types = {content:'步骤或参数说明',diagram:'积木图示',other:'其他建议'};
-  let toastTimer, progressQuery = '', progressFilter = 'all', lessonMounted = false;
+  let toastTimer, progressQuery = '', progressFilter = 'all', lessonMounted = false, renderedUser = null;
   const getSection = () => Object.hasOwn(names, location.hash.slice(1)) ? location.hash.slice(1) : 'overview';
   const currentId = () => { const raw = new URLSearchParams(location.search).get('id') ?? '0'; return /^\d+$/.test(raw) && Number(raw) < 145 ? Number(raw) : null; };
   function notify(message) {
@@ -46,7 +46,7 @@
     return `<article class="space-course-row" data-course-id="${id}"><span class="space-course-symbol ${id >= 40 ? 'purple' : id >= 6 ? 'blue' : ''}">${icon('book')}</span><div><h3><a href="${courseLink(id)}">${escape(title(id))}</a></h3><p>${escape(lessons[id]?.series || (id < 6 ? '入门课程' : '玩法实战'))} · ${done ? '已标记学完' : '待学习'}</p></div><div class="space-row-actions">${progress ? `<button type="button" class="space-button" data-space-action="complete" data-lesson-id="${id}" aria-pressed="${done}">${icon(done ? 'check' : 'plus')}${done ? '取消学完' : '标记学完'}</button>` : `<a class="space-course-open" href="${courseLink(id)}" aria-label="${done ? '回顾' : '学习'}：${escape(title(id))}">${icon('arrow')}</a>`}<button type="button" class="space-icon-button" data-space-action="favorite" data-lesson-id="${id}" aria-pressed="${favorite}" aria-label="${favorite ? '取消收藏' : '收藏'}：${escape(title(id))}">${icon('bookmark')}</button></div></article>`;
   }
   function overview(state) {
-    const id = state.lastLesson ?? 12;
+    const id = state.lastLesson ?? (state.mode==='cloud'?0:12);
     const latestNote = [...state.notes].sort((a,b)=>new Date(b.updatedAt)-new Date(a.updatedAt))[0];
     const percent = Math.round(state.completed.length / 145 * 100);
     const routes = [
@@ -82,21 +82,27 @@
     return `<div class="space-section-toolbar"><p>每课一份笔记，记下你真正用得上的经验。</p><button class="space-button space-button-primary" data-space-action="note" type="button">${icon('plus')}写笔记</button></div>${state.notes.length ? `<div class="space-note-grid">${state.notes.map(note=>`<article class="space-note" data-note-id="${note.lessonId}"><small>${date(note.updatedAt)} · 课程笔记</small><h3><a href="${courseLink(note.lessonId)}">${escape(title(note.lessonId))}</a></h3><p>${escape(note.content || '这份笔记还没有内容。')}</p><footer><button class="space-plain" type="button" data-space-action="note" data-lesson-id="${note.lessonId}">编辑笔记</button><button class="space-icon-button" type="button" data-space-action="delete-note" data-lesson-id="${note.lessonId}" aria-label="删除笔记：${escape(title(note.lessonId))}">${icon('trash')}</button></footer></article>`).join('')}</div>` : empty('给下次的自己留一条提示','比如记录一个关键参数、容易漏掉的作用域，或试玩发现的问题。','<button class="space-button space-button-primary" data-space-action="note" type="button">写第一份笔记</button>')}`;
   }
   function feedback(state) {
+    if(state.mode==='cloud')return `<section class="space-panel"><h2>问题反馈</h2><p>问题反馈暂未接入账号服务。学习记录的保存不会自动提交反馈。</p><a class="space-button" href="service-info.html">查看服务说明与反馈方式</a></section>`;
     return `<div class="space-section-toolbar"><p>把遇到的问题说具体，后续更容易一起修好。</p><button class="space-button space-button-primary" type="button" data-space-action="feedback">${icon('plus')}记录问题</button></div><p class="space-warning">这里是反馈流程预览。记录尚未发送给管理员，接入数据库后才能真实提交和查询处理进度。</p>${state.feedback.length ? state.feedback.map(item=>`<article class="space-feedback"><header><h3>${escape(types[item.type] || '其他建议')}</h3><span class="space-status-pill">本机演示 · 未发送</span></header><small>${escape(title(item.lessonId))} · ${date(item.createdAt)}</small><p>${escape(item.content)}</p></article>`).join('') : empty('还没有反馈记录','发现教程步骤不清楚、图示有疑问，或有新玩法建议，都可以先记录下来。','<button type="button" class="space-button" data-space-action="feedback">记录第一个问题</button>')}`;
   }
   function settings(state) {
+    if(state.mode==='cloud')return `<div class="space-settings-grid"><section class="space-panel"><h2>账号与资料</h2><p>${escape(state.email || '真实账号')} · ${state.ready?'学习记录已读取':'学习记录尚未就绪'}</p><button class="space-button" type="button" data-space-action="account">修改昵称</button><button class="space-button" type="button" data-space-action="logout">退出账号</button><a class="space-plain" href="login.html">管理登录与密码</a></section><section class="space-panel"><h2>学习记录</h2><p>${escape(state.storageMessage)} 本机演示数据不会自动导入这个账号。</p><button class="space-button" type="button" data-space-action="refresh">重新读取学习记录</button><button class="space-button" type="button" data-space-action="export">${icon('download')}导出当前学习记录</button><a class="space-plain" href="cloud-account.html">账号与云端投稿</a></section><section class="space-panel"><h2>投稿与社区</h2><p>投稿编辑、广场和消息仍包含当前浏览器的本机体验内容，未实现社区账号共享。学习记录的账号同步不会把这些内容自动提交或合并。</p><a class="space-button" href="contribute.html">编辑投稿</a><a class="space-plain" href="service-info.html">服务说明与反馈</a></section></div>`;
     return `<div class="space-settings-grid"><section class="space-panel"><h2>账号体验</h2><a class="space-plain" href="login.html">打开登录页</a><a class="space-plain" href="contribute.html">投稿教程</a><p>当前${state.active ? `体验昵称是“${escape(state.nickname)}”` : '尚未进入体验账号'}。这不是正式登录，不收集密码。真实账号和跨设备同步会在接入数据库后开放。</p><button class="space-button" type="button" data-space-action="account">${state.active ? '修改体验昵称' : '进入体验账号'}</button>${state.active ? '<button class="space-button" type="button" data-space-action="logout">退出体验账号</button>' : ''}</section><section class="space-panel"><h2>保留已有学习记录</h2><p>可以主动把当前浏览器中原版网站的完成标记合并到这份演示记录。只读取有效课程，不清空原版记录。线上站点与本地预览是不同地址，无法直接互读。</p><button class="space-button" type="button" data-space-action="import">导入同地址本机进度</button></section><section class="space-panel"><h2>数据与备份</h2><p>预览记录${state.storageMode === 'persistent' ? '只保存在这个浏览器和当前地址下' : '当前仅在本页临时保留'}。清理浏览器或更换设备后，演示数据不会自动同步。</p><button class="space-button" type="button" data-space-action="export">${icon('download')}导出演示记录</button><button class="space-button space-button-danger" type="button" data-space-action="reset">恢复初始演示数据</button></section><section class="space-panel"><h2>真实账号与云端记录</h2><p>邮箱登录、云端学习记录与图文上传的接入入口已准备好。填写真实项目配置并完成连接检查后，才能跨设备保存。</p><a class="space-button space-button-primary" href="cloud-account.html">打开云端账号页</a><a class="space-plain" href="admin.html">体验投稿审核</a><div class="space-file-links"><a href="../database/README.md">${icon('note')}查看搭建说明</a><a href="../database/schema.sql" download>${icon('database')}下载数据库配置 SQL</a><a href="../database/config.example.js" download>${icon('settings')}下载公开配置模板</a></div></section></div>`;
   }
   function render() {
     const state = api.getState();
+    if(state.mode==='cloud'&&renderedUser!==state.userId){
+      document.querySelectorAll('#space-note-dialog,#space-account-dialog,#space-feedback-dialog').forEach(dialog=>{if(dialog.open)dialog.close();dialog.querySelector('form')?.reset();});
+      renderedUser=state.userId;
+    }
     if (!isWorkspace) { updateLessonTools(state); return; }
     const focused = document.activeElement;
     const focusAction = focused?.closest('#space-view') ? focused.dataset.spaceAction : null;
     const focusId = focused?.dataset.lessonId;
     const section = getSection();
     document.getElementById('space-nickname').textContent = state.active ? state.nickname : '游客';
-    document.getElementById('space-account-label').textContent = state.active ? '体验账号' : '请先登录';
-    document.getElementById('space-account-button-label').textContent = state.active ? '修改体验昵称' : '登录 / 体验';
+    document.getElementById('space-account-label').textContent = state.active ? (state.mode==='cloud'?'邮箱账号':'体验账号') : '请先登录';
+    document.getElementById('space-account-button-label').textContent = state.active ? (state.mode==='cloud'?'修改昵称':'修改体验昵称') : '登录 / 体验';
     document.querySelector('.space-sidebar-bottom [data-space-action="logout"]').hidden=!state.active;
     document.getElementById('space-page-title').textContent = section === 'overview' && state.active ? `${state.nickname}，欢迎回来。` : names[section];
     document.getElementById('space-page-description').textContent = ({overview:'从上次的课程继续，把想法搭出来。',progress:'找到下一课，再让自己的地图多一点新意。',favorites:'喜欢的玩法，随时回来接着学。',notes:'把搭建中的小发现，留给下一次的自己。',feedback:'记下具体的问题，让教程更容易跟着做。',settings:'管理体验账号，保留自己的学习记录。'})[section];
@@ -104,14 +110,15 @@
     document.querySelectorAll('[data-space-section]').forEach(node=>{ if(node.dataset.spaceSection === section) node.setAttribute('aria-current','page'); else node.removeAttribute('aria-current'); });
     document.querySelectorAll('[data-space-count]').forEach(node=>{node.textContent = state.active ? state[node.dataset.spaceCount].length : 0;});
     const warning = document.getElementById('space-storage-warning');
-    warning.hidden = state.storageMode === 'persistent';
+    warning.hidden = state.mode==='cloud'?state.ready:state.storageMode === 'persistent';
     warning.textContent = state.storageMessage || '浏览器未能保存，当前操作仅在本页临时保留。';
     const view = document.getElementById('space-view');
-    view.innerHTML = !state.active && section !== 'settings' ? empty('先进入体验账号','登录后才能浏览教程、记录进度、收藏和笔记。','<a class="space-button space-button-primary" href="' + loginLink() + '">登录 / 体验</a>') : ({overview,progress,favorites,notes,feedback,settings}[section])(state);
-    if (state.active && section === 'progress') updateProgressList(state);
+    view.innerHTML = state.mode==='cloud'&&!state.ready&&section!=='settings' ? empty(state.loading?'正在读取学习记录':'学习记录暂时无法读取',state.storageMessage,'<button class="space-button space-button-primary" type="button" data-space-action="refresh">重新读取</button>') : !state.active && section !== 'settings' ? empty('先进入体验账号','登录后才能浏览教程、记录进度、收藏和笔记。','<a class="space-button space-button-primary" href="' + loginLink() + '">登录 / 体验</a>') : ({overview,progress,favorites,notes,feedback,settings}[section])(state);
+    if (state.active && (state.mode!=='cloud'||state.ready) && section === 'progress') updateProgressList(state);
+    if(state.mode==='cloud')view.querySelectorAll('[data-space-action]').forEach(button=>{if(['complete','favorite','note','delete-note','account','export'].includes(button.dataset.spaceAction))button.disabled=!state.ready||state.saving;});
     if (focusAction) [...view.querySelectorAll('[data-space-action]')].find(node=>node.dataset.spaceAction === focusAction && node.dataset.lessonId === focusId)?.focus({preventScroll:true});
   }
-  function ensureAccount() { if (api.getState().active) return true; openAccount(); return false; }
+  function ensureAccount() { const state=api.getState();if(state.mode==='cloud'&&!state.ready){notify(state.storageMessage);return false;}if(state.active)return true;openAccount();return false; }
   function fillCourses(select, selected) {
     select.innerHTML = lessons.map((_,id)=>`<option value="${id}">${id < 6 ? '入门' : '实战'} · ${escape(title(id))}</option>`).join('');
     select.value = String(selected ?? 12);
@@ -122,10 +129,10 @@
     if (!dialog.open) dialog.showModal();
   }
   function loginLink() { return 'login.html?next=' + encodeURIComponent(isWorkspace ? 'personal-space.html' + location.hash : courseLink(currentId() ?? 0) + location.hash); }
-  function openAccount() { if (!api.getState().active) { location.assign(loginLink()); return; } document.getElementById('space-account-name').value = api.getState().nickname; openDialog('space-account-dialog'); }
+  function openAccount() { const state=api.getState();if(!state.active){location.assign(loginLink());return;}if(state.mode==='cloud'&&!state.ready){notify(state.storageMessage);return;}document.getElementById('space-account-name').value=state.nickname;document.getElementById('space-account-title').textContent=state.mode==='cloud'?'修改昵称':'修改体验昵称';document.querySelector('label[for="space-account-name"]').firstChild.textContent=state.mode==='cloud'?'昵称':'体验昵称';openDialog('space-account-dialog'); }
   function openNote(id) {
     if (!ensureAccount()) return;
-    const selected = id ?? api.getState().lastLesson ?? 12;
+    const selected = id ?? api.getState().lastLesson ?? (api.getState().mode==='cloud'?0:12);
     const form = document.getElementById('space-note-form');
     fillCourses(form.elements.lessonId, selected);
     form.elements.content.value = api.getState().notes.find(item=>item.lessonId === selected)?.content || '';
@@ -139,25 +146,31 @@
     openDialog('space-feedback-dialog');
   }
   function handleResult(result) { notify(result.message); return result.ok; }
-  document.addEventListener('click', event=>{
+  document.addEventListener('click', async event=>{
     const close = event.target.closest('[data-space-close]'); if(close) { close.closest('dialog').close(); return; }
     const target = event.target.closest('[data-space-action]'); if(!target) return;
     const action = target.dataset.spaceAction, id = target.dataset.lessonId === undefined ? undefined : Number(target.dataset.lessonId);
+    if(target.disabled)return;
+    target.disabled=true;
+    try{
     if(action === 'account') openAccount();
-    else if(action === 'logout') handleResult(api.logout());
+    else if(action === 'logout') handleResult(await (window.EGG_ACCESS?window.EGG_ACCESS.logout():api.logout()));
     else if(action === 'note') openNote(id);
     else if(action === 'feedback') openFeedback(id);
-    else if(action === 'favorite' && ensureAccount()) handleResult(api.toggleFavorite(id));
-    else if(action === 'complete' && ensureAccount()) handleResult(api.setCompleted(id,!api.getState().completed.includes(id)));
-    else if(action === 'delete-note' && ensureAccount()) handleResult(api.deleteNote(id));
-    else if(action === 'import' && ensureAccount()) handleResult(api.importLocalProgress());
+    else if(action === 'favorite' && ensureAccount()) handleResult(await api.toggleFavorite(id));
+    else if(action === 'complete' && ensureAccount()) handleResult(await api.setCompleted(id,!api.getState().completed.includes(id)));
+    else if(action === 'delete-note' && ensureAccount()) handleResult(await api.deleteNote(id));
+    else if(action === 'import' && ensureAccount()) handleResult(await api.importLocalProgress());
+    else if(action === 'refresh'){const user=await window.EGG_CLOUD.requireUser();handleResult(await api.loadCloudUser(user,{refresh:true}));}
     else if(action === 'reset') openDialog('space-reset-dialog');
-    else if(action === 'confirm-reset') { document.getElementById('space-reset-dialog').close(); handleResult(api.resetDemo()); }
+    else if(action === 'confirm-reset') { document.getElementById('space-reset-dialog').close(); handleResult(await api.resetDemo()); }
     else if(action === 'reset-search') { progressQuery='';progressFilter='all';render(); document.getElementById('space-course-query')?.focus(); }
     else if(action === 'export' && ensureAccount()) {
-      const blob = new Blob([JSON.stringify({...api.getState(),description:'自由树梦想空间本机演示记录，不是云端备份'},null,2)],{type:'application/json;charset=utf-8'});
-      const url = URL.createObjectURL(blob), link = document.createElement('a'); link.href=url;link.download='自由树梦想空间-演示记录.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);notify('已导出当前演示记录。');
+      const state=api.getState(),cloud=state.mode==='cloud';
+      const blob = new Blob([JSON.stringify({...state,description:cloud?'自由树梦想空间当前账号学习记录快照':'自由树梦想空间本机演示记录，不是云端备份'},null,2)],{type:'application/json;charset=utf-8'});
+      const url = URL.createObjectURL(blob), link = document.createElement('a'); link.href=url;link.download=cloud?'自由树梦想空间-学习记录.json':'自由树梦想空间-演示记录.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);notify('已导出当前学习记录。');
     }
+    }catch(error){notify(error.message || '操作未完成，请重试。');}finally{target.disabled=false;}
   });
   document.addEventListener('input',event=>{if(event.target.id === 'space-course-query'){progressQuery=event.target.value;updateProgressList(api.getState());}});
   document.addEventListener('change',event=>{
@@ -180,7 +193,8 @@
     const id = currentId(), root = document.getElementById('space-lesson-tools');
     if(!root || id === null) return;
     const done=state.active && state.completed.includes(id), favorite=state.active && state.favorites.includes(id);
-    root.innerHTML=`<div><strong>我的学习空间 · 预览</strong>${state.active ? `<button type="button" class="space-button space-button-primary" data-space-action="complete" data-lesson-id="${id}" aria-pressed="${done}">${icon(done ? 'check' : 'plus')}${done ? '已学完 · 点击取消' : '标记本课已学完'}</button>` : '<a href="' + loginLink() + '" class="space-button">登录 / 体验</a>'}</div><div class="space-lesson-actions"><button type="button" class="space-button" data-space-action="favorite" data-lesson-id="${id}" aria-pressed="${favorite}">${icon('bookmark')}${favorite ? '已收藏 · 点击取消' : '收藏本课'}</button><button type="button" class="space-button" data-space-action="note" data-lesson-id="${id}">${icon('note')}学习笔记</button><button type="button" class="space-button" data-space-action="feedback" data-lesson-id="${id}">${icon('message')}记录问题</button><a class="space-button" href="personal-space.html">查看我的空间</a></div><p>${state.storageMode === 'persistent' ? '仅保存到本浏览器演示记录，尚未连接云端。' : '浏览器无法持久保存，目前只在本页临时保留。'} 完成标记不代表蛋仔编辑器验证通过。</p>`;
+    root.innerHTML=`<div><strong>我的学习空间${state.mode==='cloud'?'':' · 预览'}</strong>${state.active ? `<button type="button" class="space-button space-button-primary" data-space-action="complete" data-lesson-id="${id}" aria-pressed="${done}">${icon(done ? 'check' : 'plus')}${done ? '已学完 · 点击取消' : '标记本课已学完'}</button>` : '<a href="' + loginLink() + '" class="space-button">登录 / 体验</a>'}</div><div class="space-lesson-actions"><button type="button" class="space-button" data-space-action="favorite" data-lesson-id="${id}" aria-pressed="${favorite}">${icon('bookmark')}${favorite ? '已收藏 · 点击取消' : '收藏本课'}</button><button type="button" class="space-button" data-space-action="note" data-lesson-id="${id}">${icon('note')}学习笔记</button><button type="button" class="space-button" data-space-action="feedback" data-lesson-id="${id}">${icon('message')}记录问题</button><a class="space-button" href="personal-space.html">查看我的空间</a></div><p>${state.mode==='cloud'?escape(state.storageMessage):state.storageMode === 'persistent' ? '仅保存到本浏览器演示记录，尚未连接云端。' : '浏览器无法持久保存，目前只在本页临时保留。'} 完成标记不代表蛋仔编辑器验证通过。</p>`;
+    if(state.mode==='cloud')root.querySelectorAll('[data-space-action]').forEach(button=>{button.disabled=!state.ready||state.saving||button.dataset.spaceAction==='feedback';});
   }
   async function mountLesson() {
     if(document.body.dataset.page !== 'lesson' || currentId() === null) return;
@@ -193,15 +207,22 @@
     function attach() {
       const header=document.querySelector('.lesson-article .article-header'); if(!header) return false;
       const root=document.createElement('section');root.id='space-lesson-tools';root.className='space-lesson-tools';root.setAttribute('aria-label','个人学习空间预览');header.after(root);lessonMounted=true;updateLessonTools(api.getState());
-      if(api.getState().active) api.rememberLesson(currentId());
+      if(api.getState().active&&api.getState().mode!=='cloud') api.rememberLesson(currentId());
       return true;
     }
     if(!attach()) { const observer=new MutationObserver(()=>{if(attach())observer.disconnect();});observer.observe(document.querySelector('.lesson-article'),{childList:true,subtree:true}); }
   }
-  function submitForm(event,kind) {
+  async function submitForm(event,kind) {
     event.preventDefault();const form=event.currentTarget;
-    const result=kind==='account' ? api.enterDemo(form.elements.nickname.value) : kind==='note' ? (form.elements.content.value.trim() ? api.saveNote(Number(form.elements.lessonId.value),form.elements.content.value) : {ok:false,message:'请先写下笔记内容。'}) : api.saveFeedback({lessonId:Number(form.elements.lessonId.value),type:form.elements.type.value,content:form.elements.content.value});
-    if(result.ok){form.closest('dialog').close();handleResult(result);}else form.querySelector('.space-form-error').textContent=result.message;
+    if(form.dataset.saving==='true')return;
+    const owner=api.getState().userId,content=kind==='note'?form.elements.content.value:null,controls=[...form.querySelectorAll('input,textarea,select,button')];
+    form.dataset.saving='true';controls.forEach(node=>node.disabled=true);
+    try{
+      const result=await (kind==='account' ? api.setNickname(form.elements.nickname.value) : kind==='note' ? (content.trim() ? api.saveNote(Number(form.elements.lessonId.value),content) : {ok:false,message:'请先写下笔记内容。'}) : api.saveFeedback({lessonId:Number(form.elements.lessonId.value),type:form.elements.type.value,content:form.elements.content.value}));
+      if(api.getState().userId!==owner)return;
+      if(result.ok){if(kind!=='note'||form.elements.content.value===content)form.closest('dialog').close();handleResult(result);}else form.querySelector('.space-form-error').textContent=result.message;
+    }catch(error){if(api.getState().userId===owner)form.querySelector('.space-form-error').textContent=error.message || '保存未完成，内容仍会保留。';}
+    finally{form.dataset.saving='false';controls.forEach(node=>node.disabled=false);}
   }
   hydrateIcons();bindForms();api.subscribe(render);render();
   window.addEventListener('hashchange',()=>{render();document.getElementById('space-page-title')?.scrollIntoView({block:'start'});});
