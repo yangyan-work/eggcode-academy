@@ -36,6 +36,11 @@ function page(file='personal-space.html',cloud=service()){
   return{dom,w,cloud,run,api:w.EGG_SPACE,get reads(){return reads;},close:()=>{dom.window.close();eq(errors,[],'页面脚本没有未处理错误');}};
 }
 async function main(){
+  const lessonDOM=new JSDOM(fs.readFileSync(path.join(root,'lesson.html'),'utf8'));
+  const lessonScripts=[...lessonDOM.window.document.querySelectorAll('script[src]')],progressIndex=lessonScripts.findIndex(script=>script.getAttribute('src').split('?')[0]==='learning-progress.js');
+  eq(lessonScripts.filter(script=>script.getAttribute('src').split('?')[0]==='learning-progress.js').length,1,'真实课程HTML加载进度模块一次');
+  eq(progressIndex>=0&&lessonScripts[progressIndex].defer&&metadata.every(file=>lessonScripts.slice(0,progressIndex).some(script=>script.getAttribute('src').split('?')[0]===file))&&progressIndex<lessonScripts.findIndex(script=>script.getAttribute('src').split('?')[0]==='lesson-loader.js'),true,'真实课程进度模块defer顺序位于元数据之后、加载器之前');
+  lessonDOM.window.close();
   let p=page();try{
     const {api,cloud}=p;
     eq(api.getState().completed,[],'真实新账号初始没有演示完成标记');eq(api.getState().favorites,[],'没有演示收藏');eq(api.getState().notes,[],'没有演示笔记');
