@@ -55,9 +55,24 @@ async function main(){
     cloud.errors.loadStudyState='PG暂不可用';eq((await api.loadCloudUser(cloud.A,{refresh:true})).ok,false,'读取错误明确返回');eq(api.getState().ready,false,'读取错误不冒充零记录');eq((await api.setCompleted(1,true)).ok,false,'读取失败时禁止写');delete cloud.errors.loadStudyState;await api.loadCloudUser(cloud.A);
     cloud.change(null);eq(api.getState().active,false,'登出清除共享快照');eq(api.getState().completed,[],'登出不保留旧记录展示');
   }finally{p.close();}
+  const localService=service();localService.api.status=()=>({configured:false,mode:'local',user:null});
+  p=page('personal-space.html',localService);try{
+    p.run('personal-space.js');p.api.enterDemo('本机文案检查');
+    eq(p.w.document.querySelector('.space-preview-note p').textContent,'浏览器体验模式，数据保存在当前浏览器，尚未连接云端。','本机保留预览说明');
+    eq(p.w.document.querySelector('.space-footer-note').textContent,'登录后使用本站功能。当前体验记录保存在本浏览器；云端账号记录需接入数据库。','本机保留末尾说明');
+    eq(p.w.document.querySelector('.space-sidebar-bottom [data-space-action="logout"]').getAttribute('aria-label'),'退出体验账号','本机保留退出体验账号标签');
+    eq(p.w.document.querySelector('#space-note-form .space-field-help').textContent,'每课保存一份笔记，最多 2000 字。预览仅保存在本机。','本机笔记仍显示本机保存说明');
+    eq(p.w.document.querySelector('#space-account-dialog > p').textContent,'仅修改当前浏览器的体验昵称，已有学习记录会保留，不会创建新的账号。','本机昵称仍显示体验说明');
+  }finally{p.close();}
   p=page();try{
     const {api,cloud,w}=p;p.run('personal-space.js');
     await api.loadCloudUser(cloud.A);
+    eq(w.document.querySelector('.space-preview-note p').textContent,'邮箱账号模式：'+api.getState().storageMessage+' 社区与投稿功能仍在接入中。','云端说明使用真实状态消息与社区状态');
+    eq(w.document.querySelector('.space-footer-note').textContent,'当前账号的学习记录由账号服务保存，保存结果以服务端确认为准。社区与投稿功能尚未开放。','云端末尾说明服务端保存确认');
+    eq(w.document.querySelector('.space-sidebar-bottom [data-space-action="logout"]').getAttribute('aria-label'),'退出邮箱账号','云端退出标签同步账号模式');
+    eq(w.document.querySelector('#space-note-form .space-field-help').textContent,'每课保存一份笔记，最多 2000 字。'+api.getState().storageMessage,'云端笔记帮助使用真实状态消息');
+    eq(w.document.querySelector('#space-account-dialog > p').textContent,'昵称保存在当前邮箱账号中，修改后需由账号服务确认。学习记录会保留。','云端昵称说明账号服务保存');
+    eq(w.document.querySelector('#space-feedback-form button[type="submit"]').disabled,true,'云端反馈没有被文案同步误开放');
     w.document.querySelector('[data-space-action="note"]').click();const form=w.document.getElementById('space-note-form');form.elements.content.value='失败后应保留的内容';cloud.errors.saveNote='模拟笔记保存失败';
     form.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();
     eq(w.document.getElementById('space-note-dialog').open,true,'失败保留主空间笔记弹窗');eq(form.elements.content.value,'失败后应保留的内容','失败保留主空间笔记输入');eq(form.querySelector('.space-form-error').textContent,'模拟笔记保存失败','失败显示服务错误');
@@ -79,6 +94,8 @@ async function main(){
     const {api,cloud,w}=p;w.history.replaceState(null,'','lesson.html?id=144');w.fetch=async()=>({ok:true,text:async()=>fs.readFileSync(path.join(root,'personal-space.html'),'utf8')});p.run('learning-progress.js');w.EGG_PROGRESS.init();p.run('personal-space.js');
     eq(cloud.calls.filter(c=>c.name==='saveProfilePatch').length,0,'课程未加载账号前不写阅读位置');await api.loadCloudUser(cloud.A);await tick();
     eq(cloud.calls.filter(c=>c.name==='saveProfilePatch').map(c=>c.args[0]),[{last_lesson_id:144}],'课程载入后只写一次阅读位置');w.EGG_PROGRESS.init();await tick();eq(cloud.calls.filter(c=>c.name==='saveProfilePatch').length,1,'重复init不重复保存阅读位置');
+    eq(w.document.querySelector('#space-note-form .space-field-help').textContent,'每课保存一份笔记，最多 2000 字。'+api.getState().storageMessage,'课程异步挂载弹窗同样同步云端说明');
+    eq(w.document.getElementById('space-lesson-tools').getAttribute('aria-label'),'个人学习空间','课程工具云端无预览账号标签');
     const held=deferred();cloud.next.saveProgress=held.promise;const save=api.setCompleted(144,true);
     eq(w.document.querySelector('[data-progress-toggle]').disabled,true,'保存时课程进度按钮收到共享忙状态');eq(w.document.querySelector('[data-space-action="complete"]').disabled,true,'保存时主空间课程按钮收到共享忙状态');
     held.resolve({applied:true,current_completed:true,current_revision:1});await save;eq(w.document.querySelector('[data-progress-toggle]').getAttribute('aria-pressed'),'true','完成后课程进度按钮同步');eq(w.document.querySelector('[data-space-action="complete"]').getAttribute('aria-pressed'),'true','完成后主空间课程按钮同步');eq(cloud.calls.filter(c=>c.name==='saveProfilePatch').length,1,'忙状态通知不触发阅读保存循环');
