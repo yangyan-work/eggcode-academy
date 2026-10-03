@@ -28,7 +28,8 @@ const localPath = value => decodeURIComponent(new URL(value, 'https://qa.invalid
 const scriptFiles = page => [...read(page).matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/g)].map(match => localPath(match[1]));
 const detailManifest = () => JSON.parse(read('detail-chunks.json'));
 function renderingScripts(page, query = '', allDetails = false) {
-  const scripts = scriptFiles(page);
+  // Render-only fixtures exclude the separately tested auth and shared navigation.
+  const scripts = scriptFiles(page).filter(file => !['personal-space-state.js','cloud-config.js','cloud-client.js','access-gate.js','personal-space.js','site-navigation.js'].includes(file));
   if (page !== 'lesson.html') return scripts;
   const raw = new URLSearchParams(query).get('id') ?? '0';
   const id = /^\d+$/.test(raw) ? Number(raw) : -1;
@@ -39,7 +40,8 @@ function renderingScripts(page, query = '', allDetails = false) {
 const lessonScripts = () => renderingScripts('lesson.html', '', true).filter(file => file !== 'app.js');
 function loadContent() {
   const context = vm.createContext({ window: {} });
-  for (const file of lessonScripts()) new vm.Script(read(file), { filename: file }).runInContext(context);
+  // Content checks load data only; login/navigation belong to browser checks.
+  for (const file of lessonScripts().filter(file => /^(?:lessons-data|tutorials|manual-data|build-guides|progression-guides|block-diagrams|curriculum-(?:expansion|lessons-\d+|guides-\d+)|detailed-guides-\d+)\.js$/.test(file))) new vm.Script(read(file), { filename: file }).runInContext(context);
   const w = context.window;
   const tutorials = [...(w.EGG_TUTORIALS || []), ...(w.EGG_EXPANSION_LESSONS || [])];
   return { w, lessons: w.EGG_LESSONS, tutorials, all: [...w.EGG_LESSONS, ...tutorials], guides: w.EGG_BUILD_GUIDES, manual: w.EGG_MANUAL };
@@ -182,7 +184,12 @@ function checkContent() {
     assert(!/(?:40\s*(?:篇教程|课)|34\s*篇)/.test(html), `${page}: stale visible course count`);
     const scripts = scriptFiles(page);
     assert.equal(new Set(scripts).size, scripts.length, `${page}: duplicate script load`);
-    if(!['editor-guide.html','verification.html'].includes(page)) assert.equal(scripts.at(-1), page==='lesson.html'?'lesson-loader.js':'app.js', `${page}: rendering must load after its data`); else assert.equal(scripts.length,0,'Primer remains readable without JS');
+    if(!['editor-guide.html','verification.html'].includes(page)) {
+      const renderer = page === 'lesson.html' ? 'lesson-loader.js' : 'app.js';
+      const position = scripts.indexOf(renderer);
+      assert(position >= 0, page + ': missing renderer');
+      for (const file of scripts.filter(file => /^(?:lessons-data|tutorials|manual-data|build-guides|progression-guides|curriculum-).*\.js$/.test(file))) assert(scripts.indexOf(file) < position, page + ': renderer must load after ' + file);
+    }
   }
   const scripts = scriptFiles('lesson.html');
   assert(!scripts.includes('app.js'), 'lesson renderer must run exactly once after its detail chunk');

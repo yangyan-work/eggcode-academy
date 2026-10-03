@@ -1,0 +1,113 @@
+{
+  "build": "2026.10.04",
+  "checkedAt": "2026-10-03T17:02:42.603678+00:00",
+  "status": "passed",
+  "scope": "网页、内容结构、145课纠错定位与下载、19页五种宽度导航及登录门禁；不代表蛋码实机或真实云端验收",
+  "nativeEditorValidated": false,
+  "realCloudValidated": false,
+  "lessons": 145,
+  "diagrams": 454,
+  "manualRecords": 3871,
+  "checks": [
+    {
+      "script": "check.cjs",
+      "status": "passed",
+      "summary": "PASS content: 145 routes, 139 tutorials, 34 series, 454 SVG sections, 2602 native references"
+    },
+    {
+      "script": "check-details.cjs",
+      "status": "passed",
+      "summary": "PASS details: 145 lessons, 6521 detailed steps, 304 custom definitions, 479 test scenarios"
+    },
+    {
+      "script": "check-renderer.cjs",
+      "status": "passed",
+      "summary": "PASS renderer: 21 focused regression groups; all 40 legacy + 105 new guides, 454 SVG sections"
+    },
+    {
+      "script": "check-block-cases.cjs",
+      "status": "passed",
+      "summary": "PASS curated cases: 22 distinct scenarios, 44 native IDs; exact source parameters, object domains, counterexamples and SVG inputs. Native editor not tested."
+    },
+    {
+      "script": "check-challenges.cjs",
+      "status": "passed",
+      "summary": "挑战检查通过：121 / 121 题，363 条搭建改法，242 个验收例；折叠、转义、目录锚点和关键算例已核对。"
+    },
+    {
+      "script": "check-progress.cjs",
+      "status": "passed",
+      "summary": "PASS learning progress: 812 assertions; 145 stable IDs, 34 series, 8 routes, branch prerequisites, self-report controls, persistence, idempotence, corrupted/future/blocked storage, repeated actions, filtered cards and multi-tab events."
+    },
+    {
+      "script": "check-big-number.cjs",
+      "status": "passed",
+      "summary": "Big-number lab passed: 10563 assertions; 816 deterministic arithmetic pairs; validation, full string multiplication/division, traces, DOM recovery, SVG and links. Native Eggcode runtime not tested."
+    },
+    {
+      "script": "check-personal-space-state.cjs",
+      "status": "passed",
+      "summary": "PASS 个人空间状态：216 项检查；145 个稳定课程 ID、独立演示键、深拷贝、刷新和跨标签、账号门槛、Unicode 边界、纯文本、明确导入、损坏/未来版本保护、存储受阻与恢复。"
+    },
+    {
+      "script": "check-community-store.cjs",
+      "status": "passed",
+      "summary": "{"
+    },
+    {
+      "script": "check-cloud-client.cjs",
+      "status": "passed",
+      "summary": "PASS cloud client: 55 assertions; blank configuration has zero third-party requests; validation/RPC contract only."
+    },
+    {
+      "script": "check-login-gate-client.cjs",
+      "status": "passed",
+      "summary": "PASS login gate client: 24 assertions; local contract only; zero real cloud requests."
+    },
+    {
+      "script": "check-dom.cjs",
+      "status": "passed",
+      "summary": "PASS DOM lessons: 145 routes, 454 valid SVG drawings, 2602 rendered native references, invalid/default IDs"
+    },
+    {
+      "script": "check-quality.cjs",
+      "status": "passed",
+      "summary": "PASS quality integration: 13 representative lessons; honest validation vs personal progress, 5-column variable evidence, independent numeric branches, dialog zoom/reset, evidence manifest"
+    },
+    {
+      "script": "check-site-navigation.cjs",
+      "status": "passed",
+      "groups": 102,
+      "assertions": 1568,
+      "layouts": 95
+    },
+    {
+      "script": "check-access-gate.cjs",
+      "status": "passed",
+      "groups": 13,
+      "assertions": 123,
+      "layouts": 0
+    },
+    {
+      "script": "check-feedback-browser.cjs",
+      "status": "passed",
+      "groups": 10,
+      "assertions": 39209,
+      "layouts": 0,
+      "responsiveRetest": {
+        "status": "passed",
+        "groups": 5,
+        "assertions": 166
+      }
+    }
+  ],
+  "files": {
+    "lesson-feedback.js": "c241651d0da6601af6c79ca03713395c0555833ff9cc41073ed5345eccf3bdbc",
+    "lesson-feedback.css": "13577ce738ac175c593bad93eef59f8077e926bba1a762983ada41bde340a69f",
+    "lesson-loader.js": "6b2bfd39526a13000bf8e0759a8222df8e6eaf540e6f1217e3cd58ecd4b35cb3",
+    "cloud-client.js": "c532a04bce3cb827532feaa3eb23ddf22a860e39c4f8c2252c06c84d7cad5ecc",
+    "service-info.html": "3a779c7d96e69c21b8149a0b35b2c0a02db78a0f26caa33629ed017d248428cb",
+    "service-info.css": "06ae549d371c96a6e30fd969673fc2f3609e22de89946f500431b25c607261ce",
+    "site-navigation.css": "21f623c86139275f290ce789e052e75944643e8c71d82a8ec7fcbaa861beb16f"
+  }
+}

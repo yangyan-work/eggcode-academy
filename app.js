@@ -402,7 +402,3 @@ for (const region of document.querySelectorAll('.table-wrap, .bn-table-wrap')) {
   region.setAttribute('role', 'region');
   region.setAttribute('aria-label', '数据表格；宽表可左右滚动');
 }
-const siteHeader = document.querySelector('.site-header');
-if (siteHeader && typeof ResizeObserver === 'function') {
-  new ResizeObserver(() => document.documentElement.style.setProperty('--site-header-height', siteHeader.getBoundingClientRect().height + 'px')).observe(siteHeader);
-}

@@ -37,6 +37,13 @@
     await loadScript(resourceURL('app.js'));
     if (document.getElementById('lesson-title').textContent === '正在打开课程') throw new Error('课程未能打开');
     if (valid && (!body.querySelector('.microsteps') || !body.querySelector('#acceptance') || !document.querySelector('#lesson-steps a'))) throw new Error('课程未完整显示');
+    // Correction tools must not block a successfully loaded lesson.
+    if (valid) await loadScript(resourceURL('lesson-feedback.js')).catch(() => {
+      const note = document.createElement('p');
+      note.className = 'lesson-source';
+      note.textContent = '本课纠错工具暂时未加载，阅读不受影响。需要反馈时请复制课程链接与具体步骤。';
+      body.append(note);
+    });
     article.setAttribute('aria-busy', 'false');
   }
   openLesson().catch(() => {

@@ -46,7 +46,7 @@ async function main() {
   check(d.querySelector('#route-big-numbers').textContent.includes('不计入 145 课'), 'lab excluded from lesson count');
   check(d.querySelector('#route-reliable-save a[href="lesson.html?id=70"]'), 'multiplayer curriculum present');
   check(d.querySelector('#route-reliable-save a[href="lesson.html?id=75"]'), 'save curriculum present');
-  equal(d.querySelectorAll('.site-header nav a').length, 4, 'original header navigation');
+  equal(d.querySelectorAll('.site-header .hub-primary a').length, 7, 'shared learning and community navigation');
   const initialRoutes = d.querySelectorAll('.learning-route-card').length;
   api.init(); api.init();
   equal(d.querySelectorAll('.learning-route-card').length, initialRoutes, 'idempotent routes');

@@ -1,6 +1,6 @@
 # 自由树梦想空间 · 蛋码学习站
 
-这是 `yangyan-work/eggcode-academy` 的根目录静态站点，保留现有自由树标志、蛋仔素材、活泼配色和 SVG 彩色积木连接图。
+这是 yangyan-work/eggcode-academy 的静态网站源文件，采用全站水晶玻璃风格，保留自由树标志、145课、3,871条手册记录和454个课程积木图。网站地址：https://yangyan-work.github.io/eggcode-academy/ 。当前使用昵称体验登录，记录保存在访问者自己的浏览器；真实数据库与云端账号未启用。
 
 ## 课程结构
 
@@ -94,3 +94,9 @@ python3 -m http.server 8000
 - `scripts/build-details.cjs` 生成原有24份详解及 `detail-chunks.json` 映射。课程页由 `lesson-loader.js` 先读取小索引，再加载本课对应分片，最后执行页面渲染；目录、旧ID和前置课保留。分片使用内容哈希缓存，索引重新验证；加载失败显示重试，不静默展示缺失详解的课程。
 - 修改 `detail-source` 后运行 `node scripts/build-details.cjs`，提交详解分片和索引。部署须保留完整目录，并通过 HTTP/HTTPS 访问课程页。
 - 新增检查见 `scripts/README.md`。证据页生成现在也需要单独QA环境中的 Playwright，真实浏览器检查仍不执行原生蛋码。
+
+## 2026.10.04 运营补全
+
+lesson-feedback.js 为每条真实搭建步骤生成带原文、课程和直达链接的纠错报告，支持文字/JSON下载和复制，未配置真实收件接口。service-info.html 说明来源、举报/下架、账号数据边界和五人试用任务；database/OPERATIONS.md 提供上线、备份恢复、权限和费用控制清单。
+
+本轮可复查的16个检查脚本摘要在 release-checks.json。145课纠错入口、454图保护、19业务页五种宽度、登录门禁和真实浏览器下载已检查；蛋码实机和真实Supabase仍未验收。

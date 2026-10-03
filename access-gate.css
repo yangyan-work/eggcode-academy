@@ -1,0 +1,6 @@
+html[data-access-pending] body{visibility:hidden!important}
+.access-loading{display:none}
+html[data-access-pending] .access-loading{visibility:visible;display:grid;position:fixed;inset:0;z-index:10000;place-content:center;gap:18px;padding:30px;background:radial-gradient(ellipse at 20% 30%,#17374888,transparent 52%),radial-gradient(ellipse at 80% 70%,#34204b88,transparent 52%),#070710;color:#f3f1fa;text-align:center;font:16px/1.8 "Microsoft YaHei",system-ui,sans-serif}
+.access-loading a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:9px 20px;border:1px solid #576679;border-radius:100px;background:linear-gradient(108deg,#205364,#344364);color:#f3f1fa;box-shadow:inset 0 1px 0 #ffffff12}
+.access-loading a:hover{border-color:#a3d7e8}.access-loading a:focus-visible{outline:2px solid #b8e3ed;outline-offset:3px}
+.access-loading noscript{display:block}
