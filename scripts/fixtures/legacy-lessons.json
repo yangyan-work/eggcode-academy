@@ -1,247 +1,287 @@
 {
   "sourceCommit": "8688c199796d3d371386b565084cfbe333975859",
-  "description": "Captured directly from git HEAD before the 105-lesson expansion; hashes preserve original records and guide content at route IDs 0 through 39.",
+  "description": "原40课的旧快照及技术字段哈希。2026-10-04允许修改讲解文案和标题；路由顺序、积木、操作、连接图与数值算法仍受保护。",
   "manual": "35b43bc39ba4c5e74a0734de3864c4c0da47bfadb7037b63dcf8f0a93c23c891",
   "lessons": [
     {
       "id": 0,
       "title": "认识你的第一块蛋码",
       "record": "fb389892aa65eceb8e8c0ade9cc412c709c8c342fe4478fc4a3c20e4a66b8407",
-      "guide": "ab4a915685d43b73de28ef55c83ac3a47d2b19b0db69d55091985a7c947f8da4"
+      "guide": "ab4a915685d43b73de28ef55c83ac3a47d2b19b0db69d55091985a7c947f8da4",
+      "operations": "8938a00b5b49de8153b05731f93c81d4f3b7ce3baffa8a414ad2ca34c2c937e6"
     },
     {
       "id": 1,
       "title": "让地图听懂你的指令",
       "record": "607350d411b1e134bcedfb8eca1eed33dfd5689d23d4ad99217d5fc29a32e6b1",
-      "guide": "1fc6c89c1debf648628172d6f63d34684c4a3f4f2a7049bb20ee88581e3cb1c1"
+      "guide": "1fc6c89c1debf648628172d6f63d34684c4a3f4f2a7049bb20ee88581e3cb1c1",
+      "operations": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
     },
     {
       "id": 2,
       "title": "给地图一份小小记忆",
       "record": "3c7fb99ffc4146552674985c91d898c76c71406b5384ef9a454468a9a7b5fa87",
-      "guide": "0d84ccce3b40d08c074aca0f5bafb7bb1645e8cfac6f5ae775bef26710c6861f"
+      "guide": "0d84ccce3b40d08c074aca0f5bafb7bb1645e8cfac6f5ae775bef26710c6861f",
+      "operations": "20d3c3ee046973aab01a18bc08610aede1d26293fed9b0c3dc52525f2f99c13f"
     },
     {
       "id": 3,
       "title": "让玩法有判断、有节奏",
       "record": "1989055687677b8c83ab7806594dddb38e7dbd06dbbb82117da5ab4cef3deee4",
-      "guide": "0d84ccce3b40d08c074aca0f5bafb7bb1645e8cfac6f5ae775bef26710c6861f"
+      "guide": "0d84ccce3b40d08c074aca0f5bafb7bb1645e8cfac6f5ae775bef26710c6861f",
+      "operations": "db342de9b30297e651b163d2eba4e81412c2859dc7df6986f8d91fcf4ebe1a2d"
     },
     {
       "id": 4,
       "title": "把小积木拼成大能力",
       "record": "3df5f8020e6a24adb844daeafc3612ee4f6981f5344cf442e2909f5c19f27dc2",
-      "guide": "91008c0145480fb707760047b6ec3cd4bf6038a96e9090313e6f7fd9398c7b4c"
+      "guide": "91008c0145480fb707760047b6ec3cd4bf6038a96e9090313e6f7fd9398c7b4c",
+      "operations": "101f7a5a2ee9fe7df7af1f5ad7331e3091c7fd55613582d568d8f731506029c4"
     },
     {
       "id": 5,
       "title": "下一站，用 Lua 扩展脑洞",
       "record": "b73cd66d3b4f628e079ea3c5b031ef23db6d7c3b33e05449fe819d7cf1ed577f",
-      "guide": "ce4407ecee26f89f0b0500584e67a53df2a516b12247025bbb16f5cac61c6cbf"
+      "guide": "ce4407ecee26f89f0b0500584e67a53df2a516b12247025bbb16f5cac61c6cbf",
+      "operations": "572294b59dce783649707bc05e41a55e03cfef66d7e41bec0815498506190abe"
     },
     {
       "id": 6,
       "title": "给玩家一个开场欢迎",
       "record": "f931d80d9f2b7406f5ef6716a5ea014990710fe0bfafad17fea683c6d8cb7f55",
-      "guide": "ab4a915685d43b73de28ef55c83ac3a47d2b19b0db69d55091985a7c947f8da4"
+      "guide": "ab4a915685d43b73de28ef55c83ac3a47d2b19b0db69d55091985a7c947f8da4",
+      "operations": "e031045a5a03b20995adbccf182698e3a57451bb748775a73edc981e12f9aa7b"
     },
     {
       "id": 7,
       "title": "把动作准确重复 3 次",
       "record": "998b34fe5ecb1eab06d12d7bc6b75605b33b6947bbf44635108554836812c0ca",
-      "guide": "16bce68f96e9e081196bca9dc551b2100c0c0214f49845cb7eb49ac1db8af493"
+      "guide": "16bce68f96e9e081196bca9dc551b2100c0c0214f49845cb7eb49ac1db8af493",
+      "operations": "a3d2f034a5d0c64587d4df65bb0e94d8b654d7841ca91aa91f4a25de23991ad9"
     },
     {
       "id": 8,
       "title": "一秒一次，只提醒三次",
       "record": "e61a3637d408b86499bcbf3800b2b4173c4772ef3543a7ba2407e78412b63b8b",
-      "guide": "ffaab3c93b050369df524484941e40ddb69246b64a2f06db260d0e81a8af12a2"
+      "guide": "ffaab3c93b050369df524484941e40ddb69246b64a2f06db260d0e81a8af12a2",
+      "operations": "1ae6ce5f3e36e0d7c9c8afccce1c3ac7aecbe27dba00f1ae369dc6d4674d5037"
     },
     {
       "id": 9,
       "title": "累计三次，解锁达标提示",
       "record": "70c87bbadc33910909462136685a4c1ff3528d07eaf7bc3e3d9b59c1946dc8c1",
-      "guide": "0d84ccce3b40d08c074aca0f5bafb7bb1645e8cfac6f5ae775bef26710c6861f"
+      "guide": "0d84ccce3b40d08c074aca0f5bafb7bb1645e8cfac6f5ae775bef26710c6861f",
+      "operations": "537037fd6bacc3da94c421b5060e4b162f14162d5c3decb174356ea97d4feb7a"
     },
     {
       "id": 10,
       "title": "走进区域，让方块动起来",
       "record": "3239622a6767d3ef95ecccbc69cdcdc7346cc9222571c707edac88e02570f73e",
-      "guide": "a5ba00d4dd3362164eefbb1d712996f94f382e61321600e656593f234e776698"
+      "guide": "a5ba00d4dd3362164eefbb1d712996f94f382e61321600e656593f234e776698",
+      "operations": "71da0daef9fa39940b9aad8db71cd7b3455ab8802bf7bc951c05b13a1f505d88"
     },
     {
       "id": 11,
       "title": "用一个信号连接两段逻辑",
       "record": "053c13c1f580581299a3391f59d7b7eb4f3f0085cd5432c3ffe895bed2023231",
-      "guide": "c3fa00c1e137f11713fcda2aa132974ea1e109600bf5499486002d3397b7bf36"
+      "guide": "c3fa00c1e137f11713fcda2aa132974ea1e109600bf5499486002d3397b7bf36",
+      "operations": "9d91a4278c03e0518a448617c142f8ca6d3c3a479ae1a1c13d14829d1016d06e"
     },
     {
       "id": 12,
       "title": "消消乐 01 · 用列表搭出一张棋盘",
       "record": "e12cab43f5f13fef40ae86f57b4da05d81b4b7f0116743c173a18542739c9385",
-      "guide": "6d60a09905525220f6a3d04d6f443f6d552c5e33648049cc1c70cbb4c9bf474b"
+      "guide": "6d60a09905525220f6a3d04d6f443f6d552c5e33648049cc1c70cbb4c9bf474b",
+      "operations": "2ef23dc64ad3e2da8f7c6bdfa88b5a85775f905e15e51fc5edb1f4b555722bfa"
     },
     {
       "id": 13,
       "title": "消消乐 02 · 选择、交换与无效回退",
       "record": "9c7b8c9cd0418c342c9d7f9f8ce780aaca91d4ac0869248baaefebc799912b97",
-      "guide": "f3125116dc16a3f2f00c71de87a3df0673cd2b48682ea564cf556fe10fd22389"
+      "guide": "f3125116dc16a3f2f00c71de87a3df0673cd2b48682ea564cf556fe10fd22389",
+      "operations": "9fb626527a4df723c9051117e4218637ea2da6edac65bcf32cca676d3236c91c"
     },
     {
       "id": 14,
       "title": "消消乐 03 · 找出横竖三连并去重",
       "record": "e5188d0825fc4e65716efca000768ed435b8ba64c9de664f17f664e0d8024287",
-      "guide": "7ce9652e0f49ae94eb043aab090c97d37662eef4cc465fd484441e9572631af8"
+      "guide": "7ce9652e0f49ae94eb043aab090c97d37662eef4cc465fd484441e9572631af8",
+      "operations": "44f3304fa8a2a3011b5bdbbad3a0a8f540da19b30783eddbd4c9150c0b435c2f"
     },
     {
       "id": 15,
       "title": "消消乐 04 · 清除、下落、补齐与连锁",
       "record": "e8e5d742db5dc6f97250bcce48bb1be79b0fc70e1e7febfbbe8f255063b260ef",
-      "guide": "8d1b34cb4d1e0ec02772c536c7df008a8defbd69be818f96b02e9050c99ee234"
+      "guide": "8d1b34cb4d1e0ec02772c536c7df008a8defbd69be818f96b02e9050c99ee234",
+      "operations": "303be8ec5d735c67e29e035a568baebe45c9115338858c54fbd131ee05c9057e"
     },
     {
       "id": 16,
       "title": "消消乐 05 · 步数、分数与结算顺序",
       "record": "429c2d186196503ebc4a2e390ff906d5a897cd2f9799eace11038015a0de13b7",
-      "guide": "a1250003d3157aa93658228123b8d26fb26d7660f2693e29ccfd75b94cdc07de"
+      "guide": "a1250003d3157aa93658228123b8d26fb26d7660f2693e29ccfd75b94cdc07de",
+      "operations": "024b079fe4a21725a3b5109d356a1dafd4291554a494d5cb42b62c53bf232209"
     },
     {
       "id": 17,
       "title": "消消乐 06 · 死局检测与关卡验收",
       "record": "faa0e5e11727cb59ad1a7aa2f9bd083adf6ef421d50dcf23b4ac9339580c2ccf",
-      "guide": "722d2ffb8062fe4307592a78bf78e20cabe7140f23559a12d1fd743c45e2d80f"
+      "guide": "722d2ffb8062fe4307592a78bf78e20cabe7140f23559a12d1fd743c45e2d80f",
+      "operations": "426118a86fdce590987d63f279ff2022e06a8e7db1e40a1d83a5f79adb150b27"
     },
     {
       "id": 18,
       "title": "限时收集 · 30 秒找到 5 个目标",
       "record": "b34f9b832c8aa7524bd3cfae1a87aa23da44c5c6d16ff35f3099e3908deefa18",
-      "guide": "71172dfc58e7139b517d1f4feb7a1331fb504b282fe5a4f083bf9c323cd7b556"
+      "guide": "71172dfc58e7139b517d1f4feb7a1331fb504b282fe5a4f083bf9c323cd7b556",
+      "operations": "2b10912f0f52e97a488b929cb902e2087039f7584788032b8c0994572b2a96c1"
     },
     {
       "id": 19,
       "title": "记忆机关 · 按顺序重现三个信号",
       "record": "a2903ff93525d39a37dae36bdc5d2ac98fb252e7429c57cafad7df2b0d9490b6",
-      "guide": "344113969ef37ef784e227a3d65206a19f1144b66e96b7f302aae19b6350db70"
+      "guide": "344113969ef37ef784e227a3d65206a19f1144b66e96b7f302aae19b6350db70",
+      "operations": "5f6c184ce5a2cb814cfdc3daabb7e1e72258dec3a6578944b6ce8be3cf617adf"
     },
     {
       "id": 20,
       "title": "跑酷闯关 · 按顺序通过检查点",
       "record": "1ff5006dbf9ef877a78f9a9013006537ec26174bea3f3a94e8bd33da76e8b48b",
-      "guide": "5294892c4a8a66cada03b446cf41a6de2e6a2378358c27d4a001b44393cde846"
+      "guide": "5294892c4a8a66cada03b446cf41a6de2e6a2378358c27d4a001b44393cde846",
+      "operations": "f6d9a677572b8cd3491a9557e61201fd7f471899baad9a704d76002dad68c730"
     },
     {
       "id": 21,
       "title": "双开关联动 · 两个条件打开一道门",
       "record": "7afec5a031530f1b075a01c8d0a51b82e93709b33e43c1c6a80615a4a511a8fb",
-      "guide": "41273ac310aa9e94507d57fb9f1e1edc1600bf021c3390310080e9d44d1b9a2b"
+      "guide": "41273ac310aa9e94507d57fb9f1e1edc1600bf021c3390310080e9d44d1b9a2b",
+      "operations": "7effbfb8e793c028c66edd7855d5715756384dfeb94d40e63d85100a45db5ad9"
     },
     {
       "id": 22,
       "title": "数值图 01 · 玩家数据与成长路线",
       "record": "153ef8615ac3ae45973800bd8725d074a549ad5c41014fad2379e35440531a3e",
-      "guide": "8052b67d7d8d060ddaf36cc8c667bf6abb8774e14e8e8b3df4d021bffbc2f398"
+      "guide": "8052b67d7d8d060ddaf36cc8c667bf6abb8774e14e8e8b3df4d021bffbc2f398",
+      "operations": "fccf28ffa1be814bb245ec41a5e9a345a26f2f0387edf5618a566641eedad785"
     },
     {
       "id": 23,
       "title": "数值图 02 · 训练收益与点击限频",
       "record": "0aa0f40a65ab2d2d8e54c78a3ef38c5e51816d186b209251722891e712c914d4",
-      "guide": "373cb4f6cdc122368a95a28e8fa0b9faa352a8b6376db1ed26736d7f75cfbcb4"
+      "guide": "373cb4f6cdc122368a95a28e8fa0b9faa352a8b6376db1ed26736d7f75cfbcb4",
+      "operations": "8c59a34546d7b3c3e7ec382bd412de340c9e2f992f2eb8fc06ff72c8076205bb"
     },
     {
       "id": 24,
       "title": "数值图 03 · 出售力量换金币",
       "record": "6c4b9e7dc7080310c644af98306dc5ea2d396489803127e75145a140f0263663",
-      "guide": "4405cf59763b903f95e352b0ad142e30e498db4cd29f12eed829c8a8268f34f0"
+      "guide": "4405cf59763b903f95e352b0ad142e30e498db4cd29f12eed829c8a8268f34f0",
+      "operations": "2b1f28ba0fef8f49f33d4dfd090c370475635d35f38f1c6bb2227640d814e847"
     },
     {
       "id": 25,
       "title": "数值图 04 · 金币升级与价格曲线",
       "record": "5c7930500fcbe71e25c499952161c556b74ce0def5e54ade83f75611379bfd5e",
-      "guide": "8153e88cc4ae1dfd2432e9f1a951ea7d8be1ca3a0e3ab61c52f4095af229aecf"
+      "guide": "8153e88cc4ae1dfd2432e9f1a951ea7d8be1ca3a0e3ab61c52f4095af229aecf",
+      "operations": "4bfa80aee4b7053a0f81a710ac27a1202361cf21cfe64c7fbe5d88e2a0770bbb"
     },
     {
       "id": 26,
       "title": "数值图 05 · 个人区域与训练倍率",
       "record": "dde275a94bc6ed7b00b821115e7a357f6a21024f9e6d391f8f74c2ea81fe8953",
-      "guide": "8feb4f70bbbda2e6a70b0e259f3d4fc101dbebc8a25b070b7471e9f85b22f408"
+      "guide": "8feb4f70bbbda2e6a70b0e259f3d4fc101dbebc8a25b070b7471e9f85b22f408",
+      "operations": "f4fb321f4e8edcfebdc2c58624271817bdbf570199093795f901d71182d3f53f"
     },
     {
       "id": 27,
       "title": "数值图 06 · 转生与永久加成",
       "record": "bc077db4555d98e8eb64892f3835cd84ec6f9fcfcc9b57f7a5dd125a62dcfcf5",
-      "guide": "adef2ce7a69dd470899fab690c1cc8b15622a09e6cd92ad3debd72b98b8ee27e"
+      "guide": "adef2ce7a69dd470899fab690c1cc8b15622a09e6cd92ad3debd72b98b8ee27e",
+      "operations": "408cfc710c9f778d81c4731407f10842009d34ec87bf6e1511ce9f624a1519b7"
     },
     {
       "id": 28,
       "title": "数值图 07 · 属性面板与操作反馈",
       "record": "cb9a1a57db7c97c4f8dd739eca518979c792ee1efd25f7269e70c627f205a632",
-      "guide": "73f9c369a1c1bc5a29e33a361b7e482c90f7dec8c01820ad069f2c07a7649852"
+      "guide": "73f9c369a1c1bc5a29e33a361b7e482c90f7dec8c01820ad069f2c07a7649852",
+      "operations": "d7387c9598a602a95807d1bbbf8ee44f451d7149acfe348b989233761b9da49d"
     },
     {
       "id": 29,
       "title": "数值图 08 · 存档、读档与重进验收",
       "record": "cbb7a4650211f8c95c0eb47cdabf0a18b881eb230f6b2686ea3fe6233312f3ea",
-      "guide": "acd1db0c82cab0fbe00ca9cb6df418bfcc3ad34e1617511c91f7ac85fd41b3fe"
+      "guide": "acd1db0c82cab0fbe00ca9cb6df418bfcc3ad34e1617511c91f7ac85fd41b3fe",
+      "operations": "c94784bf5939f9fc6524e3b919eecb7096b9937ead5fc42997b77d4c54f309d5"
     },
     {
       "id": 30,
       "title": "数值图 09 · 整数攻击、字符串与实际伤害",
       "record": "f87d6624b7dd2667a6430f7f27faaa01abff4fd2549795f8934ceface795a43e",
-      "guide": "9fb9468ae9f186e408755c73315b5f9b0f936e2e157741fdd78d3df06dcdeb6a"
+      "guide": "9fb9468ae9f186e408755c73315b5f9b0f936e2e157741fdd78d3df06dcdeb6a",
+      "operations": "3214d9cda6ffb87f7204c9bf6ae70f21247558f3fc895ac8c70a4cf88d25e97d"
     },
     {
       "id": 31,
       "title": "数值图 10 · 固定怪物、伤害与掉落",
       "record": "7cf53c420ec54b2a955d0741cacb71a1b6c402ff02931e035469279d068cfb9d",
-      "guide": "283309271e7593bcf9a3c775a667b4f6baf341aa6f354fe806ab59bf65260d2e"
+      "guide": "283309271e7593bcf9a3c775a667b4f6baf341aa6f354fe806ab59bf65260d2e",
+      "operations": "778d28a27621f37b7d69f135cce3e6f059914b2a1f46e685fa62cfc7ce2ce7f6"
     },
     {
       "id": 32,
       "title": "数值图 11 · 装备强化与金币消耗",
       "record": "b02299d861ff9e551d7814de85da9275862cc684e3ceb7ec6a8dbec5a0bf9f2b",
-      "guide": "9f33f60b123bca2ea0f5212cf7bbf3a3955cc8c1cef7f06e37485381405bfcc5"
+      "guide": "9f33f60b123bca2ea0f5212cf7bbf3a3955cc8c1cef7f06e37485381405bfcc5",
+      "operations": "96911c60ec07aec6cda30d5c04ffcf4b4388bdd8f8a2e918a807201cb9b145f2"
     },
     {
       "id": 33,
       "title": "数值图 12 · 三关推进与整图验收",
       "record": "38bf9ffa91a492c35119e12252ea87fa65e3323badb9d54dee9262ae8e87ff57",
-      "guide": "144e5feaf1ceae1564ce41986e1f2218e8ec6c281b053f11a1fe915156d32fbc"
+      "guide": "144e5feaf1ceae1564ce41986e1f2218e8ec6c281b053f11a1fe915156d32fbc",
+      "operations": "6ff2965338dbd50d7a5d0f0de19933b84be48811ee296aec8475e5f42f529151"
     },
     {
       "id": 34,
       "title": "数值图 13 · 万、亿与 K/M/B 大数显示",
       "record": "d2468ca587cbaad7074458b907a115c4c5b5154a63579c88929a18a5cf393c9f",
-      "guide": "4b53dbe834619d61accb958485bbf9f85fd8dd0fb7dad4b8292418c02e3a2751"
+      "guide": "4b53dbe834619d61accb958485bbf9f85fd8dd0fb7dad4b8292418c02e3a2751",
+      "operations": "484d3422ba1785da966ed8adfa1bad9116f13df231a8893475e03eb840b4bdc3"
     },
     {
       "id": 35,
       "title": "数值图 14 · 小数、舍入与单位进位",
       "record": "bfbcba312679b849872c51263fd4485add28ebe2f462e09f5920bacd9ea2b5cc",
-      "guide": "034206a2fd512c60c35e17d9735eb3dccb582b5ddde6eba5f32d7b199b5fbe14"
+      "guide": "034206a2fd512c60c35e17d9735eb3dccb582b5ddde6eba5f32d7b199b5fbe14",
+      "operations": "d94a8484ed8902b62ca5679ebe3d974ed7dd350dacd6d9ac73e5b7acbd546002"
     },
     {
       "id": 36,
       "title": "数值图 15 · 三种方案与原生整数运算",
       "record": "636b46f0715da9b93ba24ecab10851eca59957c310be729b1a2a3cec951dbd61",
-      "guide": "aff621447891efc80e6729ffc4fac07c3ba027f1464e8b8df96ddd23d509930d"
+      "guide": "aff621447891efc80e6729ffc4fac07c3ba027f1464e8b8df96ddd23d509930d",
+      "operations": "fdbea41001ecbd52613779768cdb6e7737c90e888bf78bb495fb5967e6975698"
     },
     {
       "id": 37,
       "title": "数值图 16 · 逐位字符串比较、加法与减法",
       "record": "b020d02be8ddf76c1bdfe78842ca66e8c4cf4d315de35f3c231a178e16025a1e",
-      "guide": "ffe4e70a6f35f8534d9298ba30320f9e4aae068398f464ee69e3869ea219e716"
+      "guide": "ffe4e70a6f35f8534d9298ba30320f9e4aae068398f464ee69e3869ea219e716",
+      "operations": "acd8e711587e6e81142aa76db88b4670b05dca81943c958910cc4d7ed8983307"
     },
     {
       "id": 38,
       "title": "数值图 17 · 字符串倍率、交易与存档",
       "record": "f66cdaa0db210d443ba7cc979e95cb0ec5d45b6d8bfbed22e278ecfdc9b454f6",
-      "guide": "dde1856cf537e6688a73e15ce18e9673e524dedfaa5674ffe5e03e5ef22fc10b"
+      "guide": "dde1856cf537e6688a73e15ce18e9673e524dedfaa5674ffe5e03e5ef22fc10b",
+      "operations": "a28b835e9b4b33f9502cec401a6fc7f7401d1d860333ce66796f78c76cf9fd1c"
     },
     {
       "id": 39,
       "title": "数值图 18 · 尾数＋指数：近似成长强度",
       "record": "f3901dd19f60260aeba768b64a4406fb8e56cf2cb4c161ac88321eee83e2252d",
-      "guide": "9a8afccadbba5286aada463cf739a32b618371764422dd752cd67b3806d0e199"
+      "guide": "9a8afccadbba5286aada463cf739a32b618371764422dd752cd67b3806d0e199",
+      "operations": "d3bc503c9fc3bac6646ccc61affbb10504f6cb2d92e3d80a936db6e28ecab875"
     }
   ]
 }

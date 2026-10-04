@@ -4,7 +4,7 @@
   const difficulties = {beginner:'入门',intermediate:'进阶',advanced:'高阶'};
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const date = value => {const parsed=new Date(value);return Number.isNaN(parsed.getTime())?'日期未知':parsed.toLocaleDateString('zh-CN');};
-  const active = () => Boolean(window.EGG_SPACE?.getState().active);
+  const active = () => window.EGG_COMMUNITY.getCapabilities().mode==='local' && Boolean(window.EGG_SPACE?.getState().active);
   const loginLink = () => 'login.html?next='+encodeURIComponent(location.pathname.split('/').pop()+location.search+location.hash);
   const tutorialLink = id => 'community-tutorial.html?id='+encodeURIComponent(id);
   const sample = item => item?.sample?'<span class="common-tag common-tag-sample">演示示例</span>':'';
@@ -23,11 +23,22 @@
     if(kind==='error')box.focus();
   }
   function requireLogin() {
+    const capability=window.EGG_COMMUNITY.getCapabilities();if(capability.mode!=='local'){message(capability.message);return false;}
     if(active())return true;
     message('请先进入体验账号，页面中填写的内容会暂时保留。','error');
     const box=document.querySelector('#community-message'),link=document.createElement('a');link.href=loginLink();link.textContent=' 登录 / 体验';box.append(link);return false;
   }
   function loginGate() {return `<p class="common-muted">进入体验账号后可以参与互动。<a class="space-button" href="${esc(loginLink())}">登录 / 体验</a></p>`;}
+  function unavailable(content,title) {
+    const capability=window.EGG_COMMUNITY.getCapabilities();if(capability.mode==='local')return false;
+    document.querySelectorAll('.common-tools,#community-filter,#work-editor,#works-create,.common-hero > a[href="contribute.html"]').forEach(node=>{node.hidden=true;});
+    document.querySelectorAll('#community-main button,#community-main input,#community-main select,#community-main textarea').forEach(node=>{node.disabled=true;});
+    const note=document.querySelector('.common-preview-note');if(note)note.textContent=capability.message;
+    const intro=document.querySelector('.common-hero p');if(intro)intro.textContent=title+'将在云端发布与权限服务完成后开放。';
+    const count=document.querySelector('#community-count,#works-count');if(count)count.textContent='尚未开放';
+    content.innerHTML=`<section class="common-empty"><h2>${esc(title)}暂未开放</h2><p>${esc(capability.message)}</p><div class="common-tool-actions"><a class="space-button space-button-primary" href="courses.html">继续学习课程</a><a class="space-button" href="personal-space.html">查看我的学习记录</a></div></section>`;
+    content.setAttribute('aria-busy','false');return true;
+  }
   async function seed(button) {
     if(!requireLogin())return;
     button.disabled=true;
@@ -36,9 +47,10 @@
     finally{button.disabled=false;}
   }
   document.querySelector('#community-seed')?.addEventListener('click',event=>seed(event.currentTarget));
-  window.EGG_COMMUNITY_UI=Object.freeze({categories,difficulties,esc,date,active,loginLink,tutorialLink,sample,imageSource,videoLink,message,requireLogin,loginGate,seed});
+  window.EGG_COMMUNITY_UI=Object.freeze({categories,difficulties,esc,date,active,loginLink,tutorialLink,sample,imageSource,videoLink,message,requireLogin,loginGate,seed,unavailable});
   if(document.body.dataset.community!=='browse')return;
   const form=document.querySelector('#community-filter'),list=document.querySelector('#community-list'),count=document.querySelector('#community-count');
+  if(unavailable(list,'教程广场'))return;
   let publications=[],request=0;
   function render() {
     const query=document.querySelector('#community-search').value.trim().toLocaleLowerCase(),category=document.querySelector('#community-category').value,difficulty=document.querySelector('#community-difficulty').value,sort=document.querySelector('#community-sort').value;

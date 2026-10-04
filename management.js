@@ -40,6 +40,14 @@
   async function refresh(){const seq=++loadSequence;try{const next=await api.getState();if(seq!==loadSequence)return;const inputs=preserveInputs();data=next;gate();admin?renderAdmin():renderMessages();for(const old of inputs){if(old.id==='review-reason'&&old.owner!==selected)continue;const node=$(old.id);if(node){node.value=old.value;if(old.focused){node.focus({preventScroll:true});node.setSelectionRange(old.start,old.end);}}}}catch(error){notice(error.message||'记录读取失败，请稍后重试。',true);}}
   async function mutate(action,success){if(busy||!gate())return;busy=true;document.querySelectorAll('#manage-workspace button,#manage-workspace input,#manage-workspace select,#manage-workspace textarea').forEach(b=>b.disabled=true);try{await action();await refresh();notice(success);}catch(error){notice(error.message||'操作没有完成，填写内容仍会保留。',true);}finally{busy=false;document.querySelectorAll('#manage-workspace button,#manage-workspace input,#manage-workspace select,#manage-workspace textarea').forEach(b=>b.disabled=false);if(!admin)$('message-read-all').disabled=!data.messages.some(m=>!m.read);}}
   if(!api){notice('社区功能没有加载成功，请刷新页面。',true);return;}
+  const capability=api.getCapabilities();
+  if(capability.mode!=='local'){
+    $('manage-workspace').hidden=true;document.querySelectorAll('#manage-workspace button,#manage-workspace input,#manage-workspace select,#manage-workspace textarea').forEach(node=>{node.disabled=true;});
+    $('manage-gate').hidden=false;$('manage-gate').innerHTML=`<h2>${admin?'云端审核工作台暂未开放':'消息中心暂未开放'}</h2><p>${escape(capability.message)}</p><a class="space-button" href="courses.html">继续学习课程</a>`;
+    document.querySelector('.manage-mode').textContent='尚未开放';document.querySelector('.manage-notice').textContent=capability.message;
+    document.querySelector('.manage-heading p').textContent=admin?'正式审核服务与管理员权限配置完成后开放。':'社区通知服务完成后开放。';
+    document.querySelector('.manage-footer').hidden=true;return;
+  }
   if(admin){
     $('manage-search').addEventListener('input',renderAdmin);$('manage-filter').addEventListener('change',renderAdmin);$('manage-refresh').addEventListener('click',refresh);
     $('manage-list').addEventListener('click',event=>{const b=event.target.closest('[data-select]');if(!b||busy)return;selected=b.dataset.select;renderAdmin();if(matchMedia('(max-width:800px)').matches)$('manage-detail').scrollIntoView({behavior:'instant',block:'start'});});

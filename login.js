@@ -92,6 +92,10 @@
   }
   function render(){
     const state=cloud.status(),hasUser=Boolean(state.user),resetting=verification?.kind==='reset',editing=mode==='update'||mode==='forgot'&&isCloudbase();
+    if(state.mode!=='local'){
+      $('login-title').textContent=hasUser&&!editing&&!verification?'欢迎回来':({signin:'欢迎回来',signup:'创建账号',forgot:'找回密码',update:'设置新密码'}[mode]||'邮箱登录');
+      $('login-intro-help').textContent=verification?'填写邮箱中的验证码，完成验证。':hasUser&&!editing?'继续查看你的课程与学习记录。':({signin:'登录后，继续上次的学习。',signup:'验证邮箱后，即可保存学习进度。',forgot:'通过邮箱验证码重新设置密码。',update:'设置密码后，继续学习。'}[mode]||'使用邮箱账号保存学习进度。');
+    }
     $('login-email-field').hidden=mode==='update';$('login-email').readOnly=Boolean(verification);
     $('login-password-field').hidden=verification?.kind==='signup'||mode==='forgot'&&!resetting;
     $('login-confirm-field').hidden=!(resetting||!verification&&['signup','update'].includes(mode));
@@ -99,12 +103,13 @@
     $('login-password').autocomplete=mode==='signin'?'current-password':'new-password';$('login-password-label').textContent=editing?'新密码':'密码';
     buttons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.authMode===mode)));
     if(!busy)$('login-auth-submit').textContent=verification?resetting?'确认验证码并设置密码':'确认验证码':isCloudbase()?({signin:'登录',signup:'发送注册验证码',forgot:'发送重置验证码'}[mode]||titles[mode]):titles[mode];
-    $('login-email-form').hidden=hasUser&&!editing&&!verification;
+    $('login-email-form').hidden=state.mode==='local'||hasUser&&!editing&&!verification;
     $('login-cloud-session').hidden=!hasUser;
     $('login-current-email').textContent=state.user?.email||'';
     $('login-cloud-continue').href=destination();
     document.querySelector('.login-email-fields').disabled=!state.configured||!hasGate()||busy;
-    buttons.forEach(button=>button.disabled=!state.configured||!hasGate()||busy);
+    buttons.forEach(button=>{button.disabled=!state.configured||!hasGate()||busy;button.hidden=mode==='signin'?button.dataset.authMode==='signin':button.dataset.authMode!=='signin';});
+    document.querySelector('[aria-label="邮箱账号操作"]').hidden=state.mode==='local'||hasUser&&!editing&&!verification;
     $('login-cloud-signout').disabled=!hasGate()||busy;$('login-change-password').disabled=!hasGate()||busy;
     $('login-cloud-continue').setAttribute('aria-disabled',String(!hasGate()));
   }
@@ -154,8 +159,11 @@
   });
   window.addEventListener?.('pagehide',cancelVerification);
   const state=cloud.status();
-  $('login-cloud-heading').textContent=state.mode==='local'?'邮箱登录待开放':state.mode==='error'?'云端配置需要修正':'使用真实邮箱账号';
-  $('login-cloud-description').textContent=state.message;
+  $('login-cloud-entry').hidden=state.mode!=='local';
+  $('login-cloud-notice').hidden=state.mode!=='error';
+  $('login-cloud-heading').textContent=state.mode==='local'?'邮箱账号请使用腾讯云测试站':state.mode==='error'?'云端配置需要修正':'使用真实邮箱账号';
+  $('login-cloud-description').textContent=state.mode==='local'?'使用上方“前往邮箱登录测试站”入口。本机体验的学习记录只保存在当前浏览器。':state.message;
+  if(state.mode==='local')$('login-cloud-help').textContent='两个站点的记录分开保存，已有本机记录不会自动上传到邮箱账号。';
   if(isCloudbase())$('login-cloud-help').textContent='邮箱验证码确认后可同步学习记录。教程投稿暂未开放，本机记录不会自动上传。';
   setMode(mode);
   if(!hasGate())showError(new Error('登录校验组件未能加载，请刷新后再试。'));

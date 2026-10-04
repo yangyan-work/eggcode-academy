@@ -26,9 +26,9 @@ function service(){
   return{api,A,B,calls,next,errors,records,change};
 }
 const metadata=['lessons-data.js','tutorials.js','build-guides.js','progression-guides.js','curriculum-expansion.js','curriculum-lessons-01.js','curriculum-lessons-02.js'];
-function page(file='personal-space.html',cloud=service()){
+function page(file='personal-space.html',cloud=service(),allowLocalStorage=false){
   const dom=new JSDOM(fs.readFileSync(path.join(root,file),'utf8'),{url:'https://qa.invalid/'+file,runScripts:'outside-only'}),w=dom.window;
-  let reads=0;const errors=[];w.addEventListener('error',event=>{errors.push(event.message);event.preventDefault();});Object.defineProperty(w,'localStorage',{get(){reads++;throw new Error('云端不应读取旧本机记录');}});
+  let reads=0;const errors=[];w.addEventListener('error',event=>{errors.push(event.message);event.preventDefault();});if(!allowLocalStorage)Object.defineProperty(w,'localStorage',{get(){reads++;throw new Error('云端不应读取旧本机记录');}});
   w.HTMLElement.prototype.scrollIntoView=function(){};
   w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};w.HTMLDialogElement.prototype.close=function(){this.open=false;};w.confirm=()=>true;
   const run=file=>w.eval(fs.readFileSync(path.join(root,file),'utf8'));
@@ -99,11 +99,29 @@ async function main(){
     const {api,cloud,w}=p;w.history.replaceState(null,'','lesson.html?id=144');w.fetch=async()=>({ok:true,text:async()=>fs.readFileSync(path.join(root,'personal-space.html'),'utf8')});p.run('learning-progress.js');w.EGG_PROGRESS.init();p.run('personal-space.js');
     eq(cloud.calls.filter(c=>c.name==='saveProfilePatch').length,0,'课程未加载账号前不写阅读位置');await api.loadCloudUser(cloud.A);await tick();
     eq(cloud.calls.filter(c=>c.name==='saveProfilePatch').map(c=>c.args[0]),[{last_lesson_id:144}],'课程载入后只写一次阅读位置');w.EGG_PROGRESS.init();await tick();eq(cloud.calls.filter(c=>c.name==='saveProfilePatch').length,1,'重复init不重复保存阅读位置');
+    eq(w.document.querySelectorAll('[data-progress-toggle],[data-space-action="complete"]').length,1,'云端课程只生成一个完成按钮');eq(w.document.querySelectorAll('[data-learning-lesson-panel]').length,0,'旧完成面板被替换而非隐藏');
+    eq(w.document.getElementById('space-lesson-tools').previousElementSibling.id,'lesson-body','先看正文再使用统一学习工具');
+    eq(w.document.getElementById('space-lesson-tools').nextElementSibling.classList.contains('lesson-navigation'),true,'统一工具位于正文与章节切换之间');
     eq(w.document.querySelector('#space-note-form .space-field-help').textContent,'每课保存一份笔记，最多 2000 字。'+api.getState().storageMessage,'课程异步挂载弹窗同样同步云端说明');
     eq(w.document.getElementById('space-lesson-tools').getAttribute('aria-label'),'个人学习空间','课程工具云端无预览账号标签');
     const held=deferred();cloud.next.saveProgress=held.promise;const save=api.setCompleted(144,true);
-    eq(w.document.querySelector('[data-progress-toggle]').disabled,true,'保存时课程进度按钮收到共享忙状态');eq(w.document.querySelector('[data-space-action="complete"]').disabled,true,'保存时主空间课程按钮收到共享忙状态');
-    held.resolve({applied:true,current_completed:true,current_revision:1});await save;eq(w.document.querySelector('[data-progress-toggle]').getAttribute('aria-pressed'),'true','完成后课程进度按钮同步');eq(w.document.querySelector('[data-space-action="complete"]').getAttribute('aria-pressed'),'true','完成后主空间课程按钮同步');eq(cloud.calls.filter(c=>c.name==='saveProfilePatch').length,1,'忙状态通知不触发阅读保存循环');
+    eq([...w.document.querySelectorAll('#space-lesson-tools button')].every(button=>button.disabled),true,'保存时统一工具的完成收藏笔记均禁用');
+    cloud.records.get(cloud.A.id).progress=[{lesson_id:144,completed:true,revision:1}];held.resolve({applied:true,current_completed:true,current_revision:1});await save;eq(w.document.querySelector('[data-space-action="complete"]').getAttribute('aria-pressed'),'true','完成后统一课程按钮同步');eq(cloud.calls.filter(c=>c.name==='saveProfilePatch').length,1,'忙状态通知不触发阅读保存循环');
+    cloud.errors.saveProgress='模拟RPC拒绝';w.document.querySelector('[data-space-action="complete"]').click();await tick();eq(api.getState().completed,[144],'统一完成按钮失败不取消已保存标记');eq(w.document.getElementById('space-toast').textContent,'模拟RPC拒绝','统一完成按钮保留服务错误提示');delete cloud.errors.saveProgress;
+    w.document.querySelector('[data-space-action="complete"]').click();await tick();eq(w.EGG_PROGRESS.getState().completed,[],'统一取消按钮更新云端进度模块');eq(cloud.calls.filter(call=>call.name==='saveProgress').map(call=>call.args[1]),[true,false,false],'每个云端完成操作只请求一次RPC');
+    w.document.querySelector('[data-space-action="favorite"]').click();await tick();eq(api.getState().favorites,[144],'合并工具保留收藏写入');
+    w.document.querySelector('[data-space-action="note"]').click();const form=w.document.getElementById('space-note-form');form.elements.content.value='课程笔记失败保留';cloud.errors.saveNote='模拟课中笔记失败';form.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();eq(form.elements.content.value,'课程笔记失败保留','合并工具笔记失败保留文本');eq(form.closest('dialog').open,true,'合并工具笔记失败保持弹窗');delete cloud.errors.saveNote;form.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();eq(api.getState().notes[0].content,'课程笔记失败保留','合并工具笔记重试保存');
+  }finally{p.close();}
+  p=page('lesson.html',localService,true);try{
+    const {api,w}=p;w.history.replaceState(null,'','lesson.html?id=144');w.fetch=async()=>({ok:true,text:async()=>fs.readFileSync(path.join(root,'personal-space.html'),'utf8')});api.enterDemo('本机课程检查');p.run('personal-space.js');await tick();p.run('learning-progress.js');w.EGG_PROGRESS.init();w.EGG_PROGRESS.init();
+    eq(w.document.querySelectorAll('[data-progress-toggle],[data-space-action="complete"]').length,1,'本机工具先挂载后重复init仍只有一个完成按钮');eq(w.document.getElementById('space-lesson-tools').previousElementSibling.id,'lesson-body','本机统一学习工具同样位于正文后');eq(api.getState().lastLesson,144,'本机空间最近阅读保留');eq(w.EGG_PROGRESS.getState().lastLesson,144,'本机原进度最近阅读保留');
+    w.document.querySelector('[data-space-action="complete"]').click();await tick();eq(api.getState().completed.includes(144),true,'统一按钮保存本机空间完成');eq(w.EGG_PROGRESS.getState().completed,[144],'统一按钮保留原本机路线完成入口');eq(JSON.parse(w.localStorage.getItem(api.storageKey)).completed.includes(144),true,'统一按钮持久保存本机空间键');eq(JSON.parse(w.localStorage.getItem(w.EGG_PROGRESS.storageKey)).completed,[144],'统一按钮持久保存原本机进度键');
+    w.document.querySelector('[data-space-action="complete"]').click();await tick();eq(api.getState().completed.includes(144),false,'统一按钮取消本机空间完成');eq(w.EGG_PROGRESS.getState().completed,[],'统一按钮取消原本机路线完成');
+    w.document.querySelector('[data-space-action="favorite"]').click();await tick();eq(api.getState().favorites.includes(144),true,'本机收藏仍可用');w.document.querySelector('[data-space-action="note"]').click();const form=w.document.getElementById('space-note-form');form.elements.content.value='本机课程笔记';form.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));await tick();eq(api.getState().notes.find(note=>note.lessonId===144).content,'本机课程笔记','本机笔记仍可保存');
+  }finally{p.close();}
+  p=page('lesson.html');try{
+    const {api,cloud,w}=p;w.history.replaceState(null,'','lesson.html?id=40');p.run('learning-progress.js');w.EGG_PROGRESS.init();w.fetch=async()=>{throw new Error('弹窗资源不可用');};p.run('personal-space.js');await api.loadCloudUser(cloud.A);await tick();
+    eq(w.document.querySelectorAll('[data-progress-toggle],[data-space-action="complete"]').length,1,'弹窗资源失败仍保留一个原完成按钮');w.document.querySelector('[data-progress-toggle]').click();await tick();eq(api.getState().completed,[40],'资源失败的回退面板仍可保存完成');eq(api.getState().lastLesson,40,'资源失败不丢最近阅读保存');
   }finally{p.close();}
   p=page();try{
     const {cloud,w}=p;cloud.errors.loadStudyState='PG故障';p.run('access-gate.js');await tick();await tick();

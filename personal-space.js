@@ -57,13 +57,13 @@
     return `<div class="space-overview-grid">
       <section class="space-resume" aria-labelledby="space-resume-title">
         <div class="space-resume-copy"><span class="space-course-kicker">${icon('book')}${state.lastLesson === null ? '从第一步开始' : '继续上次的课程'}</span><h2 id="space-resume-title">${escape(title(id))}</h2><p>把一个小效果搭出来，<br>再让自己的地图多一点新意。</p><a class="space-button space-button-primary" href="${courseLink(id)}">继续学习 ${icon('arrow')}</a><span class="space-resume-caption">${escape(lessons[id]?.series || (id < 6 ? '入门课程' : '玩法实战'))} · 含搭建步骤与检查清单</span></div>
-        <div class="space-resume-art"><img src="assets/eggy-character.png" alt="背着创作工具飞行的粉色蛋仔" width="427" height="242"><span class="space-art-caption">想法，正在起飞。</span></div>
+        <div class="space-resume-art"><img src="assets/eggy-character.png" alt="背着创作工具飞行的粉色蛋仔" width="427" height="242"><span class="space-art-caption">课程练习</span></div>
       </section>
-      <section class="space-growth" aria-labelledby="space-growth-title"><div class="space-panel-heading"><h2 id="space-growth-title">一点点，学会更多</h2><span>${icon('check')}</span></div><a class="space-growth-total" href="#progress"><strong>${state.completed.length}</strong><span>/ 145 课<br>已标记学完</span></a><div class="space-growth-meter"><progress max="145" value="${state.completed.length}" aria-label="已标记学完 ${state.completed.length} / 145 课"></progress><span>${percent}%</span></div><p>每次完成一课，都给自己留个标记。</p><nav class="space-growth-links" aria-label="个人记录统计"><a href="#favorites">${icon('bookmark')}<span><strong>${state.favorites.length}</strong> 课收藏</span>${icon('arrow')}</a><a href="#notes">${icon('note')}<span><strong>${state.notes.length}</strong> 份笔记</span>${icon('arrow')}</a></nav></section>
+      <section class="space-growth" aria-labelledby="space-growth-title"><div class="space-panel-heading"><h2 id="space-growth-title">学习进度</h2><span>${icon('check')}</span></div><a class="space-growth-total" href="#progress"><strong>${state.completed.length}</strong><span>/ 145 课<br>已标记学完</span></a><div class="space-growth-meter"><progress max="145" value="${state.completed.length}" aria-label="已标记学完 ${state.completed.length} / 145 课"></progress><span>${percent}%</span></div><p>完成标记由你在课程页手动记录。</p><nav class="space-growth-links" aria-label="个人记录统计"><a href="#favorites">${icon('bookmark')}<span><strong>${state.favorites.length}</strong> 课收藏</span>${icon('arrow')}</a><a href="#notes">${icon('note')}<span><strong>${state.notes.length}</strong> 份笔记</span>${icon('arrow')}</a></nav></section>
     </div>
-      <section class="space-contribute-banner" aria-labelledby="space-contribute-title"><span class="space-contribute-mark">${icon('note')}</span><div><h2 id="space-contribute-title">${state.mode==='cloud'?'投稿与社区正在接入中。':'也把你的经验，写成一篇教程。'}</h2><p>${state.mode==='cloud'?'先整理搭建步骤和试玩结果，功能开放后再分享。':'整理搭建步骤，添加配图，和其他创作者交流。'}</p><nav class="space-community-links" aria-label="社区与创作"><a href="community.html">教程广场</a><a href="works.html">作品展示</a><a href="messages.html">消息中心</a></nav></div><a class="space-button" href="contribute.html">${state.mode==='cloud'?'查看投稿状态':'投稿教程'} ${icon('arrow')}</a></section>
+      <section class="space-contribute-banner" aria-labelledby="space-contribute-title"><span class="space-contribute-mark">${icon('note')}</span><div><h2 id="space-contribute-title">${state.mode==='cloud'?'投稿与社区正在接入中。':'投稿教程'}</h2><p>${state.mode==='cloud'?'先整理搭建步骤和试玩结果，功能开放后再分享。':'整理搭建步骤，添加配图，和其他创作者交流。'}</p><nav class="space-community-links" aria-label="社区与创作"><a href="community.html">教程广场</a><a href="works.html">作品展示</a><a href="messages.html">消息中心</a></nav></div><a class="space-button" href="contribute.html">${state.mode==='cloud'?'查看投稿状态':'投稿教程'} ${icon('arrow')}</a></section>
     <div class="space-workspace-grid">
-      <section class="space-home-collection"><div class="space-panel-heading"><div><h2>想做的玩法，留在这里</h2><p>从收藏的一课，开始下一次创作。</p></div><a href="#favorites">全部收藏 ${icon('arrow')}</a></div><div class="space-course-list">${state.favorites.length ? state.favorites.slice(0,3).map(value=>courseRow(value,state)).join('') : empty('还没有收藏','在课程页收藏一课，下次就能直接找到。')}</div></section>
+      <section class="space-home-collection"><div class="space-panel-heading"><div><h2>我的收藏</h2><p>最近收藏的课程。</p></div><a href="#favorites">全部收藏 ${icon('arrow')}</a></div><div class="space-course-list">${state.favorites.length ? state.favorites.slice(0,3).map(value=>courseRow(value,state)).join('') : empty('还没有收藏','在课程页收藏一课，下次就能直接找到。')}</div></section>
       <section class="space-latest-note" aria-labelledby="space-latest-note-title"><div class="space-panel-heading"><h2 id="space-latest-note-title">留给自己的小提示</h2>${icon('note')}</div>${latestNote ? `<p class="space-latest-note-course">${escape(title(latestNote.lessonId))}</p><p class="space-latest-note-content">${escape(latestNote.content || '这份笔记还没有内容。')}</p><div class="space-latest-note-footer"><small>${date(latestNote.updatedAt)} 更新</small><button type="button" class="space-plain" data-space-action="note" data-lesson-id="${latestNote.lessonId}">继续编辑 ${icon('arrow')}</button></div>` : '<p class="space-latest-note-content">记下关键参数、容易漏掉的连接，或试玩时发现的小问题。</p><button type="button" class="space-plain" data-space-action="note">写第一份笔记</button>'}</section>
     </div>
     <section class="space-home-routes"><div class="space-panel-heading"><h2>选一条路线，慢慢搭</h2><a href="learning-path.html">全部路线 ${icon('arrow')}</a></div><div class="space-route-list">${routes.map(route=>{const done=route.ids.filter(value=>state.completed.includes(value)).length;return `<a href="${route.href}"><div><span>${route.name}</span><small>${done} / ${route.ids.length}</small></div><progress value="${done}" max="${route.ids.length}" aria-label="${route.name}：${done} / ${route.ids.length} 课"></progress></a>`;}).join('')}</div></section>`;
@@ -115,8 +115,8 @@
     logoutButton.setAttribute('aria-label',state.mode==='cloud'?'退出邮箱账号':'退出体验账号');
     document.querySelector('.space-preview-note p').textContent=state.mode==='cloud'?'邮箱账号模式：'+state.storageMessage+' 社区与投稿功能仍在接入中。':'浏览器体验模式，数据保存在当前浏览器，尚未连接云端。';
     document.querySelector('.space-footer-note').textContent=state.mode==='cloud'?'当前账号的学习记录由账号服务保存，保存结果以服务端确认为准。社区与投稿功能尚未开放。':'登录后使用本站功能。当前体验记录保存在本浏览器；云端账号记录需接入数据库。';
-    document.getElementById('space-page-title').textContent = section === 'overview' && state.active ? `${state.nickname}，欢迎回来。` : names[section];
-    document.getElementById('space-page-description').textContent = ({overview:'从上次的课程继续，把想法搭出来。',progress:'找到下一课，再让自己的地图多一点新意。',favorites:'喜欢的玩法，随时回来接着学。',notes:'把搭建中的小发现，留给下一次的自己。',feedback:'记下具体的问题，让教程更容易跟着做。',settings:state.mode==='cloud'?'管理邮箱账号和学习记录。':'管理体验账号，保留自己的学习记录。'})[section];
+    document.getElementById('space-page-title').textContent = section === 'overview' && state.active ? `我的学习` : names[section];
+    document.getElementById('space-page-description').textContent = ({overview:'继续学习，查看收藏和笔记。',progress:'查看课程和完成记录。',favorites:'查看已收藏的课程。',notes:'查看各课笔记。',feedback:'记下具体的问题，让教程更容易跟着做。',settings:state.mode==='cloud'?'管理邮箱账号和学习记录。':'管理体验账号，保留自己的学习记录。'})[section];
     document.title = names[section] + ' · 自由树梦想空间';
     document.querySelectorAll('[data-space-section]').forEach(node=>{ if(node.dataset.spaceSection === section) node.setAttribute('aria-current','page'); else node.removeAttribute('aria-current'); });
     document.querySelectorAll('[data-space-count]').forEach(node=>{node.textContent = state.active ? state[node.dataset.spaceCount].length : 0;});
@@ -169,7 +169,12 @@
     else if(action === 'note') openNote(id);
     else if(action === 'feedback') openFeedback(id);
     else if(action === 'favorite' && ensureAccount()) handleResult(await api.toggleFavorite(id));
-    else if(action === 'complete' && ensureAccount()) handleResult(await api.setCompleted(id,!api.getState().completed.includes(id)));
+    else if(action === 'complete' && ensureAccount()) {
+      const completed=!api.getState().completed.includes(id),result=await api.setCompleted(id,completed);
+      // ponytail: 本机保留两个旧键，顺序同步不具事务性；统一本机状态迁移后删除这一步。
+      if(result.ok&&api.getState().mode==='local')window.EGG_PROGRESS?.setCompleted(id,completed);
+      handleResult(result);
+    }
     else if(action === 'delete-note' && ensureAccount()) handleResult(await api.deleteNote(id));
     else if(action === 'import' && ensureAccount()) handleResult(await api.importLocalProgress());
     else if(action === 'refresh'){const user=await window.EGG_CLOUD.requireUser();handleResult(await api.loadCloudUser(user,{refresh:true}));}
@@ -205,7 +210,7 @@
     if(!root || id === null) return;
     root.setAttribute('aria-label',state.mode==='cloud'?'个人学习空间':'个人学习空间预览');
     const done=state.active && state.completed.includes(id), favorite=state.active && state.favorites.includes(id);
-    root.innerHTML=`<div><strong>我的学习空间${state.mode==='cloud'?'':' · 预览'}</strong>${state.active ? `<button type="button" class="space-button space-button-primary" data-space-action="complete" data-lesson-id="${id}" aria-pressed="${done}">${icon(done ? 'check' : 'plus')}${done ? '已学完 · 点击取消' : '标记本课已学完'}</button>` : '<a href="' + loginLink() + '" class="space-button">登录 / 体验</a>'}</div><div class="space-lesson-actions"><button type="button" class="space-button" data-space-action="favorite" data-lesson-id="${id}" aria-pressed="${favorite}">${icon('bookmark')}${favorite ? '已收藏 · 点击取消' : '收藏本课'}</button><button type="button" class="space-button" data-space-action="note" data-lesson-id="${id}">${icon('note')}学习笔记</button><button type="button" class="space-button" data-space-action="feedback" data-lesson-id="${id}">${icon('message')}记录问题</button><a class="space-button" href="personal-space.html">查看我的空间</a></div><p>${state.mode==='cloud'?escape(state.storageMessage):state.storageMode === 'persistent' ? '仅保存到本浏览器演示记录，尚未连接云端。' : '浏览器无法持久保存，目前只在本页临时保留。'} 完成标记不代表蛋仔编辑器验证通过。</p>`;
+    root.innerHTML=`<div class="space-lesson-actions">${state.active ? `<button type="button" class="space-button space-button-primary" data-space-action="complete" data-lesson-id="${id}" aria-pressed="${done}" aria-label="${done?'取消本课已学完标记':'标记本课已学完'}">${icon(done ? 'check' : 'plus')}${done ? '取消已学完' : '标记学完'}</button>` : '<a href="' + loginLink() + '" class="space-button">登录 / 体验</a>'}<button type="button" class="space-button" data-space-action="favorite" data-lesson-id="${id}" aria-pressed="${favorite}">${icon('bookmark')}${favorite ? '取消收藏' : '收藏本课'}</button><button type="button" class="space-button" data-space-action="note" data-lesson-id="${id}">${icon('note')}学习笔记</button>${state.mode==='cloud'?'':`<button type="button" class="space-button" data-space-action="feedback" data-lesson-id="${id}">${icon('message')}记录问题</button>`}<a class="space-button" href="learning-path.html">学习路线</a><a class="space-button" href="personal-space.html">我的空间</a></div><p>${state.mode==='cloud'?escape(state.storageMessage):state.storageMode === 'persistent' ? '仅保存到本浏览器演示记录，尚未连接云端。' : '浏览器无法持久保存，目前只在本页临时保留。'} 完成标记不代表蛋仔编辑器验证通过。</p>`;
     if(state.mode==='cloud')root.querySelectorAll('[data-space-action]').forEach(button=>{button.disabled=!state.ready||state.saving||button.dataset.spaceAction==='feedback';});
   }
   async function mountLesson() {
@@ -217,8 +222,11 @@
     // 复用同一套弹窗。表单在异步挂载后绑定，避免为课程另写一份业务流程。
     bindForms();
     function attach() {
-      const header=document.querySelector('.lesson-article .article-header'); if(!header) return false;
-      const root=document.createElement('section');root.id='space-lesson-tools';root.className='space-lesson-tools';root.setAttribute('aria-label','个人学习空间预览');header.after(root);lessonMounted=true;render();
+      const header=document.querySelector('.lesson-article .article-header'),body=document.getElementById('lesson-body'); if(!header||!body) return false;
+      const root=document.createElement('section');root.id='space-lesson-tools';root.className='space-lesson-tools';root.setAttribute('aria-label','个人学习空间预览');
+      const progressPanel=header.parentElement.querySelector('[data-learning-lesson-panel]');
+      progressPanel?.remove();body.after(root);
+      lessonMounted=true;render();
       if(api.getState().active&&api.getState().mode!=='cloud') api.rememberLesson(currentId());
       return true;
     }

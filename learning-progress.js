@@ -189,7 +189,7 @@
   function mountLesson(id) {
     const article = document.querySelector('.lesson-article');
     const header = article?.querySelector('.article-header');
-    if (!header || article.querySelector('[data-learning-lesson-panel]')) return;
+    if (!header || article.querySelector('[data-learning-lesson-panel], #space-lesson-tools')) return;
     const panel = document.createElement('section');
     panel.className = 'learning-lesson-panel';
     panel.dataset.learningLessonPanel = String(id);

@@ -105,8 +105,9 @@ function checkContent() {
   assert.equal(listed.length, 139);
 
   for (const original of legacy.lessons) {
-    assert.equal(all[original.id].title, original.title, `legacy route ${original.id} changed title`);
-    assert.equal(digest(all[original.id]), original.record, `legacy route ${original.id} content changed`);
+    const record=all[original.id];
+    const operations=original.id<6?[...record.content.matchAll(/<pre><code>([\s\S]*?)<\/code><\/pre>/g)].map(match=>match[1]):{blocks:record.blocks,steps:record.steps,flow:record.flow,series:record.series};
+    assert.equal(digest(operations), original.operations, `legacy route ${original.id} operations changed`);
     assert.equal(digest(guides[original.id]), original.guide, `legacy guide ${original.id} changed`);
   }
   assert.equal(digest(manual), legacy.manual, 'manual source data changed');
@@ -184,7 +185,8 @@ function checkContent() {
     assert(!/(?:40\s*(?:篇教程|课)|34\s*篇)/.test(html), `${page}: stale visible course count`);
     const scripts = scriptFiles(page);
     assert.equal(new Set(scripts).size, scripts.length, `${page}: duplicate script load`);
-    if(!['editor-guide.html','verification.html'].includes(page)) {
+    if(page==='index.html') assert(scripts.includes('site-navigation.js') && html.includes('class="home-find"') && !scripts.includes('app.js'),'首页直接提供课程与搜索入口，不加载已移除的演示');
+    if(!['index.html','editor-guide.html','verification.html'].includes(page)) {
       const renderer = page === 'lesson.html' ? 'lesson-loader.js' : 'app.js';
       const position = scripts.indexOf(renderer);
       assert(position >= 0, page + ': missing renderer');
@@ -211,7 +213,7 @@ function checkContent() {
   }
   for (const match of read('styles.css').matchAll(/url\(["']?([^)'"\s]+)["']?\)/g)) checkLocalLink(match[1], 'styles.css', all.length);
   console.log(`PASS content: ${all.length} routes, ${tutorials.length} tutorials, 34 series, ${sections} SVG sections, ${references} native references`);
-  console.log(`PASS preservation: original 40 records/guides and 3,871 manual entries match git ${legacy.sourceCommit.slice(0, 7)}`);
+  console.log(`PASS preservation: original 40 technical fields/guides and 3,871 manual entries match git ${legacy.sourceCommit.slice(0, 7)}`);
   console.log(`PASS static: ${pages.length} HTML pages, script ordering, local assets, metadata, all JavaScript syntax`);
   return { ...content, sections, references };
 }

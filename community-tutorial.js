@@ -1,6 +1,7 @@
 (() => {
   'use strict';
   const ui=window.EGG_COMMUNITY_UI,store=window.EGG_COMMUNITY,content=document.querySelector('#tutorial-content'),id=new URLSearchParams(location.search).get('id');
+  if(ui.unavailable(content,'社区教程与问答'))return;
   let publication=null,state=null,request=0,renderedRevision=null;
   const e=ui.esc;
   function questionForm(step) {return ui.active()?`<form class="common-form" data-question-form data-step="${step}"><fieldset><label for="question-${step}">${step?'这一步哪里还不清楚？':'想和作者交流什么？'}</label><textarea id="question-${step}" name="body" rows="3" minlength="5" maxlength="1000" required placeholder="写清楚操作到哪里、看到什么，以及你期待的效果。"></textarea><small>5–1000 个字符。当前使用体验昵称，本机记录对本浏览器共享。</small><button class="space-button" type="submit">保存提问体验</button><p class="common-inline-message" data-form-message role="status" tabindex="-1" hidden></p></fieldset></form>`:ui.loginGate();}

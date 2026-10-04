@@ -2,8 +2,8 @@
 // 纯 SVG 积木结构图：只负责教学展示，不是编辑器模板或可执行蛋码。
 window.EGG_BLOCKS = (() => {
   const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const colors={event:'#ffb400',action:'#4998f7',control:'#9148dc',condition:'#ff7637',value:'#50cf95',variable:'#ec4b95',literal:'#a0e9bc',custom:'#ef5b62',note:'#3b4050'};
-  const dark=new Set(['event','action','condition','value','variable','literal','custom']);
+  const colors={event:'#ffb400',action:'#4998f7',control:'#9148dc',condition:'#ff7637',value:'#50cf95',variable:'#ec4b95',literal:'#a0e9bc',custom:'#ef5b62',note:'#e4eaf1'};
+  const dark=new Set(['event','action','condition','value','variable','literal','custom','note']);
   const font='Microsoft YaHei, PingFang SC, sans-serif';
   const textWidth=s=>[...String(s)].reduce((n,c)=>n+(/[\u0000-\u00ff]/.test(c)?8.4:16),0);
   function wrap(text,width){
@@ -69,7 +69,7 @@ window.EGG_BLOCKS = (() => {
       svg+=translate(0,y,badge)+translate(34,y,`<g data-block-kind="${esc(node.kind||'note')}"${number===null?'':` data-step="${number}"`}>${n.svg}</g>`);
       y+=n.h;w=Math.max(w,n.w+34);
       const next=nodes[i+1],connected=next&&node.kind!=='note'&&next.kind!=='note'&&!node.definition&&!next.definition&&next.kind!=='event';
-      if(connected)svg+=`<path d="M84 ${y} v12 m-4 -4 l4 4 l4 -4" fill="none" stroke="#adbbd4" stroke-width="1.5" data-flow="next"/>`;
+      if(connected)svg+=`<path d="M84 ${y} v12 m-4 -4 l4 4 l4 -4" fill="none" stroke="#596b7a" stroke-width="1.5" data-flow="next"/>`;
       y+=connected?17:14;
     }return{w,h:y,svg};
   }
@@ -95,7 +95,7 @@ window.EGG_BLOCKS = (() => {
       const exit=kind==='custom'?'定义结束 · 返回调用处':isIf?'分支汇合 · 接下方动作':timer?'外层后续 · 不属于上方到期回调':loop?'循环结束 · 接下方动作':'控制结束 · 接下方动作';
       // The footer is a connector; its adjacent prose is not an invented return/end block.
       const exitLabel='接线提示：'+exit;
-      svg=`<rect x="0" y="${h-5}" width="19" height="${y-h+18}" rx="8" fill="${colors[kind]}"/>`+svg+`<path d="${stackPath(118,24)}" transform="translate(0,${y})" fill="${colors[kind]}" stroke="#ffffff50" data-flow="exit"/>`+text([exitLabel],136,y+18,'#cbd6ec',12);
+      svg=`<rect x="0" y="${h-5}" width="19" height="${y-h+18}" rx="8" fill="${colors[kind]}"/>`+svg+`<path d="${stackPath(118,24)}" transform="translate(0,${y})" fill="${colors[kind]}" stroke="#ffffff50" data-flow="exit"/>`+text([exitLabel],136,y+18,'#596b7a',12);
       height=y+34;totalW=Math.max(totalW,136+textWidth(exitLabel)*.75);
     }else if(node.children?.length){
       const eventLabel=kind==='event'?27:0;
@@ -107,7 +107,7 @@ window.EGG_BLOCKS = (() => {
   }
   function svg(roots,label='彩色积木搭建示意'){
     const layout=nodesLayout(roots),w=Math.ceil(Math.max(640,layout.w+56)),h=Math.ceil(layout.h+102);
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(label)}"><title>${esc(label)}</title><desc>彩色块为教学连接示意，编号用于定位搭建步骤。参数槽显示槽名和具体值，嵌套取值保持在槽内。灰色虚线框是说明，不能直接当作原生积木。循环内部、分支和外层后续分别标明。</desc><rect width="${w}" height="${h}" rx="12" fill="#292b36"/>${text(['编号定位搭建步骤 · 小标签是槽位说明 · 灰框为教学备注'],26,29,'#c7d2e7',12)}${translate(26,57,layout.svg)}</svg>`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(label)}"><title>${esc(label)}</title><desc>彩色块为教学连接示意，编号用于定位搭建步骤。参数槽显示槽名和具体值，嵌套取值保持在槽内。灰色虚线框是说明，不能直接当作原生积木。循环内部、分支和外层后续分别标明。</desc><rect width="${w}" height="${h}" rx="12" fill="#eef2f6"/>${text(['编号定位搭建步骤 · 小标签是槽位说明 · 灰框为教学备注'],26,29,'#596b7a',12)}${translate(26,57,layout.svg)}</svg>`;
   }
   const literal=text=>({kind:'literal',text:String(text)}),value=text=>({kind:'value',text:String(text)}),variable=text=>({kind:'variable',text:String(text)}),condition=parts=>({kind:'condition',parts});
   const known=window.EGG_MANUAL?.entries||[], titles=[...new Set(known.map(e=>e.title))].sort((a,b)=>b.length-a.length);

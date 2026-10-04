@@ -15,20 +15,12 @@ window.EGG_DETAIL_UI = (() => {
       const checks=p.type==='回调函数'?'动作要在内部凹槽中，不是在这块积木下方并排连接。':p.type==='布尔值'?'输出必须是真/假，不是字符串“真”或整数1。':/列表$/.test(p.type)?'元素类型与本条版本一致；读取前先确认长度和0起始索引。':/预设/.test(p.type)?'选的是资源模板，不能拿场景中的运行时对象代替。':/^(整数|定点数)$/.test(p.type)?'确认单位、正负号和范围；整数槽不填小数。':p.type==='字符串'?'文本原样输入，名称、字段、事件名大小写及空格一致。':'核对对象类型、有效期与本条限制；不把对象名称当字符串。';
       return `<tr><td>第 ${p.index+1} 槽</td><td>${esc(p.type)}</td><td>${esc(role)}<br>${esc(p.help)}</td><td>${esc(checks)}</td></tr>`;
     }).join('');
-    return `<div class="slot-workbench"><h3>按槽位逐个接，不要一次填完再找错</h3><p>“第几槽”对应上方官方描述里的参数编号。先读用途，再选择输入类型；多类型参数必须跟本次使用的变量类型一致。</p><div class="table-wrap"><table><thead><tr><th>槽位</th><th>本次讲解类型</th><th>怎么放进去</th><th>接好先检查</th></tr></thead><tbody>${rows}</tbody></table></div><p>实际例子使用的名称和值见下方“逐步搭建”。原文没有列明的下拉枚举、参数或默认值会明确标注待核对，不用猜测的数字代替。</p></div>`;
+    return `<div class="slot-workbench"><h3>参数怎么填</h3><p>槽位编号与官方描述一致。名称和值见下方例子；多类型参数按本例选用的类型填写。</p><div class="table-wrap"><table><thead><tr><th>槽位</th><th>类型</th><th>填法</th><th>注意</th></tr></thead><tbody>${rows}</tbody></table></div><p>手册未列明的参数标为“待核对”，不补猜测值。</p></div>`;
   }
   function wiring(entry,ex){
     if(entry.category==='基础')return `<section class="wiring-walkthrough"><h3>先按基础说明操作</h3>${list(ex.steps)}</section>`;
-    const steps=[];
-    steps.push('先按上方路径找到“'+entry.title+'”，核对平台'+entry.platform+'、对象组'+entry.group+'。先不要连接其他功能，把本页当作单独的小实验。');
-    steps.push('先完成下方“先准备”的对象和数据；确定实际进入的触发器区域，预设入口和运行对象必须分清。已有场景对象先取得有效引用，再运行依赖它的动作。');
     const place={事件:'把这块作为当前触发器的事件头，放在动作链最上方；不要把事件头塞进另一块动作的参数槽。',动作:'先放能触发本次测试的事件头，把本块接到该事件的动作区；继续的动作再接在本块下方。',条件:'先放“如果/否则”，把本块嵌入其条件槽；成立动作放在成立区，不成立动作放在否则区。',控制:'将本块接在本次事件的动作区。重复、分支或计时回调的动作接在内部动作槽，只有明确要在控制结束后执行的动作才接到整块下方。',取值:'先选择一个需要本条输出类型的参数槽，把本块嵌进去。例如示例要求记录结果时，把它放入“设置变量”的新值槽；变量类型必须与输出一致。'}[entry.category];
-    if(place)steps.push(place);
-    ex.parameters.forEach(p=>steps.push('接第'+(p.index+1)+'槽：先核对上方描述中的参数'+(p.index+1)+'，本次说明按'+p.type+'类型讲解。'+p.help+' 本例具体填写内容见下面逐步搭建中对应第'+(p.index+1)+'项；若它是对象，使用对象引用而不是输入显示名称。'));
-    steps.push('从左至右复查普通参数，再复查嵌套块：外层槽要求的类型要与内层块输出一致。参数齐全后，确认没有悬空的条件块或未接入事件的动作块。');
-    steps.push('按下方例子的测试操作触发一次，对照“预期结果”；没有变化时先确认事件确实触发，再查对象引用、参数类型与成立分支。不要一开始同时修改多个参数。');
-    steps.push('重新试玩恢复本例初始状态，只改变一个输入再试。涉及次数、索引、计时的积木，另测边界；涉及对象销毁、消耗或奖励的积木，不要在正式数据上反复试。');
-    return `<section class="wiring-walkthrough"><h3>从拿到积木到接入流程</h3>${list(steps)}<p><a href="editor-guide.html">不清楚触发器区域、预设和对象？先看完整准备说明</a></p></section>`;
+    return `<section class="wiring-walkthrough"><h3>接在哪</h3><p>${esc(place||'按下方例子的连接图放置。')}</p><p><a href="editor-guide.html">触发器区域与对象引用说明</a></p></section>`;
   }
   function referenceCards(guide,index){
     const entries=window.EGG_MANUAL?.entries||[];
@@ -59,18 +51,18 @@ window.EGG_DETAIL_UI = (() => {
   }
   function placements(items){
     if(!items?.length)return '';
-    return `<section class="trigger-placement"><h3>本课究竟放在哪个触发器区域？</h3>${items.map((item,i)=>`<article><h4>${i+1}. ${esc(item.area)}</h4><p><strong>进入顺序：</strong>${esc(item.entry)}</p><p><strong>归属对象：</strong>${esc(item.owner)}</p><p><strong>对象从哪里取：</strong>${esc(item.objectSource)}</p><p><strong>连接前检查：</strong>${esc(Array.isArray(item.notes)?item.notes.join('；'):item.notes)}</p></article>`).join('')}<p class="source-label">区域名称按当前使用的九类区域说明；旧版手册的“全局／关卡／预设”叫法只作背景。每个事件能否使用，还需核对其原文运行域限制。</p></section>`;
+    return `<section class="trigger-placement"><h3>触发器位置</h3>${items.map((item,i)=>`<article><h4>${i+1}. ${esc(item.area)}</h4><p><strong>进入顺序：</strong>${esc(item.entry)}</p><p><strong>归属对象：</strong>${esc(item.owner)}</p><p><strong>对象从哪里取：</strong>${esc(item.objectSource)}</p><p><strong>连接前检查：</strong>${esc(Array.isArray(item.notes)?item.notes.join('；'):item.notes)}</p></article>`).join('')}<p class="source-label">区域名称按当前使用的九类区域说明；旧版手册的“全局／关卡／预设”叫法只作背景。每个事件能否使用，还需核对其原文运行域限制。</p></section>`;
   }
   function preparation(detail){
     if(!detail)return '';
-    return `<section class="detailed-start" id="start-here"><h2>从这里开始：先把对象和变量准备好</h2><p><a class="text-link" href="editor-guide.html">先看九类触发器区域、预设入口与对象获取 →</a></p><p class="callout">${esc(detail.scopeNote)}</p>${placements(detail.triggerPlacement)}${detail.scene.map((obj,i)=>`<details class="setup-object"${i===0?' open':''}><summary>${i+1}. ${esc(obj.name)} <small>${esc(obj.type)}</small></summary>${list(obj.steps)}</details>`).join('')}<h3 id="variable-creation">变量实际怎么建</h3><ol>${detail.variableSteps.map((step,i)=>`<li id="variable-step-${i+1}">${esc(step)}</li>`).join('')}</ol>${detail.customActions.length?`<details class="custom-catalog"><summary>本课自定义动作：先创建，再接内部积木（${detail.customActions.length} 项）</summary><p class="callout">这里与下方分节步骤描述的是同一套自定义动作，只创建、连接一次。可先读清单确认参数，再到对应步骤搭建；已经完成的定义只核对，不再重复接一套。</p>${detail.customActions.map(action=>`<section><h4>${esc(action.name)}</h4><p>参数按顺序创建：${esc(action.parameters.length?action.parameters.join('；'):'无参数')}</p>${list(action.steps)}</section>`).join('')}</details>`:''}</section>`;
+    return `<div class="lesson-ready-list"><h3>先准备</h3><p>${detail.scene.map(obj=>`${esc(obj.name)}（${esc(obj.type)}）`).join('；')}。</p><p>${esc(detail.scene[0]?.steps[0]||detail.scopeNote)}</p><p><a href="#variable-creation">变量逐项创建说明 · ${detail.variableSteps.length} 步</a>${detail.customActions.length?` · 自定义动作 ${detail.customActions.length} 项`:''}</p></div><details class="lesson-prep-details"><summary>展开场景、触发器与逐项创建说明</summary><section class="detailed-start" id="start-here"><h2>场景与变量</h2><p><a class="text-link" href="editor-guide.html">触发器区域与对象说明</a></p><p class="callout">${esc(detail.scopeNote)}</p>${placements(detail.triggerPlacement)}${detail.scene.map((obj,i)=>`<details class="setup-object"${i===0?' open':''}><summary>${i+1}. ${esc(obj.name)} <small>${esc(obj.type)}</small></summary>${list(obj.steps)}</details>`).join('')}<h3 id="variable-creation">创建变量</h3><p>按下面的作用范围创建。同名的动作参数分别建立；赋值槽只放一个值或表达式，不填分号、箭头文字。自定义动作使用调用块，不能用发送事件代替。</p><ol>${detail.variableSteps.map((step,i)=>`<li id="variable-step-${i+1}">${esc(step)}</li>`).join('')}</ol>${detail.customActions.length?`<details class="custom-catalog"><summary>自定义动作定义（${detail.customActions.length} 项）</summary><p class="callout">下方分步说明接在这些定义里，每个动作只创建一次。</p>${detail.customActions.map(action=>`<section><h4>${esc(action.name)}</h4><p>参数按顺序创建：${esc(action.parameters.length?action.parameters.join('；'):'无参数')}</p>${list(action.steps)}</section>`).join('')}</details>`:''}</section></details>`;
   }
   function sectionSteps(detailSection,original){
-    return detailSection?`<div class="microsteps">${list(detailSection.steps)}</div><p class="recipe-check"><strong>本段小检查：</strong>${esc(detailSection.check)}</p><details class="logic-summary"><summary>看这一段的逻辑概要</summary>${list(original.steps)}</details>`:list(original.steps);
+    return detailSection?`<div class="microsteps">${list(detailSection.steps)}</div><p class="recipe-check"><strong>结果：</strong>${esc(detailSection.check)}</p><details class="logic-summary"><summary>逻辑概要</summary>${list(original.steps)}<p>${esc(original.verify)}</p></details>`:list(original.steps)+`<p class="recipe-check">${esc(original.verify)}</p>`;
   }
   function tests(detail){
     if(!detail)return '';
-    return `<div class="scenario-tests">${detail.tests.map((t,i)=>`<section class="test-case"><h4>测试 ${i+1}</h4><p><strong>动手操作：</strong>${esc(t.action)}</p><p><strong>应该看到：</strong>${esc(t.expected)}</p><p><strong>不一致先查：</strong>${esc(t.ifNot)}</p></section>`).join('')}</div>${detail.pitfalls.length?`<details><summary>逐项排查常见接错</summary>${list(detail.pitfalls)}</details>`:''}`;
+    return `<div class="scenario-tests">${detail.tests.map((t,i)=>`<section class="test-case"><h4>测试 ${i+1}</h4><p><strong>动手操作：</strong>${esc(t.action)}</p><p><strong>应该看到：</strong>${esc(t.expected)}</p><details class="lesson-reading-extra"><summary>结果不一致？查看排查提示</summary><p>${esc(t.ifNot)}</p></details></section>`).join('')}</div>${detail.pitfalls.length?`<details><summary>常见错误</summary>${list(detail.pitfalls)}</details>`:''}`;
   }
   return{location,slots,wiring,referenceCards,preparation,sectionSteps,tests,variableTable};
 })();

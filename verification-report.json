@@ -60,15 +60,15 @@
   "lessons": [
     {
       "id": 0,
-      "title": "认识你的第一块蛋码",
-      "detailedSteps": 16,
+      "title": "蛋码入门：显示一条欢迎提示",
+      "detailedSteps": 10,
       "diagrams": 2,
       "testScenarios": 3,
       "editorStatus": "not_tested"
     },
     {
       "id": 1,
-      "title": "让地图听懂你的指令",
+      "title": "触发器：事件、条件和动作",
       "detailedSteps": 16,
       "diagrams": 2,
       "testScenarios": 3,
@@ -76,7 +76,7 @@
     },
     {
       "id": 2,
-      "title": "给地图一份小小记忆",
+      "title": "变量：记录分数与设置作用范围",
       "detailedSteps": 16,
       "diagrams": 2,
       "testScenarios": 3,
@@ -84,7 +84,7 @@
     },
     {
       "id": 3,
-      "title": "让玩法有判断、有节奏",
+      "title": "流程控制：判断与循环",
       "detailedSteps": 16,
       "diagrams": 2,
       "testScenarios": 3,
@@ -92,7 +92,7 @@
     },
     {
       "id": 4,
-      "title": "把小积木拼成大能力",
+      "title": "列表与自定义积木",
       "detailedSteps": 18,
       "diagrams": 2,
       "testScenarios": 3,
@@ -100,7 +100,7 @@
     },
     {
       "id": 5,
-      "title": "下一站，用 Lua 扩展脑洞",
+      "title": "Lua 入门：计算奖励总和",
       "detailedSteps": 18,
       "diagrams": 2,
       "testScenarios": 3,
@@ -108,7 +108,7 @@
     },
     {
       "id": 6,
-      "title": "给玩家一个开场欢迎",
+      "title": "游戏开始时显示欢迎提示",
       "detailedSteps": 16,
       "diagrams": 2,
       "testScenarios": 3,
@@ -116,7 +116,7 @@
     },
     {
       "id": 7,
-      "title": "把动作准确重复 3 次",
+      "title": "重复执行 3 次动作",
       "detailedSteps": 16,
       "diagrams": 2,
       "testScenarios": 3,
@@ -124,7 +124,7 @@
     },
     {
       "id": 8,
-      "title": "一秒一次，只提醒三次",
+      "title": "计时器：每秒执行一次，共 3 次",
       "detailedSteps": 16,
       "diagrams": 2,
       "testScenarios": 3,
@@ -132,7 +132,7 @@
     },
     {
       "id": 9,
-      "title": "累计三次，解锁达标提示",
+      "title": "积分累加到 3 后显示达标提示",
       "detailedSteps": 16,
       "diagrams": 2,
       "testScenarios": 3,
@@ -140,7 +140,7 @@
     },
     {
       "id": 10,
-      "title": "走进区域，让方块动起来",
+      "title": "进入区域后移动方块",
       "detailedSteps": 16,
       "diagrams": 2,
       "testScenarios": 3,
@@ -148,7 +148,7 @@
     },
     {
       "id": 11,
-      "title": "用一个信号连接两段逻辑",
+      "title": "发送与接收自定义事件",
       "detailedSteps": 16,
       "diagrams": 2,
       "testScenarios": 3,
@@ -156,8 +156,8 @@
     },
     {
       "id": 12,
-      "title": "消消乐 01 · 用列表搭出一张棋盘",
-      "detailedSteps": 139,
+      "title": "消消乐 01 · 棋盘列表与格子编号",
+      "detailedSteps": 69,
       "diagrams": 4,
       "testScenarios": 3,
       "editorStatus": "not_tested"
@@ -196,8 +196,8 @@
     },
     {
       "id": 17,
-      "title": "消消乐 06 · 死局检测与关卡验收",
-      "detailedSteps": 220,
+      "title": "消消乐 06 · 死局检测与试玩检查",
+      "detailedSteps": 185,
       "diagrams": 6,
       "testScenarios": 3,
       "editorStatus": "not_tested"
@@ -212,8 +212,8 @@
     },
     {
       "id": 19,
-      "title": "记忆机关 · 按顺序重现三个信号",
-      "detailedSteps": 62,
+      "title": "记忆机关 · 按顺序输入三个编号",
+      "detailedSteps": 60,
       "diagrams": 3,
       "testScenarios": 3,
       "editorStatus": "not_tested"
@@ -228,7 +228,7 @@
     },
     {
       "id": 21,
-      "title": "双开关联动 · 两个条件打开一道门",
+      "title": "双开关 · A、B 激活后开门",
       "detailedSteps": 33,
       "diagrams": 3,
       "testScenarios": 3,
@@ -1232,5 +1232,7 @@
     "block-examples.js": "56d60df2912709700010d0c6d5f95f680b2671f29512c220d53dcd90a9ed7c7a",
     "challenge-solutions.js": "0151c22edcb0ffb280db7956e436e80ea57e585066a247edf61b6f318f895691",
     "challenge-solutions.css": "424cac086f8d0a220bd23e17af331994f42e59e4b6ce92ba6a583191af31b7ea"
-  }
+  },
+  "contentEditedAt": "2026-10-04T06:15:49.033Z",
+  "contentEditNote": "已精简重复说明、合并连续列表添加步骤，并同步课程标题和步骤数。网页检查通过不代表蛋码编辑器实机通过；原检查日志保留原日期。"
 }

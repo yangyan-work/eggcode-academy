@@ -1,52 +1,52 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8"><style>html[data-access-pending] body{visibility:hidden!important}</style><link rel="stylesheet" href="access-gate.css?v=crystal-site1"><script src="personal-space-state.js?v=login1" defer></script><script src="cloud-config.js" defer></script><script src="cloud-client.js?v=release20261004" defer></script><script src="access-gate.js?v=login1" defer></script>
+  <meta charset="utf-8"><style>html[data-access-pending] body{visibility:hidden!important}</style><link rel="stylesheet" href="access-gate.css?v=crystal-site1"><script src="personal-space-state.js?v=release20261004-fix1" defer></script><script src="cloud-config.js?v=release20261004-fix1" defer></script><script src="cloud-client.js?v=release20261004-fix1" defer></script><script src="access-gate.js?v=release20261004-fix1" defer></script>
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#070710">
+  <meta name="theme-color" content="#F8F9F6">
   <meta name="robots" content="noindex">
   <title>登录 · 自由树梦想空间</title>
   <link rel="icon" href="assets/free-tree-logo.png?v=20261002-transparent">
   <link rel="stylesheet" href="styles.css?v=crystal-site1">
-  <link rel="stylesheet" href="personal-space.css?v=crystal-site1">
-  <link rel="stylesheet" href="login.css?v=crystal3">
+  <link rel="stylesheet" href="personal-space.css?v=release20261004-fix1">
+  <link rel="stylesheet" href="login.css?v=glass-preview1">
 
 
 
-  <script src="login.js?v=login1" defer></script>
-  <script src="login-effects.js?v=crystal3" defer></script>
-</head>
-<body data-page="login">
-  <div class="login-atmosphere" aria-hidden="true"><span></span><span></span></div>
-  <canvas id="login-particles" aria-hidden="true"></canvas>
+  <script src="login.js?v=glass-preview1" defer></script>
+<link rel="stylesheet" href="light-theme.css?v=sidebar-preview2"><script src="theme-switch.js?v=glass-preview1" defer></script></head>
+<body data-page="login" data-motion="off">
   <a class="skip-link" href="#login-panel">跳到登录表单</a>
   <header class="login-header">
-    <a class="brand" href="#login-panel"><img src="assets/free-tree-logo.png?v=20261002-transparent" alt="自由树标志" width="44" height="44"><span>自由树梦想空间<small>灵感、学习与创作</small></span></a>
-    <button class="login-motion-toggle" id="login-motion-toggle" type="button" aria-label="动态特效" aria-pressed="true" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/></svg><span id="login-motion-label">暂停特效</span><span class="login-motion-dot" aria-hidden="true"></span></button>
+    <a class="brand" href="#login-panel"><img src="assets/free-tree-logo.png?v=20261002-transparent" alt="自由树标志" width="44" height="44"><span>自由树梦想空间<small>蛋码学习与玩法创作</small></span></a>
   </header>
   <main class="login-layout">
-    <div class="login-stage" id="login-garden">
-      <div class="login-stage-art" aria-hidden="true"><div class="login-art-scene"><img class="login-crystal crystal-tall" src="assets/login-crystal-long.svg" alt="" width="300" height="430"><img class="login-crystal crystal-near" src="assets/login-crystal-chunk.svg" alt="" width="350" height="350"><img class="login-crystal crystal-left" src="assets/login-crystal-chunk.svg" alt="" width="350" height="350"><img class="login-crystal crystal-right" src="assets/login-crystal-chunk.svg" alt="" width="350" height="350"><img class="login-crystal crystal-edge" src="assets/login-crystal-long.svg" alt="" width="300" height="430"></div></div>
+    <aside class="login-introduction" aria-label="自由树学习空间介绍">
+      <h2>看清步骤，<br>做出玩法。</h2>
+      <p>跟着积木图，一步步做出自己的玩法。</p>
+      <ul class="login-learning-points"><li><span aria-hidden="true">✓</span> 积木有例子</li><li><span aria-hidden="true">✓</span> 教程分步骤</li><li><span aria-hidden="true">✓</span> 学习有记录</li></ul>
+    </aside>
+    <div class="login-stage">
     <section class="login-panel" id="login-panel" aria-labelledby="login-title" tabindex="-1">
-      <div class="login-welcome"><h1 id="login-title">你好，创作者</h1><p>登录自由树，继续你的创作旅程。</p></div>
-      <div class="login-tabs" role="tablist" aria-label="登录方式">
+      <div class="login-welcome"><h1 id="login-title">开始学习</h1><p id="login-intro-help">取个昵称，马上查看教程。</p></div>
+      <div class="login-tabs" role="tablist" aria-label="登录方式" hidden>
         <button type="button" id="login-demo-tab" role="tab" aria-selected="true" aria-controls="login-demo-panel">体验登录</button>
         <button type="button" id="login-email-tab" role="tab" aria-selected="false" aria-controls="login-email-panel" tabindex="-1">邮箱登录</button>
       </div>
       <div id="login-demo-panel" role="tabpanel" aria-labelledby="login-demo-tab">
         <form id="login-demo-form" novalidate>
-          <label for="login-nickname">怎么称呼你？</label>
+          <label for="login-nickname">你的昵称</label>
           <div class="login-input-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg><input id="login-nickname" name="nickname" type="text" required maxlength="40" autocomplete="nickname" placeholder="给自己取一个创作昵称" aria-describedby="login-nickname-help login-error"></div>
-          <p class="login-field-help" id="login-nickname-help">昵称 1–20 个字符，不需要密码。</p>
+          <p class="login-field-help" id="login-nickname-help">1–20 个字符，无需密码。</p>
           <p class="login-error" id="login-error" role="alert"></p>
-          <button class="space-button space-button-primary login-submit" type="submit">登录并开始学习 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></button>
+          <button class="space-button space-button-primary login-submit" type="submit">开始学习</button>
         </form>
-        <div class="login-preview-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></svg><div><strong>本机体验说明</strong><p>昵称用于显示，修改昵称不会创建独立账号。学习记录保存在当前浏览器。</p></div></div>
+        <div class="login-preview-info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></svg><p>本机体验：记录仅保存在当前浏览器，昵称不是独立账号。</p></div>
+        <div class="login-email-notice login-cloud-entry" id="login-cloud-entry" hidden><strong>用邮箱保存学习进度</strong><a class="space-button login-secondary" href="https://freedom-tree-d1g24eyez1d14380d-1500105320.tcloudbaseapp.com/freedom-tree-preview/login.html">前往邮箱登录测试站</a><details class="login-details"><summary>测试站与本机有什么区别？</summary><p>测试站可保存完成记录、收藏和笔记；本机记录不会自动迁移。社区投稿暂未开放。</p></details></div>
         <p id="login-storage-warning" class="space-warning" role="status" hidden></p>
       </div>
       <div id="login-email-panel" role="tabpanel" aria-labelledby="login-email-tab" tabindex="0" hidden>
         <div class="login-email-notice" id="login-cloud-notice"><strong id="login-cloud-heading">邮箱登录待开放</strong><p id="login-cloud-description">云端服务未配置。可以先切换到体验登录，查看本浏览器的个人空间。</p></div>
-        <div class="login-auth-modes" aria-label="邮箱账号操作"><button type="button" data-auth-mode="signin" aria-pressed="true" disabled>登录</button><button type="button" data-auth-mode="signup" aria-pressed="false" disabled>注册</button><button type="button" data-auth-mode="forgot" aria-pressed="false" disabled>找回密码</button></div>
         <form id="login-email-form" novalidate>
           <fieldset class="login-email-fields" disabled aria-label="邮箱账号表单">
             <div id="login-email-field"><label for="login-email">邮箱地址</label><input id="login-email" type="email" required maxlength="254" placeholder="name@example.com" autocomplete="email" aria-describedby="login-cloud-error"></div>
@@ -57,16 +57,15 @@
             <button class="space-button space-button-primary login-submit" id="login-auth-submit" type="submit">登录</button>
           </fieldset>
         </form>
+        <div class="login-auth-modes" aria-label="邮箱账号操作"><button type="button" data-auth-mode="signin" aria-pressed="true" disabled>返回登录</button><button type="button" data-auth-mode="signup" aria-pressed="false" disabled>创建账号</button><button type="button" data-auth-mode="forgot" aria-pressed="false" disabled>忘记密码？</button></div>
         <div id="login-cloud-session" hidden><p>当前邮箱：<strong id="login-current-email"></strong></p><a class="space-button space-button-primary login-submit" id="login-cloud-continue" href="index.html">进入网站</a><div class="login-session-actions"><button class="space-plain" id="login-change-password" type="button">修改密码</button><button class="space-plain" id="login-cloud-signout" type="button">退出云端账号</button></div></div>
         <p id="login-cloud-error" class="login-error" role="alert"></p><p id="login-cloud-result" class="login-cloud-result" role="status" aria-live="polite"></p>
-        <p class="login-email-help" id="login-cloud-help">配置完成后可使用真实邮箱账号。本机体验与云端记录分开，不会自动上传已有记录。</p>
+        <details class="login-details"><summary>账号与学习记录说明</summary><p class="login-email-help" id="login-cloud-help">本机体验与邮箱账号的记录分开保存。</p></details>
       </div>
-      <div class="login-panel-footer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6Z"/><path d="m8 12 3 3 5-6"/></svg><span>登录后，学习、分享，一起创造。</span></div>
       <noscript><p class="space-warning">请启用 JavaScript 完成登录后使用网站。</p></noscript>
     </section>
-      <div class="login-play"><button class="login-seed-button" id="login-seed" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m12 3 8 8-8 10-8-10Z"/><path d="m4 11 8 2 8-2M12 3v10l-4 3m4-3 4 3"/></svg><span>唤醒一点灵感</span></button><span class="login-seed-response" id="login-seed-response" role="status" aria-live="polite"></span></div>
     </div>
   </main>
-  <footer class="login-footer"><span>自由树梦想空间</span><span>学习与创作，从这里开始</span></footer>
+  <footer class="login-footer"><a href="service-info.html">服务说明</a><span>自由树梦想空间</span></footer>
 </body>
 </html>

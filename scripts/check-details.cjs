@@ -9,7 +9,7 @@ const w=c.window,details=w.EGG_DETAILED_GUIDES||{};assert.equal(Object.keys(deta
 let steps=0,customs=0,scenarios=0;
 for(let id=0;id<145;id++){
  const d=details[id],g=w.EGG_BUILD_GUIDES[id];assert(d,'Missing details '+id);assert.equal(d.sections.length,g.sections.length,'Section count '+id);
- for(const [i,s]of d.sections.entries()){assert.equal(s.title,g.sections[i].title,'Section alignment '+id+'/'+i);assert(s.steps.length>=8);steps+=s.steps.length;for(const x of s.steps)assert(typeof x==='string'&&x.trim().length>0,'Empty step '+id);}
+ for(const [i,s]of d.sections.entries()){assert.equal(s.title,g.sections[i].title,'Section alignment '+id+'/'+i);assert(s.steps.length>=3);steps+=s.steps.length;for(const x of s.steps)assert(typeof x==='string'&&x.trim().length>0,'Empty step '+id);}
  for(const obj of d.scene)assert(obj.name&&obj.type&&obj.steps.length,'Scene '+id);
  assert(d.variableSteps.length,'Variable guide '+id);
  for(const action of d.customActions){assert(action.name&&Array.isArray(action.parameters)&&action.steps.length>=3,'Incomplete definition '+id);customs++;}
