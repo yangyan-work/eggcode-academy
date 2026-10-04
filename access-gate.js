@@ -27,8 +27,10 @@
       const user=await Promise.race([cloud.requireUser(),new Promise((_,reject)=>{timeout=setTimeout(()=>reject(new Error('账号验证超时')),15000);})]);
       if(current!==sequence||leaving)return;
       if(!user?.id)throw new Error('账号验证没有完成');
-      // 本机社区仍用同浏览器体验数据；激活界面不会上传或合并到云端账号。
-      if(!space.getState().active){activating=true;try{space.enterDemo(space.getState().nickname);}finally{activating=false;}}
+      // 学习数据读取失败会由空间显示重试；不能伪造体验身份或把数据库故障当成未登录。
+      const loaded=await space.loadCloudUser(user);
+      if(current!==sequence||leaving)return;
+      if(loaded?.code==='ACCOUNT_CHANGED')throw new Error(loaded.message);
       approved=true;root.removeAttribute('data-access-pending');
     }catch{if(current===sequence)deny();}finally{clearTimeout(timeout);}
   }

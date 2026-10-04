@@ -17,7 +17,7 @@ function escapeHTML(value) {
   return String(value).replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
 }
 const mascots = ["yellow", "pink", "black"];
-const courseSummaries = ["打开蛋码，用一条欢迎提示完成第一次创作。", "认识事件、条件和动作，让地图听懂你的指令。", "用变量记录分数，理解数据的作用范围。", "学会判断与重复，把简单动作排出节奏。", "认识列表和自定义积木，让重复步骤变简单。", "阅读一段纯 Lua 示例，向文本编程迈出一小步。"];
+const courseSummaries = ["游戏初始化时，显示持续 3 秒的欢迎提示。", "分清事件、条件和动作，设置执行条件。", "创建整数分数变量，设置作用范围。", "用比较和重复执行积木实现加分。", "用列表保存数据，将重复逻辑封装成自定义动作。", "阅读 Lua 示例，了解变量、循环和函数。"];
 
 if (page === "home") {
   const legacy = { "#courses": "courses.html", "#practice": "practice.html", "#manual": "manual.html", "#roadmap": "learning-path.html" };
@@ -29,7 +29,7 @@ function renderCourseCard(item, index, foundation = false) {
     const title = foundation ? item.title : item.title.replace(new RegExp('^' + seriesOf(item).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*\\d+(?:/\\d+)?\\s*[·：:]\\s*'), '');
     return `<a class="course-card tone-${index % 3}" href="lesson.html?id=${id}" data-lesson-id="${id}">
     <div class="course-visual"><span class="course-number">${String(number).padStart(2, "0")}</span><img src="assets/eggy-${mascots[index % 3]}.png" width="120" height="130" alt="" loading="lazy"></div>
-    <div class="course-info"><span class="course-category">${escapeHTML(foundation ? item.category.split(" / ")[1] : item.category)}</span><h2>${escapeHTML(title)}</h2><p>${escapeHTML(foundation ? courseSummaries[index] : item.summary)}</p><div class="card-bottom"><span>${foundation ? "入门课程 · 含动手练习" : buildGuides[id].sections.length + " 个搭建步骤 · 参数与连接图"}</span><span class="round-arrow" aria-hidden="true">›</span></div></div></a>`;
+    <div class="course-info"><span class="course-category">${escapeHTML(foundation ? item.category.split(" / ").at(-1) : item.category)}</span><h2>${escapeHTML(title)}</h2><p>${escapeHTML(foundation ? courseSummaries[index] : item.summary)}</p><div class="card-bottom"><span>${foundation ? "入门课程 · 含动手练习" : buildGuides[id].sections.length + " 个搭建步骤 · 参数与连接图"}</span><span class="round-arrow" aria-hidden="true">›</span></div></div></a>`;
 }
 if (page === 'courses') document.getElementById('courses-grid').innerHTML = lessons.map((item,index)=>renderCourseCard(item,index,true)).join('');
 if (page === 'practice') {
@@ -37,6 +37,7 @@ if (page === 'practice') {
   const familySelect = document.getElementById('practice-family');
   const seriesSelect = document.getElementById('practice-series');
   const grid = document.getElementById('practice-grid');
+  const empty = document.getElementById('practice-empty');
   familySelect.innerHTML += curriculum.families.map(family=>`<option value="${family.id}">${escapeHTML(family.name)}</option>`).join('');
   document.getElementById('family-nav').innerHTML = '<a href="#all" data-family="all">全部教程 <small>'+practices.length+'</small></a>' + curriculum.families.map(family=>`<a href="#family-${family.id}" data-family="${family.id}">${escapeHTML(family.name)} <small>${seriesCatalog.filter(series=>series.family===family.id).reduce((sum,series)=>sum+series.lessonIds.length,0)}</small></a>`).join('');
   document.getElementById('series-nav').innerHTML = seriesCatalog.map(series=>`<a href="#${series.id}" data-series="${series.id}">${escapeHTML(series.name)} <small>${series.lessonIds.length}</small></a>`).join('');
@@ -47,16 +48,14 @@ if (page === 'practice') {
   }
   function renderPracticeDirectory() {
     const terms = normalizeSearch(query.value).split(/\s+/).filter(Boolean);
-    let count=0, groupCount=0;
-    grid.innerHTML = seriesCatalog.map((series,groupIndex)=>{
-      if ((familySelect.value!=='all' && series.family!==familySelect.value) || (seriesSelect.value!=='all' && series.id!==seriesSelect.value)) return '';
-      const ids = series.lessonIds.filter(id=>terms.every(term=>searchTexts[id-baseLessonCount]?.includes(term)));
-      if (!ids.length) return '';
-      count += ids.length; groupCount++;
-      return `<section class="practice-group" id="${series.id}"><div class="practice-banner"><div><p class="eyebrow">${escapeHTML(curriculum.families.find(family=>family.id===series.family).name)} · ${ids.length}${ids.length!==series.lessonIds.length?' / '+series.lessonIds.length:''} 课</p><h2>${escapeHTML(series.name)}</h2><p>${escapeHTML(series.description)}</p></div><img src="assets/eggy-${mascots[groupIndex%3]}.png" alt="" width="120" height="130"></div><div class="course-grid">${ids.map(id=>renderCourseCard(practices[id-baseLessonCount],id-baseLessonCount)).join('')}</div></section>`;
-    }).join('');
-    document.getElementById('practice-empty').hidden = count > 0;
-    document.getElementById('series-status').textContent = `找到 ${count} 篇教程 · ${groupCount} 个专题`;
+    const active = terms.length > 0 || familySelect.value !== 'all' || seriesSelect.value !== 'all';
+    const ids = active ? seriesCatalog.flatMap(series=>{
+      if ((familySelect.value !== 'all' && series.family !== familySelect.value) || (seriesSelect.value !== 'all' && series.id !== seriesSelect.value)) return [];
+      return series.lessonIds.filter(id=>terms.every(term=>searchTexts[id-baseLessonCount].includes(term)));
+    }) : [];
+    grid.innerHTML = ids.map(id=>renderCourseCard(practices[id-baseLessonCount],id-baseLessonCount)).join('');
+    grid.hidden = ids.length === 0;
+    empty.hidden = !active || ids.length > 0;
     document.querySelectorAll('[data-series]').forEach(link=>{if(link.dataset.series===seriesSelect.value)link.setAttribute('aria-current','true');else link.removeAttribute('aria-current');});
     document.querySelectorAll('[data-family]').forEach(link=>{if(link.dataset.family===familySelect.value)link.setAttribute('aria-current','true');else link.removeAttribute('aria-current');});
   }
@@ -103,18 +102,20 @@ function renderBuildGuide(guide, index) {
   const related = series ? '<details class="series-switcher"><summary>'+escapeHTML(series.name)+' · 同专题 '+series.lessonIds.length+' 课</summary><nav class="recipe-series" aria-label="'+escapeHTML(series.name)+'系列课程">' + series.lessonIds.map(id=>'<a href="lesson.html?id='+id+'"'+(index===id?' aria-current="page"':'')+'>'+escapeHTML(practices[id-baseLessonCount].title)+'</a>').join('')+'</nav><a class="text-link" href="practice.html#'+series.id+'">查看这个专题</a></details>' : '';
   const refs = guide.refs.map(id => manual.entries.find(entry => entry.id === id)).filter(Boolean).map(entry => '<a class="block-reference" href="block.html?id=' + encodeURIComponent(entry.id) + '&lesson=' + index + '">' + escapeHTML(entry.title) + ' <small>' + escapeHTML(entry.group) + '</small></a>').join('');
   const prerequisites = prerequisiteIds;
-  const prerequisiteHTML = prerequisites.length ? '<aside class="course-prerequisites"><h3>本课接在哪些内容后面？</h3><p>按本专题顺序保留前课已经创建的变量和自定义动作；同名动作只定义一次，本课提到时核对或修改，不要再接第二套。</p><ol>'+prerequisites.map(id=>'<li><a href="lesson.html?id='+id+'">'+escapeHTML(practices[id-baseLessonCount].title)+'</a></li>').join('')+'</ol></aside>' : '';
+  const prerequisiteHTML = prerequisites.length ? '<details class="lesson-reading-extra"><summary>需要沿用的前课内容 · '+prerequisites.length+' 课</summary><aside class="course-prerequisites"><h3>本课接在哪些内容后面？</h3><p>按本专题顺序保留前课已经创建的变量和自定义动作；同名动作只定义一次，本课提到时核对或修改，不要再接第二套。</p><ol>'+prerequisites.map(id=>'<li><a href="lesson.html?id='+id+'">'+escapeHTML(practices[id-baseLessonCount].title)+'</a></li>').join('')+'</ol></aside></details>' : '';
   const branchNotice = isIndependentBranch ? '<p class="callout">本课属于大数方案分支：显示课34–35、原生整数i1（36）、精确字符串s1（37–38）、近似强度f1（39）按目标分别选择。各方案使用独立草稿和字段；不要把i1、s1、f1全部累接。近似强度不用于精确金额或直接替代原生伤害。<a href="big-number-lab.html">补充：完整字符串乘除法与逐步网页实验 →</a></p>' : '';
-  return (window.EGG_VERIFICATION?.panel(index)||'') + branchNotice + prerequisiteHTML + (detailUI?.preparation(detail) || '') + '<div class="build-guide"><h2 class="sr-only">搭建指南</h2><div class="guide-overview"><span><strong>'+guide.sections.length+'</strong> 个搭建步骤</span><span>附彩色连接图与验收清单</span><a class="button button-blue" href="#start-here">从准备开始</a></div>' +
-    '<details class="lesson-preparation" id="preparation" open><summary><span>搭建前，先准备好这些<small>环境约定、变量、算例与积木参数</small></span><span class="disclosure-mark" aria-hidden="true">+</span></summary><div class="preparation-body"><h3>环境与约定</h3><ul>' + guide.setup.map(item=>'<li>'+escapeHTML(item)+'</li>').join('') + '</ul>' +
+  const goal = index >= baseLessonCount ? practices[index-baseLessonCount].goal : courseSummaries[index];
+  return '<section class="lesson-reading-start"><h2>本课目标</h2><p>'+escapeHTML(goal)+'</p><div class="guide-overview"><a class="button button-blue" href="#step-1">开始第一步</a><span>'+guide.sections.length+' 个步骤 · 按图搭建</span></div>' + (detailUI?.preparation(detail) || '') + '<p class="lesson-reading-status">教学步骤已整理，编辑器实机尚未验证。</p></section>' + branchNotice + prerequisiteHTML + '<div class="build-guide"><h2 class="sr-only">搭建指南</h2>' +
+    '<details class="lesson-preparation" id="preparation"><summary><span>查看完整变量表与积木参数<small>环境约定、算例与查找位置</small></span><span class="disclosure-mark" aria-hidden="true">+</span></summary><div class="preparation-body"><h3>环境与约定</h3><ul>' + guide.setup.map(item=>'<li>'+escapeHTML(item)+'</li>').join('') + '</ul>' +
     '<details class="recipe-notation"><summary>第一次照图搭建？先看符号与操作说明</summary><ol>' + window.EGG_GUIDE_NOTATION.map(item=>'<li>'+escapeHTML(item)+'</li>').join('') + '</ol></details>' +
     (detailUI?.variableTable(guide,detail)||'<p>变量准备见本课步骤。</p>') +
     (guide.samples?.length ? '<h3>跟着数值算一遍</h3><div class="table-wrap"><table><thead><tr>'+guide.samples[0].map(cell=>'<th scope="col">'+escapeHTML(cell)+'</th>').join('')+'</tr></thead><tbody>'+guide.samples.slice(1).map(row=>'<tr>'+row.map(cell=>'<td>'+escapeHTML(cell)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>' : '') +
-    '<h3>本课积木 · 从哪里找，怎样接</h3><div class="block-references">' + refs + '</div>' + (detailUI?.referenceCards(guide,index)||'') + '</div></details>' + related + window.EGG_BLOCKS.legend() +
-    guide.sections.map((section,i)=>'<section class="recipe-step" id="step-'+(i+1)+'"><p class="recipe-number">第 '+String(i+1).padStart(2,'0')+' 步</p><h3>'+escapeHTML(section.title)+'</h3>'+(detailUI?.sectionSteps(detail?.sections[i],section)||'<ol>'+section.steps.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ol>')+code(section,i)+'<p class="recipe-check"><strong>这一步检查：</strong>'+escapeHTML(section.verify)+'</p></section>').join('') +
-    '<section id="acceptance" class="recipe-step"><h3>搭完后逐项试玩</h3>'+(detailUI?.tests(detail)||'')+'<h4>原有验收清单</h4><ol>'+guide.tests.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ol></section>' +
-    (guide.pitfalls?.length ? '<section class="recipe-step"><h3>常见问题</h3><ul>'+guide.pitfalls.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ul></section>' : '') +
-    '<p class="lesson-source">教程解读 · 对照2026-09-03原点版移动端手册编写。连接图需在蛋码画布逐块搭建，不能直接粘贴执行。彩色积木图为教学连接示意，完整玩法仍需按本课清单逐项试玩验收。自定义动作含异步积木时的执行顺序未在手册中明确，本教程核心动作不放等待或计时器；涉及调用后读取结果的地方，应先按步骤验收，也可把动作定义中的整串积木直接展开到调用处。</p></div>';
+    '<h3>本课积木 · 从哪里找，怎样接</h3><div class="block-references">' + refs + '</div>' + (detailUI?.referenceCards(guide,index)||'') + '</div></details>' + related + '<details class="lesson-reading-extra"><summary>查看积木颜色说明</summary>'+window.EGG_BLOCKS.legend()+'</details>' +
+    guide.sections.map((section,i)=>'<section class="recipe-step" id="step-'+(i+1)+'"><p class="recipe-number">第 '+String(i+1).padStart(2,'0')+' 步</p><h3>'+escapeHTML(section.title)+'</h3>'+code(section,i)+(detailUI?.sectionSteps(detail?.sections[i],section)||'<ol>'+section.steps.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ol><p class="recipe-check">'+escapeHTML(section.verify)+'</p>')+'</section>').join('') +
+    '<section id="acceptance" class="recipe-step"><h3>试玩检查</h3>'+(detailUI?.tests(detail)||'')+'<details class="logic-summary"><summary>完整验收清单</summary><ol>'+guide.tests.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ol></details></section>' +
+    (guide.pitfalls?.length ? '<details class="lesson-reading-extra"><summary>遇到问题？查看排错清单</summary><ul>'+guide.pitfalls.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ul></details>' : '') +
+    '<details class="lesson-reading-extra"><summary>展开本课检查证据</summary>'+(window.EGG_VERIFICATION?.panel(index)||'')+'</details>' +
+    '<details class="lesson-reading-extra"><summary>来源与连接方式说明</summary><p class="lesson-source">教程解读 · 对照2026-09-03原点版移动端手册编写。连接图需在蛋码画布逐块搭建，不能直接粘贴执行。彩色积木图为教学连接示意，完整玩法仍需按本课清单逐项试玩验收。自定义动作含异步积木时的执行顺序未在手册中明确，本教程核心动作不放等待或计时器；涉及调用后读取结果的地方，应先按步骤验收，也可把动作定义中的整串积木直接展开到调用处。</p></details></div>';
 }
 
 function renderChallengeSolution(index) {
@@ -124,8 +125,8 @@ function renderChallengeSolution(index) {
   return '<details class="challenge-solution" id="challenge-solution" data-challenge-lesson="'+index+'"><summary><span>展开参考解法<small>搭建改法 · 关键连接 · 验收与误区</small></span></summary><div class="challenge-solution-body"><p class="challenge-solution-note">先自己试一遍，再对照这份解法。建议在本课副本中做挑战，避免改变后续课程沿用的原始配置。下面是教学扩展思路与预期结果，尚未逐题通过蛋仔编辑器实机验收。</p><h3>怎样修改与搭建</h3>'+list(solution.steps,'ol')+'<h3>关键逻辑连接顺序</h3><p class="challenge-connection-label">文字为搭建说明，需要在蛋码画布按步骤接线；不能直接粘贴运行或导入为工程。</p><div class="lesson-code-wrap"><pre><code>'+escapeHTML(solution.connection)+'</code></pre><button class="copy-code" type="button">复制参考连接</button></div><h3>用这些输入验收</h3>'+list(solution.tests,'ul')+'<h3>这题容易错在哪</h3>'+list(solution.pitfalls,'ul')+'</div></details>';
 }
 function renderPractice(tutorial, index) {
-  return '<p class="lesson-callout">目标：' + escapeHTML(tutorial.goal) + '</p>' + renderBuildGuide(buildGuides[index], index) +
-    (!buildGuides[index].pitfalls?.length && tutorial.pitfalls?.length ? '<section class="practice-followup"><h2>容易踩到的小坑</h2><ul>'+tutorial.pitfalls.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ul></section>' : '') +
+  return renderBuildGuide(buildGuides[index], index) +
+    (!buildGuides[index].pitfalls?.length && tutorial.pitfalls?.length ? '<details class="lesson-reading-extra"><summary>遇到问题？查看本课提醒</summary><ul>'+tutorial.pitfalls.map(item=>'<li>'+escapeHTML(item)+'</li>').join('')+'</ul></details>' : '') +
     (tutorial.challenge ? '<section class="practice-followup" id="challenge"><h2>完成后，再挑战一下</h2><p>'+escapeHTML(tutorial.challenge)+'</p>'+renderChallengeSolution(index)+'</section>' : '');
 }
 

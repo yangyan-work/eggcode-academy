@@ -1,6 +1,7 @@
 (() => {
   'use strict';
   const ui=window.EGG_COMMUNITY_UI,store=window.EGG_COMMUNITY,e=ui.esc,form=document.querySelector('#work-form'),fields=document.querySelector('#work-fields'),list=document.querySelector('#works-list'),editor=document.querySelector('#work-editor'),coverInput=document.querySelector('#work-cover');
+  if(ui.unavailable(list,'作品展示'))return;
   let cover=null,pending=false,saving=false,dirty=false,request=0;
   function login(){const active=ui.active(),gate=document.querySelector('#work-login-gate');gate.hidden=active;gate.innerHTML=active?'':ui.loginGate();form.hidden=!active;}
   function drawCover(){const target=document.querySelector('#work-cover-preview');target.hidden=!cover;target.innerHTML=cover?`<img src="${e(ui.imageSource(cover))}" alt="作品封面预览"><button class="space-button" type="button" id="work-remove-cover">移除封面</button>`:'';}

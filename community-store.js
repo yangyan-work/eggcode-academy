@@ -10,9 +10,11 @@
   const now=()=>new Date().toISOString(), copy=value=>structuredClone(value), count=value=>Array.from(value).length;
   const uuid=value=>typeof value==='string' && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(value);
   const fail=message=>{throw new Error(message);};
+  const getCapabilities=()=>({mode:window.EGG_CLOUD?.status().mode==='local'?'local':'unavailable',message:'社区、作品、消息和投稿暂未开放。目前可以使用课程与个人学习记录。'});
+  function requireLocal(){const capability=getCapabilities();if(capability.mode!=='local')throw Object.assign(new Error(capability.message),{code:'FEATURE_NOT_READY'});}
   const conflict=()=>{throw Object.assign(new Error('内容已被另一页修改，请刷新后再操作。当前操作没有覆盖新版本。'),{code:'conflict'});};
   function text(value,label,min,max) { if(typeof value!=='string' || count(value.trim())<min || count(value.trim())>max)fail(`${label}需为 ${min}–${max} 个字符。`);return value.trim(); }
-  function author() { const state=window.EGG_SPACE?.getState();if(!state?.active)fail('请先进入体验账号。');return text(state.nickname,'体验昵称',1,20); }
+  function author() { requireLocal();const state=window.EGG_SPACE?.getState();if(!state?.active)fail('请先进入体验账号。');return text(state.nickname,'体验昵称',1,20); }
   function base(title,name=author()) {const time=now();return {id:crypto.randomUUID(),title,author:name,createdAt:time,updatedAt:time,revision:1};}
   function touch(item) {if(!Number.isSafeInteger(item.revision) || item.revision<1 || item.revision>=Number.MAX_SAFE_INTEGER)fail('记录版本无效，原数据会保留。');item.revision++;item.updatedAt=now();}
   const empty=()=>({id:KEY,version:1,revision:0,...Object.fromEntries(groups.map(key=>[key,[]]))});
@@ -37,6 +39,7 @@
   function notify(remote=false) {window.dispatchEvent(new CustomEvent('egg-community-change'));if(!remote)channel?.postMessage('changed');}
   try {if(typeof BroadcastChannel==='function'){channel=new BroadcastChannel(DB);channel.onmessage=event=>{if(event.data==='changed')notify(true);};}}catch {/* 同页事件仍可用；跨页可手动刷新。 */}
   async function transaction(change) {
+    requireLocal();
     const db=await openDB();
     return new Promise((resolve,reject)=>{
       const tx=db.transaction(STORE,change?'readwrite':'readonly'),store=tx.objectStore(STORE),request=store.get(KEY);let result,issue;
@@ -83,6 +86,7 @@
     return record;
   }
   async function submit(input) {
+    requireLocal();
     const record=await tutorialRecord(copy(input));
     return transaction(state=>{
       author();
@@ -136,5 +140,5 @@
       message(state,'示例社区已准备好','可以在本机体验审核、教程广场、作品、提问与消息。示例内容均有明确标记。','community.html',true);return {added:8};
     });
   }
-  window.EGG_COMMUNITY=Object.freeze({getState,submit,review,markRead,markAllRead,saveWork,ask,answer,report,resolveReport,seedExamples});
+  window.EGG_COMMUNITY=Object.freeze({getCapabilities,requireLocal,getState,submit,review,markRead,markAllRead,saveWork,ask,answer,report,resolveReport,seedExamples});
 })();

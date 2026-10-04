@@ -4,23 +4,23 @@
   <meta charset="utf-8">
   <style>html[data-access-pending] body{visibility:hidden!important}</style>
   <link rel="stylesheet" href="access-gate.css?v=crystal-site1">
-  <script src="personal-space-state.js?v=login1" defer></script>
-  <script src="cloud-config.js" defer></script>
-  <script src="cloud-client.js?v=release20261004" defer></script>
-  <script src="access-gate.js?v=login1" defer></script>
+  <script src="personal-space-state.js?v=release20261004-fix1" defer></script>
+  <script src="cloud-config.js?v=release20261004-fix1" defer></script>
+  <script src="cloud-client.js?v=release20261004-fix1" defer></script>
+  <script src="access-gate.js?v=release20261004-fix1" defer></script>
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#070710">
+  <meta name="theme-color" content="#F8F9F6">
   <meta name="robots" content="noindex">
   <meta name="description" content="自由树梦想空间的非官方说明、资料来源、举报与下架准备、账号数据边界和五人试用清单。">
   <title>服务说明与试用准备 · 自由树梦想空间</title>
   <link rel="icon" href="assets/free-tree-logo.png?v=20261002-transparent">
   <link rel="stylesheet" href="styles.css?v=discover1">
-  <link rel="stylesheet" href="personal-space.css?v=crystal-site1">
+  <link rel="stylesheet" href="personal-space.css?v=release20261004-fix1">
   <link rel="stylesheet" href="community.css?v=crystal-site1">
   <link rel="stylesheet" href="service-info.css?v=service1">
-  <link rel="stylesheet" href="site-navigation.css?v=release20261004">
-  <script src="site-navigation.js?v=toptabs1" defer></script>
-</head>
+  <link rel="stylesheet" href="site-navigation.css?v=sidebar-preview2">
+  <script src="site-navigation.js?v=sidebar-preview2" defer></script>
+<link rel="stylesheet" href="light-theme.css?v=sidebar-preview2"><script src="theme-switch.js?v=glass-preview1" defer></script></head>
 <body data-site-navigation data-service-info>
   <div id="access-loading" class="access-loading" role="status"><p>正在确认登录状态…</p><noscript>请启用 JavaScript 后登录，才能使用网站。</noscript><a href="login.html">前往登录</a></div>
   <a class="skip-link" href="#service-main">跳到服务说明</a>
@@ -28,7 +28,7 @@
 
   <main class="common-shell service-info" id="service-main" tabindex="-1">
     <div class="common-hero"><div><h1>服务说明与试用准备</h1><p>先了解资料从哪里来、数据保存在哪里，以及遇到内容问题时如何准备材料。</p></div><a class="space-button" href="#reporting">举报与下架说明</a></div>
-    <p class="common-preview-note">本站已公开上线，目前使用浏览器体验模式，可进行小范围试用。真实云端服务、远程举报收件和账号删除流程尚未完成验收；本页不接收或发送举报材料，也不会执行账号删除。</p>
+    <p class="common-preview-note">目前有两个访问入口：GitHub 站提供本机体验；腾讯云测试站提供真实邮箱账号与云端学习记录。教程广场、作品展示、投稿和消息的云端服务暂未开放；远程举报收件、完整数据导出与账号删除仍待实现。本页不会发送举报或执行账号删除。</p>
     <div class="common-reader-layout">
       <aside class="common-toc" aria-labelledby="service-toc-title"><h2 id="service-toc-title">本页内容</h2><nav aria-label="服务说明目录"><a href="#sources">本站与资料来源</a><a href="#reporting">举报与下架</a><a href="#account-data">账号与数据清理</a><a href="#beginner-trial">五人新手试用</a><a href="#operations">线上准备</a></nav></aside>
       <article class="common-article" aria-label="服务说明正文">
@@ -59,7 +59,8 @@
 
         <section class="common-reader-section" id="account-data" aria-labelledby="account-title">
           <h2 id="account-title">账号与数据清理</h2>
-          <p><strong>本机清理不等于删除真实云端账号。</strong>本机学习记录、草稿、图片和社区体验数据保存在当前浏览器。删除本机草稿、清理站点数据或退出登录，都不能证明 Supabase 中的 Auth 身份、业务记录和图片已经删除；删除本机草稿也不等于撤回已提交的审核快照。</p>
+          <p><strong>先确认使用哪个入口。</strong>GitHub 站的昵称体验将学习记录、草稿、图片和社区体验数据保存在当前浏览器。<a href="https://freedom-tree-d1g24eyez1d14380d-1500105320.tcloudbaseapp.com/freedom-tree-preview/">腾讯云测试站</a>使用 CloudBase 邮箱账号，将完成记录、收藏、笔记和最近阅读保存到账号的数据库中；已验证同一浏览器刷新与重新打开后读回，跨设备及多账号隔离的独立验收尚未完成。本机数据不会自动迁移到云端账号。</p>
+          <p><strong>本机清理不等于删除云端账号。</strong>退出登录、清理浏览器数据或删除本机草稿，不会删除 CloudBase 中的身份和学习记录。本机投稿体验仅保存在自己的浏览器，不会发送给维护者。</p>
           <h3>清理前先保留自己的内容</h3>
           <p>先导出需要保留的记录与文件。在<a href="contribute.html#drafts">我的投稿</a>中逐篇使用“导出”或编辑页的“导出教程包”，核对备份包含文字和配图，并试着导入一份测试稿确认可用。学习笔记等尚无完整导出入口的内容，应自行保存需要保留的部分。真实云端完整数据导出与账号删除仍待实现。</p>
           <h3>真实账号删除的后台要求</h3>
@@ -79,7 +80,7 @@
             <li><strong>找到第一课：</strong>从首页进入<a href="courses.html">入门课程</a>，阅读一节，按步骤在编辑器做出一个能验证的小效果，并指出成功现象。</li>
             <li><strong>查资料再回来：</strong>在<a href="manual.html">积木手册</a>中查一个用到的积木，找到参数说明，再返回教程对应步骤；手机也走一遍主导航。</li>
             <li><strong>记录学习：</strong>标记一课完成、收藏它、写一条测试笔记，刷新后检查记录，再退出并重新进入，确认界面清楚说明本机或云端状态。</li>
-            <li><strong>完成投稿体验：</strong>新建至少两步的测试教程，添加一张有使用权限的图片，保存、预览、导出，再导入备份核对文字和图片。提交到本机审核后，由维护者完成本机审核，再查看教程广场。</li>
+            <li><strong>完成投稿体验（仅 GitHub 本机模式）：</strong>新建至少两步的测试教程，添加一张有使用权限的图片，保存、预览、导出，再导入备份核对文字和图片。本机审核不会发送给维护者；腾讯云测试站的投稿尚未开放，应明确展示此状态。</li>
             <li><strong>说明数据边界：</strong>读本页，用自己的话说出“本机清理与云端账号删除的区别”和“现在的举报材料是否会发送”，最后按模板记录最影响完成任务的问题。</li>
           </ol>
           <h3>成功判据（本轮目标）</h3>
@@ -107,10 +108,10 @@
           <p>正式上线前，维护者还需逐项完成部署回滚、真实 Auth 与服务端权限验收、举报收件与审核责任分配、账号删除流程、数据库与图片恢复演练、上传限额和试用记录。项目内的 <code>database/OPERATIONS.md</code> 记录了这些待办与验收条件，供维护者在工作区查看。</p>
           <ul>
             <li><strong>托管：</strong>GitHub Free 可在公开仓库使用 GitHub Pages。它托管静态网站，不提供本站审核或删除账号的后台；发布前仍需核对其使用限制。<a href="https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits">GitHub Pages 官方限制</a></li>
-            <li><strong>备份：</strong>Supabase 建议 Free 项目定期离线导出数据并保留异地备份；数据库备份不含 Storage 图片文件，图片必须另备。<a href="https://supabase.com/docs/guides/platform/backups">Supabase 官方备份说明</a></li>
-            <li><strong>费用：</strong>Supabase 官方说明 Free 计划不收费。本轮保持 Free，不升级付费或启用付费附加项；仍需监控配额。付费计划的 Spend Cap 有覆盖例外，也不是细粒度预算或费用提醒。<a href="https://supabase.com/docs/guides/platform/cost-control">Supabase 官方费用控制</a></li>
+            <li><strong>云端与备份：</strong>当前邮箱账号与学习数据库接入腾讯云 CloudBase。定期核对数据库导出、恢复与账号删除流程；未来开放配图上传时，图片需单独备份。当前完整导出和恢复演练尚未完成。<a href="https://docs.cloudbase.net/">CloudBase 官方文档</a></li>
+            <li><strong>测试环境与费用：</strong>当前使用已开通的 CloudBase 体验环境，不购买付费套餐。维护者需查看控制台剩余资源、到期日期和访问限制；默认静态域名用于开发测试，正式长期服务仍需另行准备。<a href="https://cloud.tencent.com/document/product/876/46900">默认静态域名说明</a></li>
           </ul>
-          <p class="service-footer">准备稿更新：2026.10.04。这里说明当前能力和待完成事项，不表示已部署、已备案、已获官方认可或具备实时后台支持。</p>
+          <p class="service-footer">服务说明更新：2026.10.04。静态页面已上线，云端学习功能处于测试阶段；本站未获官方认证，也未提供实时后台支持。</p>
         </section>
       </article>
     </div>

@@ -1,5 +1,5 @@
 "use strict";
-/* Browser-only, self-reported learning progress. No editor validation or network calls.
+/* Self-reported learning progress. Shared account records when cloud auth is configured.
  * Load after curriculum metadata and before app.js; call EGG_PROGRESS.init() after rendering.
  * Optional compact dashboard mount: <div data-learning-progress-summary></div>.
  * Changing this schema requires an explicit migration; unknown versions are never overwritten.
@@ -69,6 +69,21 @@
   let observer = null;
   let refreshPending = false;
   const watched = new WeakSet();
+  const cloudMode = () => Boolean(window.EGG_CLOUD && window.EGG_CLOUD.status().mode !== 'local');
+  let sharedSubscribed=false, remembering=false, sharedUser=null;
+  function readShared() {
+    const next=window.EGG_SPACE?.getState();
+    state={version:VERSION,completed:next?.ready?[...next.completed]:[],lastLesson:next?.ready?next.lastLesson:null};
+    mode=next?.ready?'cloud':'cloud-pending';
+    if(sharedUser!==next?.userId){sharedUser=next?.userId;lastRemembered=null;}
+  }
+  async function rememberShared() {
+    const id=currentLesson(),next=window.EGG_SPACE?.getState();
+    if(id===null || !next?.ready || next.saving || remembering || lastRemembered===id)return;
+    const owner=next.userId;remembering=true;
+    try{const result=await window.EGG_SPACE.rememberLesson(id);if(result.ok&&window.EGG_SPACE.getState().userId===owner)lastRemembered=id;}
+    finally{remembering=false;}
+  }
   const escape = value => String(value).replace(/[&<>"']/g, char => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[char]));
   const valid = id => Number.isInteger(id) && catalog.has(id);
   const empty = () => ({version: VERSION, completed: [], lastLesson: null});
@@ -94,6 +109,7 @@
     catch { return {state: empty(), mode: 'unavailable'}; }
   }
   function load() {
+    if(cloudMode()){readShared();loaded=true;return;}
     const result = read();
     state = result.state;
     mode = result.mode;
@@ -118,6 +134,7 @@
   const count = ids => ids.filter(id => state.completed.includes(id)).length;
   const lessonLink = (id, text) => `<a href="lesson.html?id=${id}">${escape(text || title(id))}</a>`;
   function statusText() {
+    if(cloudMode())return window.EGG_SPACE?.getState().storageMessage || '账号学习记录尚未就绪。';
     if (mode === 'unavailable') return '浏览器未允许保存，当前记录只在本页临时保留；刷新或离开后可能丢失。';
     if (mode === 'version') return '检测到其他版本的记录，本站不会覆盖它；当前修改只在本页临时保留。';
     if (mode === 'corrupt') return '已有记录无法读取，原记录会保留；当前修改只在本页临时保留。如需重新保存，请在学习路线页明确清除旧记录。';
@@ -128,6 +145,10 @@
   }
   function setCompleted(id, complete) {
     if (!valid(id) || typeof complete !== 'boolean') return false;
+    if(cloudMode())return (async()=>{
+      const result=await window.EGG_SPACE.setCompleted(id,complete);
+      readShared();update();announce(result.message);return result.ok;
+    })();
     const persisted = save(next => {
       next.completed = complete ? unique([...next.completed, id]).sort((a, b) => a - b) : next.completed.filter(value => value !== id);
     });
@@ -136,6 +157,7 @@
     return true;
   }
   function clearProgress() {
+    if(cloudMode()){announce('账号学习记录不会由本机清理按钮删除。');return false;}
     const warning = mode === 'version' ? '检测到了其他版本的记录。' : '';
     if (!window.confirm(`${warning}确定清除本站在本浏览器保存的全部学习记录吗？完成标记和上次打开的课程都会移除，无法撤销。其他网站的数据不受影响。`)) return false;
     try { window.localStorage.removeItem(KEY); mode = 'persistent'; }
@@ -167,7 +189,7 @@
   function mountLesson(id) {
     const article = document.querySelector('.lesson-article');
     const header = article?.querySelector('.article-header');
-    if (!header || article.querySelector('[data-learning-lesson-panel]')) return;
+    if (!header || article.querySelector('[data-learning-lesson-panel], #space-lesson-tools')) return;
     const panel = document.createElement('section');
     panel.className = 'learning-lesson-panel';
     panel.dataset.learningLessonPanel = String(id);
@@ -180,7 +202,7 @@
       if (node.dataset.progressMounted) return;
       node.dataset.progressMounted = 'true';
       node.classList.add('learning-summary');
-      node.innerHTML = '<div><strong>我的学习路线</strong><p><span data-progress-compact-count></span> · 本浏览器手动记录</p></div><a class="button button-white" href="learning-path.html">选择路线 / 继续学习 →</a>';
+      node.innerHTML = '<div><strong>我的学习路线</strong><p><span data-progress-compact-count></span> · <span data-progress-source>本浏览器手动记录</span></p></div><a class="button button-white" href="learning-path.html">选择路线 / 继续学习 →</a>';
     });
   }
   const idsFrom = (node, name) => node.dataset[name].split(',').map(Number).filter(valid);
@@ -203,6 +225,9 @@
     });
   }
   function update() {
+    const shared=cloudMode()?window.EGG_SPACE?.getState():null;
+    document.querySelectorAll('[data-progress-source]').forEach(node=>{node.textContent=cloudMode()?'账号学习记录':'本浏览器手动记录';});
+    document.querySelectorAll('[data-progress-clear]').forEach(node=>{node.hidden=cloudMode();});
     const completed = state.completed.length;
     document.querySelectorAll('[data-total-done]').forEach(node => { node.textContent = completed; });
     document.querySelectorAll('[data-progress-compact-count]').forEach(node => { node.textContent = `已学完 ${completed} / ${catalog.size} 课`; });
@@ -239,6 +264,7 @@
       node.setAttribute('aria-label', `${node.textContent}：${title(next ?? ids[0])}`);
     });
     document.querySelectorAll('[data-progress-toggle]').forEach(button => {
+      button.disabled=Boolean(shared && (!shared.ready || shared.saving));
       const done = state.completed.includes(Number(button.dataset.progressToggle));
       button.setAttribute('aria-pressed', String(done));
       button.textContent = done ? '取消本课已学完标记' : '标记本课已学完';
@@ -270,16 +296,19 @@
   function bind() {
     if (bound) return;
     bound = true;
-    document.addEventListener('click', event => {
+    document.addEventListener('click', async event => {
       const target = event.target instanceof window.Element ? event.target : null;
       const toggle = target?.closest('[data-progress-toggle]');
       if (toggle) {
         const id = Number(toggle.dataset.progressToggle);
-        setCompleted(id, !state.completed.includes(id));
+        if(toggle.disabled)return;
+        toggle.disabled=true;
+        try{await setCompleted(id, !state.completed.includes(id));}finally{update();}
       }
       if (target?.closest('[data-progress-clear]')) clearProgress();
     });
     window.addEventListener('storage', event => {
+      if(cloudMode())return;
       if (event.key !== KEY && event.key !== null) return;
       try { if (event.storageArea && event.storageArea !== window.localStorage) return; } catch { return; }
       const latest = read();
@@ -294,13 +323,19 @@
     refreshCatalog();
     if (!loaded) load();
     bind();
+    if(cloudMode()&&!sharedSubscribed&&window.EGG_SPACE){
+      sharedSubscribed=true;
+      window.EGG_SPACE.subscribe(()=>{readShared();update();rememberShared();});
+      readShared();
+    }
     const root = document.getElementById('learning-path-content');
     if (root) renderRoutes(root);
     mountSummaries();
     const id = currentLesson();
     if (id !== null) {
       mountLesson(id);
-      if (lastRemembered !== id) {
+      if (cloudMode())rememberShared();
+      else if (lastRemembered !== id) {
         // Reading alone never changes completion. Corrupt/unknown records are not replaced by a visit.
         if (mode === 'persistent') save(next => { next.lastLesson = id; });
         else state.lastLesson = id;

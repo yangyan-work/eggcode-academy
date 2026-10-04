@@ -15,6 +15,13 @@
   const fresh = () => ({schemaVersion:1,id:crypto.randomUUID(),revision:0,author:api?.getState().nickname || '创作者',title:'',category:'match3',difficulty:'beginner',summary:'',preparation:'',steps:[step(),step()],validation:'',tips:'',testStatus:'not-tested',status:'draft',createdAt:now(),updatedAt:now()});
   let editor = fresh(), records = [], submissions = [], dirty = false, pendingImages = 0, saving = false, dbPromise, previewRecord, communityRefresh=0;
   const community=window.EGG_COMMUNITY, submissionLabels={pending:'待审核 · 本机',published:'已发布 · 本机',rejected:'需修改',withdrawn:'已撤回 / 下架'};
+  const capability=community.getCapabilities();
+  if(capability.mode!=='local'){
+    $('contribute-workspace').hidden=true;document.querySelectorAll('#contribute-workspace button,#contribute-workspace input,#contribute-workspace select,#contribute-workspace textarea').forEach(node=>{node.disabled=true;});
+    $('contribute-author').textContent='投稿暂未开放';document.querySelector('.contribute-notice span').textContent=capability.message;
+    $('contribute-login-gate').hidden=false;$('contribute-login-gate').innerHTML='<h2>教程投稿暂未开放</h2><p>'+capability.message+'</p><a class="space-button space-button-primary" href="courses.html">继续学习课程</a> <a class="space-button" href="personal-space.html">查看我的学习记录</a>';
+    message(capability.message);window.EGG_CONTRIBUTE=Object.freeze({getCloudRecord(){community.requireLocal();}});return;
+  }
   const latestSubmission=id=>submissions.filter(item=>item.sourceId===id).sort((a,b)=>b.sourceRevision-a.sourceRevision)[0];
   function renderReviewState() {const item=latestSubmission(editor.id),node=$('contribute-review-state');node.replaceChildren();if(item){const status=document.createElement('strong');status.textContent=submissionLabels[item.status] || '未知状态';node.append(status);const reason=document.createElement('p');reason.textContent=item.reason || '审核快照已保存，继续编辑不会改变正在审核或广场中的内容。';node.append(reason);if(editor.revision>item.sourceRevision || dirty){const draft=document.createElement('p');draft.textContent='当前草稿有更新，需再次提交并审核才会替换已发布版本。';node.append(draft);}}const link=document.createElement('a');link.href=item?.status==='published'?'community-tutorial.html?id='+item.id:'admin.html';link.className='space-plain';link.textContent=item?.status==='published'?'查看本机已发布教程 ↗':'体验本机审核流程 ↗';node.append(link);}
   async function refreshCommunity() {if(!community)return;const sequence=++communityRefresh;const state=await community.getState();if(sequence!==communityRefresh)return;submissions=state.submissions;renderList();renderReviewState();}
@@ -25,6 +32,7 @@
     return error.message || '操作未完成，当前编辑仍保留。请先导出教程包备份。';
   }
   function openDB() {
+    community.requireLocal();
     if (!dbPromise) dbPromise = new Promise((resolve, reject) => {
       const request = indexedDB.open(DB, 1);
       request.onupgradeneeded = () => { if (!request.result.objectStoreNames.contains(STORE)) request.result.createObjectStore(STORE,{keyPath:'id'}); };
@@ -245,6 +253,7 @@
   window.addEventListener('beforeunload',event=>{if(dirty || pendingImages){event.preventDefault();event.returnValue='';}});
   window.addEventListener('hashchange',setTab);
   window.EGG_CONTRIBUTE=Object.freeze({getCloudRecord(){
+    community.requireLocal();
     if(dirty || pendingImages || saving || !editor.revision)throw new Error('请先保存草稿，等待配图读取和保存完成后再上传。');
     const record=collect(),issue=draftError(record),missing=completion(record).find(item=>!item.ready);
     if(issue)throw new Error(issue);

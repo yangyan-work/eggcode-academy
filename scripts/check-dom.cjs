@@ -119,7 +119,7 @@ async function checkLessonRoutes() {
       assert.equal(url.searchParams.get('lesson'), String(id));
       totals.refs++;
     }
-    assert.equal(doc.querySelector('#acceptance > ol').children.length, guide.tests.length);
+    assert.equal(doc.querySelector('#acceptance > details.logic-summary > ol').children.length, guide.tests.length);
     assert.equal(doc.querySelectorAll('.concept-review').length, id < 6 ? 1 : 0);
     verifyDocument(dom, 'lesson.html');
     close(dom);
@@ -191,86 +191,165 @@ async function checkLessonInteractions() {
 }
 async function checkPractice() {
   const dom = open('practice.html'), doc = dom.window.document;
-  const cards = [...doc.querySelectorAll('.course-card')];
-  assert.equal(cards.length, 139);
-  const ids = cards.map(card => Number(new URL(card.href).searchParams.get('id'))).sort((a, b) => a - b);
-  assert.deepEqual(ids, Array.from({ length: 139 }, (_, i) => i + 6), 'all practice routes appear exactly once');
-  for (const card of cards) {
-    const id = Number(new URL(card.href).searchParams.get('id'));
-    assert(card.textContent.includes(data.all[id].summary), `practice card ${id} summary`);
-    assert(!/undefined|NaN/.test(card.textContent));
+  const removed = '.practice-banner, .practice-group, .learning-lesson-list, #series-status';
+  const query = doc.querySelector('#practice-query'), reset = doc.querySelector('#practice-reset');
+  const familySelect = doc.querySelector('#practice-family'), seriesSelect = doc.querySelector('#practice-series');
+  assert(query && reset && familySelect && seriesSelect, '玩法页搜索、重置和两级筛选必须保留');
+  const catalog = data.w.EGG_CURRICULUM.series;
+  const familyIds = family => Array.from(catalog).filter(item => item.family === family).flatMap(item => Array.from(item.lessonIds));
+  function verifyResults(expected, label, active = true, document = doc) {
+    const grid = document.querySelector('#practice-grid'), empty = document.querySelector('#practice-empty');
+    assert(grid?.classList.contains('course-grid') && empty, `${label}: 保留卡片网格和无结果提示`);
+    assert.equal(grid.hidden, !expected.length, `${label}: 卡片网格显示状态`);
+    assert.equal(empty.hidden, !active || !!expected.length, `${label}: 无结果提示显示状态`);
+    const cards = [...document.querySelectorAll('.course-card')];
+    assert.deepEqual(cards.map(card => Number(card.dataset.lessonId)), expected, `${label}: 匹配课程 ID 和顺序`);
+    cards.forEach(card => {
+      const id = Number(card.dataset.lessonId);
+      assert(grid.contains(card), `${label}: 卡片位于单一网格中`);
+      assert(id >= 6 && id < data.all.length, `${label}: 保留原课程 ID`);
+      assert.equal(card.getAttribute('href'), `lesson.html?id=${id}`, `${label}: 卡片课程链接`);
+    });
+    assert.equal(document.querySelectorAll(removed).length, 0, `${label}: 不恢复介绍横幅、专题分组、文字列表或结果统计`);
+    assert(!/找到\s*\d+\s*(?:篇|课|个?专题)/.test(document.querySelector('main').textContent), `${label}: 不显示找到数量统计`);
   }
+  verifyResults([], '默认未填写', false);
+  for (const whitespace of ['   ', '\t\n', '\u3000', ' \u3000\u00a0 ']) {
+    input(dom, query, whitespace);
+    verifyResults([], '空白搜索', false);
+    assert.equal(new URLSearchParams(dom.window.location.search).has('q'), false, '空白搜索不写入查询参数');
+  }
+  input(dom, query, '');
+  assert.equal(data.w.EGG_CURRICULUM.series.length, 34);
+  assert.equal(data.w.EGG_CURRICULUM.families.length, 6);
   const links = [...doc.querySelectorAll('[data-series]')];
+  assert.deepEqual(links.map(link => link.dataset.series), Array.from(data.w.EGG_CURRICULUM.series, series => series.id));
+  const familyLinks = [...doc.querySelectorAll('[data-family]')];
+  assert.deepEqual(familyLinks.map(link => link.dataset.family), ['all', ...Array.from(data.w.EGG_CURRICULUM.families, family => family.id)]);
+  assert.equal(familySelect.options.length, 7);
+  assert.equal(seriesSelect.options.length, 35);
   for (const link of links) {
+    const series = data.w.EGG_CURRICULUM.series.find(item => item.id === link.dataset.series);
+    assert.equal(link.getAttribute('href'), '#' + series.id);
+    assert(link.textContent.includes(series.name), `专题 ${series.id} 名称`);
     dom.window.location.hash = link.dataset.series; await tick(10);
     const active = doc.querySelectorAll('[data-series][aria-current]');
     assert.equal(active.length, 1, `hash ${link.dataset.series}: one selected tab`);
     assert.equal(active[0].dataset.series, link.dataset.series);
-    const shown = [...doc.querySelectorAll('.course-card')].filter(visible);
-    if (link.dataset.series === 'all') assert.equal(shown.length, 139);
-    else {
-      assert(shown.length > 0, `hash ${link.dataset.series}: empty series`);
-      const series = data.all[Number(new URL(shown[0].href).searchParams.get('id'))].series || '积木练习';
-      assert.equal(shown.length, expectedSeries[series], `hash ${link.dataset.series}: wrong count`);
-      assert(shown.every(card => (data.all[Number(new URL(card.href).searchParams.get('id'))].series || '积木练习') === series));
-      totals.series++;
-    }
+    assert.equal(seriesSelect.value, series.id);
+    assert.equal(familySelect.value, series.family);
+    assert.equal(doc.querySelector('[data-family][aria-current]').dataset.family, series.family);
+    assert.equal(seriesSelect.options.length, data.w.EGG_CURRICULUM.series.filter(item => item.family === series.family).length + 1);
+    verifyResults(Array.from(series.lessonIds), `切换 ${series.id}`);
+    totals.series++;
   }
   for (const hash of ['progression', 'match3', 'gameplay', 'basics']) assert(links.some(link => link.dataset.series === hash), `legacy hash ${hash} missing`);
+  for (const link of familyLinks) {
+    const family = link.dataset.family;
+    assert.equal(link.getAttribute('href'), family === 'all' ? '#all' : '#family-' + family);
+    dom.window.location.hash = link.hash; await tick(10);
+    assert.equal(familySelect.value, family, '方向锚点应同步筛选');
+    assert.equal(seriesSelect.value, 'all');
+    assert.equal(doc.querySelectorAll('[data-series][aria-current]').length, 0);
+    assert.equal(doc.querySelectorAll('[data-family][aria-current]').length, 1);
+    assert.equal(doc.querySelector('[data-family][aria-current]').dataset.family, family);
+    verifyResults(family === 'all' ? [] : familyIds(family), `方向锚点 ${family}`, family !== 'all');
+  }
   dom.window.location.hash = 'unknown-series'; await tick(10);
-  assert.equal([...doc.querySelectorAll('.course-card')].filter(visible).length, 139, 'unknown hash should fall back to all');
+  assert.equal(familySelect.value, 'all', 'unknown hash should fall back to all');
+  assert.equal(seriesSelect.value, 'all');
+  assert.equal(doc.querySelectorAll('[data-series][aria-current]').length, 0);
+  verifyResults([], '未知专题回退默认', false);
   dom.window.location.hash = 'all'; await tick(10);
-  const query = doc.querySelector('#course-query, #practice-query, main input[type="search"]');
-  assert(query, 'expanded practice directory needs search');
   input(dom, query, 'NO_MATCH_qa_991700');
-  assert.equal([...doc.querySelectorAll('.course-card')].filter(visible).length, 0, 'search empty state');
-  const reset = doc.querySelector('#course-clear, #practice-clear, #practice-reset, main button[type="reset"], #clear-filters');
-  assert(reset, 'search reset control missing');
+  assert.equal(new URLSearchParams(dom.window.location.search).get('q'), 'NO_MATCH_qa_991700', '搜索输入应保存查询参数');
+  verifyResults([], '无匹配搜索');
   reset.click(); await tick(10);
   assert.equal(query.value, '', 'reset must clear search');
-  assert.equal([...doc.querySelectorAll('.course-card')].filter(visible).length, 139, 'reset should restore directory');
+  assert.equal(dom.window.location.search, '');
+  assert.equal(dom.window.location.hash, '#all');
+  assert.equal(doc.activeElement, query, '重置后返回搜索框焦点');
+  verifyResults([], '重置无匹配搜索', false);
   input(dom, query, data.all[144].title);
-  assert.equal([...doc.querySelectorAll('.course-card')].filter(visible).length, 1, 'exact new title search');
-  assert.equal(new URL([...doc.querySelectorAll('.course-card')].filter(visible)[0].href).searchParams.get('id'), '144');
+  assert.equal(new URLSearchParams(dom.window.location.search).get('q'), data.all[144].title);
+  verifyResults([144], '精确课程标题搜索');
+  input(dom, query, data.all[144].title + ' NO_MATCH_qa_991700');
+  verifyResults([], '多个关键词必须全部命中');
   input(dom, query, '');
-  const familySelect = doc.querySelector('#practice-family');
-  const seriesSelect = doc.querySelector('#practice-series');
-  assert(familySelect && seriesSelect, 'directory family and series filters must exist');
+  verifyResults([], '清空关键词', false);
   for (const family of data.w.EGG_CURRICULUM.families) {
     input(dom, familySelect, family.id, 'change');
     const expected = data.w.EGG_CURRICULUM.series.filter(s => s.family === family.id);
-    assert.equal(doc.querySelectorAll('.course-card').length, expected.reduce((n, s) => n + s.lessonIds.length, 0));
+    assert.equal(seriesSelect.value, 'all', '方向 change 应重置具体专题');
     assert.equal(seriesSelect.options.length, expected.length + 1, 'series options must follow family');
+    assert.equal(new URLSearchParams(dom.window.location.search).get('family'), family.id);
+    assert.equal(dom.window.location.hash, '#family-' + family.id);
+    verifyResults(familyIds(family.id), `选择方向 ${family.id}`);
     input(dom, seriesSelect, expected[0].id, 'change');
-    assert.equal(doc.querySelectorAll('.course-card').length, expected[0].lessonIds.length);
     assert.equal(dom.window.location.hash, '#' + expected[0].id);
+    assert.equal(doc.querySelector('[data-series][aria-current]').dataset.series, expected[0].id);
+    verifyResults(Array.from(expected[0].lessonIds), `选择专题 ${expected[0].id}`);
   }
   reset.click(); await tick(10);
   assert.equal(familySelect.value, 'all'); assert.equal(seriesSelect.value, 'all');
+  verifyResults([], '重置两级筛选', false);
+  const lastSeries = catalog.find(item => item.lessonIds.includes(144));
+  input(dom, familySelect, lastSeries.family, 'change');
+  input(dom, seriesSelect, lastSeries.id, 'change');
+  input(dom, query, data.all[144].title);
+  verifyResults([144], '关键词、方向和专题联合筛选');
+  input(dom, query, '');
+  verifyResults(Array.from(lastSeries.lessonIds), '清空关键词仍保留专题筛选');
+  input(dom, seriesSelect, 'all', 'change');
+  verifyResults(familyIds(lastSeries.family), '清空专题仍保留方向筛选');
+  input(dom, familySelect, 'all', 'change');
+  verifyResults([], '清空所有筛选', false);
+  input(dom, query, data.all[144].title);
+  input(dom, familySelect, catalog.find(item => item.family !== lastSeries.family).family, 'change');
+  verifyResults([], '方向与关键词必须同时命中');
+  reset.click(); await tick(10);
   const firstSeries = data.w.EGG_CURRICULUM.series[0], secondSeries = data.w.EGG_CURRICULUM.series[1];
   dom.window.location.hash = firstSeries.id; await tick(10);
   dom.window.location.hash = secondSeries.id; await tick(10);
   dom.window.history.back(); await tick(50);
   assert.equal(seriesSelect.value, firstSeries.id, 'Back must restore prior series');
-  assert.equal(doc.querySelectorAll('.course-card').length, firstSeries.lessonIds.length);
+  assert.equal(familySelect.value, firstSeries.family);
+  assert.equal(doc.querySelector('[data-series][aria-current]').dataset.series, firstSeries.id);
+  verifyResults(Array.from(firstSeries.lessonIds), 'Back 恢复专题卡片');
   dom.window.history.forward(); await tick(50);
   assert.equal(seriesSelect.value, secondSeries.id, 'Forward must restore next series');
+  assert.equal(familySelect.value, secondSeries.family);
+  assert.equal(doc.querySelector('[data-series][aria-current]').dataset.series, secondSeries.id);
+  verifyResults(Array.from(secondSeries.lessonIds), 'Forward 恢复专题卡片');
   reset.click(); await tick(10);
   verifyDocument(dom, 'practice.html');
   close(dom);
-  const lastSeries = data.w.EGG_CURRICULUM.series.find(item => item.lessonIds.includes(144));
   const normalizedQuery = data.all[144].title.replace(/[0-9A-Z]/g, char => String.fromCharCode(char.charCodeAt(0) + 0xfee0));
   const deep = open('practice.html', '?' + new URLSearchParams({ q: normalizedQuery, family: lastSeries.family }) + '#' + lastSeries.id);
   assert.equal(deep.window.document.querySelector('#practice-query').value, normalizedQuery);
   assert.equal(deep.window.document.querySelector('#practice-family').value, lastSeries.family);
   assert.equal(deep.window.document.querySelector('#practice-series').value, lastSeries.id);
-  assert.equal(deep.window.document.querySelectorAll('.course-card').length, 1, 'URL reload/NFKC search must restore a matching new lesson');
-  assert.equal(deep.window.document.querySelector('.course-card').dataset.lessonId, '144');
+  assert.equal(deep.window.document.querySelector('[data-series][aria-current]').dataset.series, lastSeries.id);
+  verifyResults([144], 'NFKC 查询与两级筛选深链接', true, deep.window.document);
+  const submittedQuery = '  计时器 Ａ１  ';
+  deep.window.document.querySelector('#practice-query').value = submittedQuery;
+  const submit = new deep.window.Event('submit', { bubbles: true, cancelable: true });
+  deep.window.document.querySelector('#practice-filters').dispatchEvent(submit);
+  assert.equal(submit.defaultPrevented, true, '提交搜索应保存当前页状态');
+  assert.equal(new URLSearchParams(deep.window.location.search).get('q'), submittedQuery.trim());
+  assert.equal(new URLSearchParams(deep.window.location.search).get('family'), lastSeries.family);
+  assert.equal(deep.window.location.hash, '#' + lastSeries.id);
   deep.window.document.querySelector('#practice-reset').click(); await tick(10);
   assert.equal(deep.window.location.search, '', 'reset must remove persisted filter query');
   assert.equal(deep.window.location.hash, '#all');
+  verifyResults([], '深链接重置', false, deep.window.document);
   close(deep);
-  console.log(`PASS practice: all 139 card IDs, ${totals.series} series tabs, family+series filters, legacy/unknown hashes, Back/Forward, search empty/reset, deep URLs and NFKC lookup`);
+  for (const suffix of ['?q=' + encodeURIComponent('\u3000'), '#all']) {
+    const blank = open('practice.html', suffix);
+    verifyResults([], '空白或全部筛选深链接', false, blank.window.document);
+    close(blank);
+  }
+  console.log(`PASS practice: cards only after nonblank query or selected filters, ${totals.series} series, 6 families, AND search, empty/reset, legacy/unknown hashes, Back/Forward and deep URLs`);
 }
 async function checkManual() {
   let dom = open('manual.html'), doc = dom.window.document;
@@ -341,22 +420,13 @@ async function checkHomeAndCourses() {
   [...doc.querySelectorAll('.course-card')].forEach((card, id) => assert.equal(card.getAttribute('href'), `lesson.html?id=${id}`));
   verifyDocument(dom, 'courses.html'); close(dom);
   dom = open('index.html'); doc = dom.window.document;
-  const button = doc.querySelector('#home-demo'), cells = [...doc.querySelectorAll('[data-cell]')], initial = cells.map(cell => cell.className);
-  for (let i = 0; i < 3; i++) {
-    button.click(); await tick(1);
-    assert.equal(doc.querySelectorAll('.is-cleared').length, 3);
-    assert.equal(button.disabled, false);
-    button.click(); await tick(1);
-    assert.deepEqual(cells.map(cell => cell.className), initial);
-  }
+  assert.deepEqual([...doc.querySelectorAll('.home-entry')].map(link=>link.getAttribute('href')),['lesson.html?id=0','practice.html','manual.html','personal-space.html']);
+  const search=doc.querySelector('.home-find');
+  assert.equal(search.getAttribute('action'),'practice.html');
+  assert.equal(search.querySelector('input').name,'q');
+  assert.equal(doc.querySelector('#home-demo'),null,'简化首页只展示真实课程入口');
   verifyDocument(dom, 'index.html'); close(dom);
-  dom = open('index.html', '', { reduce: false, animationFailure: true });
-  dom.window.document.querySelector('#home-demo').click(); await tick(1);
-  assert.equal(dom.window.document.querySelector('#home-demo').disabled, false);
-  assert.equal(dom.window.document.querySelectorAll('.is-cleared').length, 0);
-  assert(dom.window.document.querySelector('#demo-status').textContent.includes('重置'));
-  close(dom);
-  console.log('PASS home/foundations: original card IDs, repeated play/reset and interrupted animation recovery');
+  console.log('PASS home/foundations: original course IDs; four direct learning links and native GET search');
 }
 (async () => {
   try {
