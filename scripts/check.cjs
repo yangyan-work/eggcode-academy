@@ -22,7 +22,7 @@ const expectedSeries = {
   '回合制卡牌': 4, '节奏点击': 4, '棋盘掷骰冒险': 4,
   '塔防': 3, '肉鸽闯关': 3, '消消乐进阶': 3
 };
-const read = file => fs.readFileSync(path.join(root, file), 'utf8');
+const read = file => fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
 const digest = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const localPath = value => decodeURIComponent(new URL(value, 'https://qa.invalid/').pathname).replace(/^\//, '');
 const scriptFiles = page => [...read(page).matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/g)].map(match => localPath(match[1]));
